@@ -1,13 +1,9 @@
 import { Router } from 'express';
-import type { RxDatabase, RxCollection } from 'rxdb'; 
-import { v4 as uuidv4 } from 'uuid';
+import { RxDatabase } from 'rxdb';
+// import { v4 as uuidv4 } from 'uuid';
 
-export function createEmployeeRouter(db: RxDatabase) {
-
+export function createDepartmentRouter(db: RxDatabase) {
   const router = Router();
-
-  const id = uuidv4();
-//await db.tasks.insert({ id, ... });
 
 //   let idCounter = 0;
 
@@ -29,10 +25,10 @@ export function createEmployeeRouter(db: RxDatabase) {
 //     }
 //   });
 
-//   router.get('/', async (_req, res) => {
-//     const tasks = await db.tasks.find().exec();
-//     res.json(tasks);
-//   });
+  router.get('', async (_req, res) => {
+    const tasks = await db.departments.find().exec();
+    res.json(tasks);
+  });
 
 //   router.get('/:id', async (req, res) => {
 //     const id = req.params.id.toString();
@@ -46,4 +42,4 @@ export function createEmployeeRouter(db: RxDatabase) {
 //   });
 
   return router;
-} 
+}
