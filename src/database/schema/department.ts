@@ -1,7 +1,7 @@
 export const departmentSchema = {
-  title: 'task schema',
+  title: 'department schema',
   version: 0,
-  description: 'describes a task',
+  description: 'describes a department',
   type: 'object',
   primaryKey: 'id',
   properties: {
@@ -9,11 +9,10 @@ export const departmentSchema = {
       type: 'string',
       maxLength: 100
     },
-    task: {
+    name: {
       type: 'string',
-      maxLength: 255
-    },
-    completed: { type: 'boolean' },
+      maxLength: 50
+    }
   },
-  required: ['id', 'task'],
+  required: ['id', 'name'],
 };
