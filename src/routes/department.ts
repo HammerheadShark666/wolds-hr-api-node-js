@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { RxDatabase } from 'rxdb';
 import { v4 as uuidv4 } from 'uuid';
 import { mapDepartment } from '../utils/mapper'; 
-import { ApiDepartment, BaseDepartment } from '../interface/department';
+import { ApiDepartment, AppDepartment } from '../interface/department';
 import { WoldsHrDatabaseCollections } from '../database/collection/databaseCollection';
 
 export function createDepartmentRouter(db: RxDatabase<WoldsHrDatabaseCollections>) {
@@ -13,9 +13,9 @@ export function createDepartmentRouter(db: RxDatabase<WoldsHrDatabaseCollections
     try {
     
       const name = req.body.name;    
-      const doc = await db.departments.findOne({ selector: { name } }).exec();
+      const existingDepartment = await db.departments.findOne({ selector: { name } }).exec();
 
-      if (doc) {
+      if (existingDepartment) {
         return res.status(400).json({ error: 'Department already exists' });
       }
 
@@ -35,22 +35,34 @@ export function createDepartmentRouter(db: RxDatabase<WoldsHrDatabaseCollections
   });
 
   router.get('', async (_req, res) => { 
-    const departments = await db.departments.find().exec(); 
-    const response: BaseDepartment[] = departments.map(dept => {
-      return mapDepartment(dept);
-    });
-    res.json(response);
+    try {
+      
+      const departments = await db.departments.find().exec(); 
+      const response: AppDepartment[] = departments.map(dept => {
+        return mapDepartment(dept);
+      });
+      res.json(response);
+    } catch (error) {
+      console.error('Get departments failed:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    } 
   });
 
   router.get('/:id', async (req, res) => {
-    const id = req.params.id.toString();
-    const queryResult = await db.departments.findOne({ selector: { id } }).exec();
 
-    if (queryResult !== null) {
-      res.status(200).json(queryResult);
-    } else {
-      res.status(404).json({ message: 'Department not found' });
-    }
+    try {
+      const id = req.params.id.toString();
+      const department = await db.departments.findOne({ selector: { id } }).exec();
+
+      if (department !== null) {
+        res.status(200).json(department);
+      } else {
+        res.status(404).json({ message: 'Department not found' });
+      }
+    } catch (error) {
+      console.error('Get department failed:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    } 
   });
 
   router.delete('/:id', async (req, res) => {
@@ -58,17 +70,17 @@ export function createDepartmentRouter(db: RxDatabase<WoldsHrDatabaseCollections
     try {
 
       const id = req.params.id.toString();
-      const doc = await db.departments.findOne({ selector: { id } }).exec();
+      const department = await db.departments.findOne({ selector: { id } }).exec();
 
-      if (!doc) {
+      if (!department) {
         return res.status(404).json({ error: 'Department not found' });
       }
 
-      await doc.remove();
+      await department.remove();
 
       res.status(200).json({ message: 'Department deleted' });
     } catch (error) {
-      console.error('Delete failed:', error);
+      console.error('Delete department failed:', error);
       res.status(500).json({ error: 'Internal server error' });
     } 
   }); 

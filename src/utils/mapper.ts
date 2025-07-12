@@ -1,18 +1,18 @@
-import { ApiDepartment, BaseDepartment } from "../interface/department";
-import { ApiEmployee, BaseEmployee } from "../interface/employee";
+import { ApiDepartment, AppDepartment } from "../interface/department";
+import { ApiEmployee, AppEmployee } from "../interface/employee";
 
-export function mapDepartment(apiDepartment: ApiDepartment): BaseDepartment {
+export function mapDepartment(apiDepartment: ApiDepartment): AppDepartment {
   const { id, name } = apiDepartment;
-  const appDepartment: BaseDepartment = {
+  const appDepartment: AppDepartment = {
     id: id,
     name: name
   }; 
   return appDepartment;
 }
 
-export function mapEmployee(apiEmployee: ApiEmployee): BaseEmployee {
+export function mapEmployee(apiEmployee: ApiEmployee): AppEmployee {
   const { id, surname, firstName } = apiEmployee;
-  const appEmployee: BaseEmployee = {
+  const appEmployee: AppEmployee = {
     id: id,
     surname: surname,
     firstName: firstName  
