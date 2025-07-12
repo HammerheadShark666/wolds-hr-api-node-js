@@ -1,14 +1,13 @@
-export interface BaseEmployee {
+import { BaseApi } from "./base";
+
+export interface AppEmployee {
   id: string;
   surname: string;
   firstName: string;
 }
 
-export interface ApiEmployee extends BaseEmployee {
-  _meta: {
-    lwt: number;
-  };
-  _deleted: boolean;
-  _attachments: Record<string, unknown>;
-  _rev: string;
+export interface ApiEmployee extends BaseApi {
+  id: string;
+  surname: string;
+  firstName: string;
 }

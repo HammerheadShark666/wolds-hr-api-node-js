@@ -1,13 +1,11 @@
-export interface BaseDepartment {
+import { BaseApi } from "./base";
+
+export interface ApiDepartment extends BaseApi {
   id: string;
   name: string;
 }
 
-export interface ApiDepartment extends BaseDepartment {
-  _meta: {
-    lwt: number;
-  };
-  _deleted: boolean;
-  _attachments: Record<string, unknown>;
-  _rev: string;
+export interface AppDepartment{
+  id: string;
+  name: string;
 }

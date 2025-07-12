@@ -3,7 +3,7 @@ import { RxDatabase } from 'rxdb';
 import { v4 as uuidv4 } from 'uuid';
 import { mapEmployee } from '../utils/mapper';  
 import { WoldsHrDatabaseCollections } from '../database/collection/databaseCollection';
-import { BaseEmployee } from '../interface/employee';
+import { AppEmployee } from '../interface/employee';
  
 export function createEmployeeRouter(db: RxDatabase<WoldsHrDatabaseCollections>) {
   
@@ -11,7 +11,7 @@ export function createEmployeeRouter(db: RxDatabase<WoldsHrDatabaseCollections>)
 
   router.get('', async (_req, res) => { 
     const employees = await db.employees.find().exec(); 
-    const response: BaseEmployee[] = employees.map(emp => {
+    const response: AppEmployee[] = employees.map(emp => {
     return mapEmployee(emp);
     });
     res.json(response);
