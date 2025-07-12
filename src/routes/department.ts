@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { RxDatabase } from 'rxdb';
 // import { v4 as uuidv4 } from 'uuid';
-import { mapDepartment } from '../utils/mapper';
-import { WoldsHrDatabaseCollections } from '../database/db';
+import { mapDepartment } from '../utils/mapper'; 
+import { BaseDepartment } from '../interface/department';
+import { WoldsHrDatabaseCollections } from '../database/collection/databaseCollection';
 
 export function createDepartmentRouter(db: RxDatabase<WoldsHrDatabaseCollections>) {
   const router = Router();
@@ -27,15 +28,11 @@ export function createDepartmentRouter(db: RxDatabase<WoldsHrDatabaseCollections
 //     }
 //   });
 
-  router.get('', async (_req, res) => {
-
-    let response: any[] = [];
-    const departments = await db.departments.find().exec();
-
-    departments.forEach(department => { 
-      response.push(mapDepartment(department)); 
+  router.get('', async (_req, res) => { 
+    const departments = await db.departments.find().exec(); 
+    const response: BaseDepartment[] = departments.map(dept => {
+      return mapDepartment(dept);
     });
-
     res.json(response);
   });
 
