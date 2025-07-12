@@ -1,5 +1,5 @@
 import { RxCollection, RxDocument } from "rxdb";  
-import { ApiDepartment, BaseDepartment } from "../../interface/department";
+import { ApiDepartment } from "../../interface/department";
 
 export interface DepartmentDocMethods {}
 export type DepartmentDocument = RxDocument<ApiDepartment, DepartmentDocMethods>; 
