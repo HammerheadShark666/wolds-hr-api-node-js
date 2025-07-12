@@ -5,6 +5,8 @@ import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode';
 import { departmentSchema } from './schema/department';
 import { departmentDefaultData } from './defaultData/department';
 import { WoldsHrDatabaseCollections } from './collection/databaseCollection'; 
+import { employeeSchema } from './schema/employee';
+import { employeeDefaultData } from './defaultData/employee';
   
 addRxPlugin(RxDBDevModePlugin); 
 
@@ -27,11 +29,15 @@ export async function createDb() {
   await db.addCollections({
     departments: {
       schema: departmentSchema
+    },
+    employees: {
+      schema: employeeSchema
     }
   });
  
   // Add default data
   await departmentDefaultData(db);
+  await employeeDefaultData(db);
 
   return db;
 }
