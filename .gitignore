@@ -57,7 +57,8 @@ web_modules/
 .stylelintcache
 
 # Optional REPL history
-.node_repl_history
+.node_repl_historyforest
+
 
 # Output of 'npm pack'
 *.tgz
