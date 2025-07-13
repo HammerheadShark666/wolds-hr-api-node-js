@@ -1,9 +1,12 @@
 import { createApp } from './app';
 import express from 'express';
+import dotenv from 'dotenv';
 
 async function startServer() {
   const coreApp = await createApp();
-  const wrapperApp = express();
+  const wrapperApp = express(); 
+  
+  dotenv.config();
 
   wrapperApp.use('/api', coreApp);
 
