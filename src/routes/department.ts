@@ -20,7 +20,7 @@ export function createDepartmentRouter(db: RxDatabase<WoldsHrDatabaseCollections
       }
 
       const id = uuidv4();
-      const newDepartment: ApiDepartment = { id: id, name: name , _meta: { lwt: Date.now() }, _deleted: false, _attachments: {}, _rev: "test-data" };
+      const newDepartment: ApiDepartment = { id: id, name: name, _meta: { lwt: Date.now() }, _deleted: false, _attachments: {}, _rev: "test-data" };
       const response = await db.departments.insert(newDepartment);     
       res.status(200).json(response);
     } catch (err: unknown) {

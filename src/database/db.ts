@@ -7,6 +7,9 @@ import { departmentDefaultData } from './defaultData/department';
 import { WoldsHrDatabaseCollections } from './collection/databaseCollection'; 
 import { employeeSchema } from './schema/employee';
 import { employeeDefaultData } from './defaultData/employee';
+import { accountSchema } from './schema/account';
+import bcrypt from 'bcryptjs';
+import { accountDefaultData } from './defaultData/account';
   
 addRxPlugin(RxDBDevModePlugin); 
 
@@ -32,12 +35,21 @@ export async function createDb() {
     },
     employees: {
       schema: employeeSchema
+    },
+    accounts: {
+      schema: accountSchema,
+      methods: {
+        async checkPassword(this: any, plainPassword: string): Promise<boolean> {
+          return bcrypt.compare(plainPassword, this.password);
+        }
+      }
     }
   });
  
   // Add default data
   await departmentDefaultData(db);
   await employeeDefaultData(db);
+  await accountDefaultData(db);
 
   return db;
 }
