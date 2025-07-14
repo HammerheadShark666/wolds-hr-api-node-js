@@ -20,32 +20,32 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
     try {
       console.log('[AuthenticationRouter] /login called');
 
-      const { username, password } = req.body;
+    const { username, password } = req.body;
 
-      if (!username || !password) {
-        return res.status(400).json({ message: 'Missing fields' });
-      }
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Missing fields' });
+    }
+  
+    const account = await db.accounts.findOne({ selector: { username } }).exec();
+    if (!account) return res.status(400).send("Invalid username or password.");
+
+    const validPassword = await bcrypt.compare(password, account.password);
+    if (!validPassword) return res.status(400).send("Invalid username or password.");
+
+    const secret = process.env.ACCESS_TOKEN_SECRET;
+    if (!secret) throw new Error('ACCESS_TOKEN_SECRET is missing'); 
+  
+    const token = jwt.sign({ userId: account.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ userId: account.id }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
     
-      const account = await db.accounts.findOne({ selector: { username } }).exec();
-      if (!account) return res.status(400).send("Invalid username or password.");
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/'
+    });
 
-      const validPassword = await bcrypt.compare(password, account.password);
-      if (!validPassword) return res.status(400).send("Invalid username or password.");
-
-      const secret = process.env.ACCESS_TOKEN_SECRET;
-      if (!secret) throw new Error('ACCESS_TOKEN_SECRET is missing'); 
-    
-      const token = jwt.sign({ userId: account.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '15m' });
-      const refreshToken = jwt.sign({ userId: account.id }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
-      
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        path: '/'
-      });
-
-      res.json({ token }); 
+    res.json({ token }); 
 
     } catch (err) {
       console.error('❌ Login error:', err);
