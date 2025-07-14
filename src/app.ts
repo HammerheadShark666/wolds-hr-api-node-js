@@ -10,16 +10,16 @@ import cookieParser from 'cookie-parser';
 import listEndpoints from 'express-list-endpoints';
 
 export async function createApp() {
-  const app = express();
+
+   const app = express();
+
+  try 
+  {
+ 
   app.use(cors()); 
   app.use(cookieParser());  
   app.use(express.json()); 
-
-   app.get('/health', (req, res) => {
-    console.log('Health check endpoint called');
-    res.send('OK');
-  });
-
+ 
   const db = await createDb();
 
   const v1Router = express.Router();
@@ -51,7 +51,9 @@ app.use('/v1', (req, res, next) => {
   next();
 });
 
-  app.use('/v1', v1Router);
+  //app.use('/v1', v1Router);
+
+   app.use('', v1Router);
 
   
 console.log('--- Listing all endpoints: ---');
@@ -59,4 +61,10 @@ console.log(listEndpoints(app));
 console.log('--- End of endpoint list ---');
 
   return app;
+
+    } catch (err) {
+      console.error('❌ CreateApp error:', err); 
+    }
+
+    return app;
 } 
