@@ -36,6 +36,7 @@ jobs:
         run: |
           mkdir package
           cp -r dist package/
+          cp -r node_modules package/
           cp package.json package-lock.json package/
           cd package
           zip -r ../release.zip .
