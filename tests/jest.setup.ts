@@ -7,7 +7,7 @@ dotenv.config();
 beforeAll(async () => {
   global.app = await createApp();
  
-  const response = await request(app)
+  const response = await request(global.app)
     .post("/v1/login1")
     .send({ username: "john@hotmail.com", password: "Password#1" });
 
