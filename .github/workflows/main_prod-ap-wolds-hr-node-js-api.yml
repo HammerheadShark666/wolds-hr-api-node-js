@@ -34,11 +34,7 @@ jobs:
 
       - name: Zip artifact for deployment
         run: |
-          mkdir package
-          cp -r dist package/
-          cp package.json package-lock.json package/
-          cd package
-          zip -r ../release.zip .
+          zip -r release.zip . -x ".git/*" "node_modules/*" "release.zip"
           
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
