@@ -5,7 +5,7 @@ describe("GET /api/v1/departments", () => {
   it("should return 200 and all departments", async () => {
 
     const response = await request(global.app)
-      .get("/departments")                          //v1/
+      .get("/v1/departments")
       .set("Content-Type", "application/json")
       .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`);
 

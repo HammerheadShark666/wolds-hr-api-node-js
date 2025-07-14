@@ -51,9 +51,9 @@ app.use('/v1', (req, res, next) => {
   next();
 });
 
-  //app.use('/v1', v1Router);
+  app.use('/v1', v1Router);
 
-   app.use('', v1Router);
+  // app.use('', v1Router);
 
   
 console.log('--- Listing all endpoints: ---');
