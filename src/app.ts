@@ -15,6 +15,11 @@ export async function createApp() {
   app.use(cookieParser());  
   app.use(express.json()); 
 
+   app.get('/health', (req, res) => {
+    console.log('Health check endpoint called');
+    res.send('OK');
+  });
+
   const db = await createDb();
 
   const v1Router = express.Router();
