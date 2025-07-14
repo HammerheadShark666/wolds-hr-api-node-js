@@ -26,6 +26,13 @@ jobs:
         with:
           node-version: '22.x'
 
+      - name: Clean and build
+        run: |
+          echo "🧹 Cleaning dist/"
+          rm -rf dist
+          npm ci
+          npm run build
+
       - name: Verify dist contents
         run: |
           echo "📁 dist folder structure:"
