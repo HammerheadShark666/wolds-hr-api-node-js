@@ -11,7 +11,7 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
 
   const router = Router(); 
 
-  router.post("/login1", async (req, res) => {
+  router.post("/login", async (req, res) => {
    
     try { 
 
@@ -68,8 +68,8 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
       const response = await db.accounts.insert(newAccount);     
   
       res.json({
-        message: "User registered successfully",
-        userId: response.id,
+        message: "Account registered successfully",
+        accountId: response.id,
       });
     } catch (err) {
       console.error('❌ Register error:', err);
