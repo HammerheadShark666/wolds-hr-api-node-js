@@ -17,5 +17,6 @@ async function startServer() {
 }
 
 startServer().catch((err) => {
+  console.log("✅ DEPLOYED VERSION: login1 test - " + new Date().toISOString());
   console.error("❌ Failed to start server:", err);
 });
