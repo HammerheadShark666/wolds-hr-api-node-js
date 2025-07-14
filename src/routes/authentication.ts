@@ -12,49 +12,32 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
   const router = Router(); 
 
   router.post("/login1", async (req, res) => {
+   
+    try { 
+
+      const { username, password } = req.body;
+      if (!username || !password) return res.status(400).json({ message: 'Missing fields' });
+        
+      const account = await db.accounts.findOne({ selector: { username } }).exec();
+      if (!account) return res.status(400).send("Invalid username or password.");
   
-    console.log('[AuthenticationRouter] /login called');
-    console.log("Login request received");
-    console.log("Body:", req.body);
+      const validPassword = await bcrypt.compare(password, account.password);
+      if (!validPassword) return res.status(400).send("Invalid username or password."); 
 
-    try {
-      console.log('[AuthenticationRouter] /login called');
-
-    const { username, password } = req.body;
-
-    console.log("[LOGIN] Checking user:", username);
-
-
-    if (!username || !password) {
-      return res.status(400).json({ message: 'Missing fields' });
-    }
+      const secret = process.env.ACCESS_TOKEN_SECRET;
+      if (!secret) throw new Error('ACCESS_TOKEN_SECRET is missing');  
   
-    const account = await db.accounts.findOne({ selector: { username } }).exec();
-    if (!account) return res.status(400).send("Invalid username or password.");
+      const token = jwt.sign({ userId: account.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '15m' });
+      const refreshToken = jwt.sign({ userId: account.id }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
+      
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        path: '/'
+      });
 
-    console.log("[LOGIN] User found");
-
-    const validPassword = await bcrypt.compare(password, account.password);
-    if (!validPassword) return res.status(400).send("Invalid username or password.");
-
-    console.log("[LOGIN] valid password");
-
-    const secret = process.env.ACCESS_TOKEN_SECRET;
-    if (!secret) throw new Error('ACCESS_TOKEN_SECRET is missing'); 
-
-    console.log("[LOGIN] Credentials valid. Generating tokens...");
-  
-    const token = jwt.sign({ userId: account.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ userId: account.id }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
-    
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      path: '/'
-    });
-
-    res.json({ token }); 
+      res.json({ token }); 
 
     } catch (err) {
       console.error('❌ Login error:', err);
@@ -63,6 +46,7 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
   });
 
   router.post("/register", async (req, res) => {
+    
     try {
       const { username, password } = req.body;
 
@@ -87,53 +71,63 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
         message: "User registered successfully",
         userId: response.id,
       });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal server error" });
+    } catch (err) {
+      console.error('❌ Register error:', err);
+      res.status(500).send('Internal server error');
     }
   });
   
   router.post('/refresh-token', (req, res) => {
 
-    const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) return res.sendStatus(401);
+    try { 
+      const refreshToken = req.cookies.refreshToken;
+      if (!refreshToken) return res.sendStatus(401);
 
-    jwt.verify(
-      refreshToken,
-      process.env.REFRESH_TOKEN_SECRET!,
-      (err: VerifyErrors | null, decoded: string | JwtPayload | undefined) => {
-        if (err || !decoded || typeof decoded === 'string') return res.sendStatus(403);
+      jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET!,
+        (err: VerifyErrors | null, decoded: string | JwtPayload | undefined) => {
+          if (err || !decoded || typeof decoded === 'string') return res.sendStatus(403);
 
-        const newAccessToken = jwt.sign(
-          { id: decoded.id },
-          process.env.ACCESS_TOKEN_SECRET!,
-          { expiresIn: '15m' }
-        );
+          const newAccessToken = jwt.sign(
+            { id: decoded.id },
+            process.env.ACCESS_TOKEN_SECRET!,
+            { expiresIn: '15m' }
+          );
 
-        res.json({ accessToken: newAccessToken });
-      }
-    );
+          res.json({ accessToken: newAccessToken });
+        }
+      );
+    } catch (err) {
+      console.error('❌ Refresh Token error:', err);
+      res.status(500).send('Internal server error');
+    }
   });
  
   router.post('/logout', async (req, res) => {
-    const token = req.cookies.refreshToken;
-    if (!token) return res.sendStatus(204);
+    try {
+      const token = req.cookies.refreshToken;
+      if (!token) return res.sendStatus(204);
 
-    const account = await db.accounts
-      .findOne({ selector: { tokens: { $elemMatch: token } } })
-      .exec();
+      const account = await db.accounts
+        .findOne({ selector: { tokens: { $elemMatch: token } } })
+        .exec();
 
-    if (account) {
-      const existingTokens = account.get('tokens') as string[];
-      const updatedTokens = existingTokens.filter((t) => t !== token);
+      if (account) {
+        const existingTokens = account.get('tokens') as string[];
+        const updatedTokens = existingTokens.filter((t) => t !== token);
 
-      await account.update({
-        $set: { tokens: updatedTokens }
-      });
+        await account.update({
+          $set: { tokens: updatedTokens }
+        });
+      }
+
+      res.clearCookie('refreshToken', { path: '/refresh-token' });
+      res.sendStatus(204);
+    } catch (err) {
+      console.error('❌ Logout error:', err);
+      res.status(500).send('Internal server error');
     }
-
-    res.clearCookie('refreshToken', { path: '/refresh-token' });
-    res.sendStatus(204);
   });
 
   return router;
