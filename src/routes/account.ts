@@ -22,5 +22,25 @@ export function createAccountsRouter(db: RxDatabase<WoldsHrDatabaseCollections>)
     } 
   }); 
 
+  router.delete('/:id', async (req, res) => {
+
+    try {
+
+      const id = req.params.id.toString();
+      const account = await db.accounts.findOne({ selector: { id } }).exec();
+
+      if (!account) {
+        return res.status(404).json({ error: 'Account not found' });
+      }
+
+      await account.remove();
+
+      res.status(200).json({ message: 'Account deleted' });
+    } catch (error) {
+      console.error('Delete Account failed:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    } 
+  }); 
+
   return router;
 }
