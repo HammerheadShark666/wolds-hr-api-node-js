@@ -16,11 +16,15 @@ export async function createApp() {
 
   const db = await createDb();
 
-  app.use('', createAuthenticationRouter(db));
-  app.use(authenticateToken);
-  app.use('/departments', createDepartmentRouter(db));
-  app.use('/employees', createEmployeeRouter(db));  
-  app.use('/accounts', createAccountsRouter(db));
+  const v1Router = express.Router();
+
+  v1Router.use('', createAuthenticationRouter(db));
+  v1Router.use(authenticateToken);
+  v1Router.use('/departments', createDepartmentRouter(db));
+  v1Router.use('/employees', createEmployeeRouter(db));  
+  v1Router.use('/accounts', createAccountsRouter(db));
+
+  app.use('/v1', v1Router);
 
   return app;
 } 
