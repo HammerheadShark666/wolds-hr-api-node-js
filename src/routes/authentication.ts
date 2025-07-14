@@ -11,7 +11,7 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
 
   const router = Router(); 
 
-  router.post("/login", async (req, res) => {
+  router.post("/login1", async (req, res) => {
   
     console.log('[AuthenticationRouter] /login called');
     console.log("Login request received");
