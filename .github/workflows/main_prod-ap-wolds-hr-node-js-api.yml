@@ -61,7 +61,7 @@ jobs:
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'wolds-hr-fe-node-js'
+          app-name: 'prod-ap-wolds-hr-node-js-api'
           slot-name: 'Production'
           package: release.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_2013966326404813B2C6F103209BCC5D }}
