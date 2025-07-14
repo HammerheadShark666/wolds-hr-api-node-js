@@ -24,7 +24,7 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
     const secret = process.env.ACCESS_TOKEN_SECRET;
     if (!secret) throw new Error('ACCESS_TOKEN_SECRET is missing'); 
   
-    const accessToken = jwt.sign({ userId: account.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '15m' });
+    const token = jwt.sign({ userId: account.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '15m' });
     const refreshToken = jwt.sign({ userId: account.id }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
  
     res.cookie('refreshToken', refreshToken, {
@@ -34,7 +34,7 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
       path: '/refresh-token'
     });
 
-    res.json({ accessToken }); 
+    res.json({ token }); 
   });
 
   router.post("/register", async (req, res) => {
