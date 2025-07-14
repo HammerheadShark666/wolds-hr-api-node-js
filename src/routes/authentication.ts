@@ -22,6 +22,9 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
 
     const { username, password } = req.body;
 
+    console.log("[LOGIN] Checking user:", username);
+
+
     if (!username || !password) {
       return res.status(400).json({ message: 'Missing fields' });
     }
@@ -29,11 +32,17 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
     const account = await db.accounts.findOne({ selector: { username } }).exec();
     if (!account) return res.status(400).send("Invalid username or password.");
 
+    console.log("[LOGIN] User found");
+
     const validPassword = await bcrypt.compare(password, account.password);
     if (!validPassword) return res.status(400).send("Invalid username or password.");
 
+    console.log("[LOGIN] valid password");
+
     const secret = process.env.ACCESS_TOKEN_SECRET;
     if (!secret) throw new Error('ACCESS_TOKEN_SECRET is missing'); 
+
+    console.log("[LOGIN] Credentials valid. Generating tokens...");
   
     const token = jwt.sign({ userId: account.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '15m' });
     const refreshToken = jwt.sign({ userId: account.id }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
