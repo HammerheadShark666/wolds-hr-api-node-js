@@ -13,6 +13,7 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
 
   router.post("/login", async (req, res) => {
   
+    console.log('[AuthenticationRouter] /login called');
     console.log("Login request received");
     console.log("Body:", req.body);
 
