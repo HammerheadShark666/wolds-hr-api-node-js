@@ -44,8 +44,9 @@ jobs:
           mkdir package
           cp -r dist package/
           cp package.json package-lock.json package/
+          cp -r src package/
           cd package
-          zip -r ../release.zip .
+          zip -r ../release.zip . 
 
       - name: Check zip contents
         run: unzip -l release.zip
