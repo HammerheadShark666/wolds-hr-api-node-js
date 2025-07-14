@@ -12,9 +12,16 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
   const router = Router(); 
 
   router.post("/login", async (req, res) => {
+  
+    console.log("Login request received");
+    console.log("Body:", req.body);
 
     const { username, password } = req.body;
 
+    if (!username || !password) {
+      return res.status(400).json({ message: 'Missing fields' });
+    }
+  
     const account = await db.accounts.findOne({ selector: { username } }).exec();
     if (!account) return res.status(400).send("Invalid username or password.");
 
@@ -26,12 +33,12 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
   
     const token = jwt.sign({ userId: account.id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '15m' });
     const refreshToken = jwt.sign({ userId: account.id }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: '7d' });
- 
+    
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/refresh-token'
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/'
     });
 
     res.json({ token }); 
