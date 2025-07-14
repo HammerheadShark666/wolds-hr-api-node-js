@@ -5,9 +5,7 @@ export interface AuthenticatedRequest extends Request {
   account?: any;
 }
  
-export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-
-  console.log('[AuthenticationToken [MIDDLEWARE] called');
+export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => { 
 
   const authHeader = req.headers['authorization'];
   const token = authHeader?.split(' ')[1]; 
@@ -16,7 +14,6 @@ export const authenticateToken = (req: AuthenticatedRequest, res: Response, next
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!, (err, account) => {
     if (err) return res.sendStatus(403);
-
     req.account = account;
     next();
   });
