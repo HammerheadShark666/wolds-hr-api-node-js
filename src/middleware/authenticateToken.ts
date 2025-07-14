@@ -7,6 +7,8 @@ export interface AuthenticatedRequest extends Request {
  
 export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
 
+  console.log('[AuthenticationToken [MIDDLEWARE] called');
+
   const authHeader = req.headers['authorization'];
   const token = authHeader?.split(' ')[1]; 
 
