@@ -15,6 +15,10 @@ jobs:
     permissions:
       contents: read #This is required for actions/checkout
 
+    env:
+      ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+      REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
+
     steps:
       - uses: actions/checkout@v4
 
