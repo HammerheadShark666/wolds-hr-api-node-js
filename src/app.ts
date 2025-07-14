@@ -46,10 +46,17 @@ export async function createApp() {
 });
   v1Router.use('/accounts', createAccountsRouter(db));
 
+app.use('/v1', (req, res, next) => {
+  console.log(`[app] Incoming request ${req.method} ${req.originalUrl}`);
+  next();
+});
+
   app.use('/v1', v1Router);
 
   
+console.log('--- Listing all endpoints: ---');
 console.log(listEndpoints(app));
+console.log('--- End of endpoint list ---');
 
   return app;
 } 
