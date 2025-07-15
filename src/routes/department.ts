@@ -8,32 +8,7 @@ import { WoldsHrDatabaseCollections } from '../database/collection/databaseColle
 export function createDepartmentRouter(db: RxDatabase<WoldsHrDatabaseCollections>) {
   
   const router = Router(); 
-
-  router.post('/', async (req, res) => {
-    try {
-    
-      const name = req.body.name;    
-      const existingDepartment = await db.departments.findOne({ selector: { name } }).exec();
-
-      if (existingDepartment) {
-        return res.status(400).json({ error: 'Department already exists' });
-      }
-
-      const id = uuidv4();
-      const newDepartment: ApiDepartment = { id: id, name: name, _meta: { lwt: Date.now() }, _deleted: false, _attachments: {}, _rev: "test-data" };
-      const response = await db.departments.insert(newDepartment);     
-      res.status(200).json(response);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error('Error message:', err.message);
-        res.status(400).json({ error: err.message });
-      } else {
-        console.error('Unknown error', err);
-        res.status(500).json({ error: 'Unknown error' });
-      }
-    }
-  });
-
+ 
   router.get('', async (_req, res) => { 
     try {
       
@@ -57,12 +32,68 @@ export function createDepartmentRouter(db: RxDatabase<WoldsHrDatabaseCollections
       if (department !== null) {
         res.status(200).json(department);
       } else {
-        res.status(404).json({ message: 'Department not found' });
+        res.status(404).json({ error: 'Department not found' });
       }
     } catch (error) {
       console.error('Get department failed:', error);
       res.status(500).json({ error: 'Internal server error' });
     } 
+  });
+
+  router.post('/', async (req, res) => {
+    try {
+    
+      const name = req.body.name;   
+      
+      if(name == '' || name == undefined || name == null )
+        return res.status(400).json({ error: 'Department name required' });
+
+      const existingDepartment = await db.departments.findOne({ selector: { name } }).exec();
+
+      if (existingDepartment) {
+        return res.status(400).json({ error: 'Department already exists' });
+      }
+
+      const id = uuidv4();
+      const newDepartment: ApiDepartment = { id: id, name: name, _meta: { lwt: Date.now() }, _deleted: false, _attachments: {}, _rev: "test-data" };
+      const response = await db.departments.insert(newDepartment);     
+      res.status(200).json(response);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Error message:', err.message);
+        res.status(400).json({ error: err.message });
+      } else {
+        console.error('Unknown error', err);
+        res.status(500).json({ error: 'Unknown error' });
+      }
+    }
+  });
+
+  router.put('/', async (req, res) => {
+    try {
+ 
+      const id = req.body.id;
+      const name = req.body.name;    
+      const existingDepartment = await db.departments.findOne({ selector: { id } }).exec(); 
+
+      if (!existingDepartment) {
+        return res.status(404).json({ error: 'Department not found' });
+      }
+      
+      const response = await existingDepartment.update({
+        $set: { name }
+      }); 
+       
+      res.status(200).json(response);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Error message:', err.message);
+        res.status(400).json({ error: err.message });
+      } else {
+        console.error('Unknown error', err);
+        res.status(500).json({ error: 'Unknown error' });
+      }
+    }
   });
 
   router.delete('/:id', async (req, res) => {
