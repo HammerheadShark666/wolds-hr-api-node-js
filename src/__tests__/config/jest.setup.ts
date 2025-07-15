@@ -1,6 +1,7 @@
 import request from "supertest"; 
 import dotenv from "dotenv";
-import { createApp } from "../src/app"; 
+import { createApp } from "../../app";
+// import { createApp } from "../src/app"; 
 
 dotenv.config(); 
   
