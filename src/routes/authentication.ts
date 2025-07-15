@@ -45,65 +45,65 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
     }
   });
 
-  router.post("/register", async (req, res) => {
+  // router.post("/register", async (req, res) => {
     
-    try {
-      const { username, password } = req.body;
-      if (!username || !password) return res.status(400).json({ error: 'Missing fields' });
+  //   try {
+  //     const { username, password } = req.body;
+  //     if (!username || !password) return res.status(400).json({ error: 'Missing fields' });
 
-      const existingUser = await db.accounts.findOne({ selector: { username } }).exec();
-      if (existingUser) return res.status(400).json({ error: "Username already exists." });
+  //     const existingUser = await db.accounts.findOne({ selector: { username } }).exec();
+  //     if (existingUser) return res.status(400).json({ error: "Username already exists." });
       
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+  //     const salt = await bcrypt.genSalt(10);
+  //     const hashedPassword = await bcrypt.hash(password, salt);
 
-      const newAccount: ApiAccount = {
-        id: uuidv4(),
-        username,
-        password: hashedPassword,
-        role: 'Admin',
-        tokens: [],
-        _meta: { lwt: Date.now() }, _deleted: false, _attachments: {}, _rev: "test-data" 
-      };
+  //     const newAccount: ApiAccount = {
+  //       id: uuidv4(),
+  //       username,
+  //       password: hashedPassword,
+  //       role: 'Admin',
+  //       tokens: [],
+  //       _meta: { lwt: Date.now() }, _deleted: false, _attachments: {}, _rev: "test-data" 
+  //     };
 
-      const response = await db.accounts.insert(newAccount);     
+  //     const response = await db.accounts.insert(newAccount);     
   
-      res.json({
-        message: "Account registered successfully",
-        accountId: response.id,
-      });
-    } catch (err) {
-      console.error('Register error:', err);
-      res.status(500).send('Internal server error');
-    }
-  });
+  //     res.json({
+  //       message: "Account registered successfully",
+  //       accountId: response.id,
+  //     });
+  //   } catch (err) {
+  //     console.error('Register error:', err);
+  //     res.status(500).send('Internal server error');
+  //   }
+  // });
   
-  router.post('/refresh-token', (req, res) => {
+  // router.post('/refresh-token', (req, res) => {
 
-    try { 
-      const refreshToken = req.cookies.refreshToken;
-      if (!refreshToken) return res.sendStatus(401);
+  //   try { 
+  //     const refreshToken = req.cookies.refreshToken;
+  //     if (!refreshToken) return res.sendStatus(401);
 
-      jwt.verify(
-        refreshToken,
-        process.env.REFRESH_TOKEN_SECRET!,
-        (err: VerifyErrors | null, decoded: string | JwtPayload | undefined) => {
-          if (err || !decoded || typeof decoded === 'string') return res.sendStatus(403);
+  //     jwt.verify(
+  //       refreshToken,
+  //       process.env.REFRESH_TOKEN_SECRET!,
+  //       (err: VerifyErrors | null, decoded: string | JwtPayload | undefined) => {
+  //         if (err || !decoded || typeof decoded === 'string') return res.sendStatus(403);
 
-          const newToken = jwt.sign(
-            { id: decoded.id },
-            process.env.ACCESS_TOKEN_SECRET!,
-            { expiresIn: '15m' }
-          );
+  //         const newToken = jwt.sign(
+  //           { id: decoded.id },
+  //           process.env.ACCESS_TOKEN_SECRET!,
+  //           { expiresIn: '15m' }
+  //         );
 
-          res.json({ token: newToken });
-        }
-      );
-    } catch (err) {
-      console.error('Refresh Token error:', err);
-      res.status(500).send('Internal server error');
-    }
-  });
+  //         res.json({ token: newToken });
+  //       }
+  //     );
+  //   } catch (err) {
+  //     console.error('Refresh Token error:', err);
+  //     res.status(500).send('Internal server error');
+  //   }
+  // });
  
   router.post('/logout', async (req, res) => {
     try {

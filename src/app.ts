@@ -8,6 +8,8 @@ import cors from 'cors';
 import { authenticateToken } from './middleware/authenticateToken';
 import cookieParser from 'cookie-parser';
 import listEndpoints from 'express-list-endpoints';
+import { createRegisterRouter } from './routes/register';
+import { createRefreshTokenRouter } from './routes/refreshToken';
 
 export async function createApp() {
 
@@ -22,7 +24,10 @@ export async function createApp() {
     const db = await createDb();
     const v1Router = express.Router();
 
-    v1Router.use('', createAuthenticationRouter(db)); 
+    v1Router.use('', createAuthenticationRouter(db));
+    v1Router.use('', createRefreshTokenRouter(db)); 
+    v1Router.use('', createRegisterRouter(db)); 
+
     v1Router.use(authenticateToken); 
     v1Router.use('/departments', createDepartmentRouter(db)); 
     v1Router.use('/employees', createEmployeeRouter(db));  
