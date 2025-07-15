@@ -15,19 +15,15 @@ beforeAll(async () => {
       .set("Content-Type", "application/json")
       .send({ name: departmentName });
 
-  expect(response.status).toBe(200);   
+  expect(response.status).toBe(200);    
+  expect(response.body).toBeDefined();
+  expect(response.body).toHaveProperty("id");
+  expect(response.body).toHaveProperty("name");   
+  expect(typeof response.body.id).toBe('string');  
+  expect(typeof response.body.name).toBe('string');  
+  expect(response.body.name).toBe(departmentName);
 
-  const department = response.body;
-
-  expect(department).toBeDefined();
-  expect(department).toHaveProperty("id");
-  expect(department).toHaveProperty("name");  
-
-  expect(typeof department.id).toBe('string');  
-  expect(typeof department.name).toBe('string');  
-  expect(department.name).toBe(departmentName);
-
-  departmentId = department.id;
+  departmentId = response.body.id;
 });
 
 describe("GET /api/v1/departments", () => { 
@@ -89,16 +85,12 @@ describe("GET /api/v1/departments/:id", () => {
         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
         .set("Content-Type", "application/json");
 
-    expect(response.status).toBe(200); 
-
-    const department = response.body;
-
-    expect(department).toBeDefined();
-    expect(department).toHaveProperty("id");
-    expect(department).toHaveProperty("name");  
-
-    expect(department.id).toBe(departmentId);
-    expect(department.name).toBe(departmentName); 
+    expect(response.status).toBe(200);   
+    expect(response.body).toBeDefined();
+    expect(response.body).toHaveProperty("id");
+    expect(response.body).toHaveProperty("name"); 
+    expect(response.body.id).toBe(departmentId);
+    expect(response.body.name).toBe(departmentName); 
   });
 
   it("should return 404 and error Department not found", async () => {
@@ -124,17 +116,14 @@ describe("PUT /api/v1/departments", () => {
         .set("Content-Type", "application/json")
         .send({ id: departmentId, name: updateDepartmentName });
  
-    expect(response.status).toBe(200);   
-
-    const department = response.body;
-
-    expect(department).toBeDefined();
-    expect(department).toHaveProperty("id");
-    expect(department).toHaveProperty("name");  
+    expect(response.status).toBe(200);    
+    expect(response.body).toBeDefined();
+    expect(response.body).toHaveProperty("id");
+    expect(response.body).toHaveProperty("name");  
  
-    expect(typeof department.id).toBe('string');  
-    expect(typeof department.name).toBe('string');  
-    expect(department.name).toBe(updateDepartmentName); 
+    expect(typeof response.body.id).toBe('string');  
+    expect(typeof response.body.name).toBe('string');  
+    expect(response.body.name).toBe(updateDepartmentName); 
   });
   
   it("should return 404 and error Department not found", async () => {
