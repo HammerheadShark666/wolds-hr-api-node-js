@@ -1,8 +1,15 @@
 import { Express } from 'express';
 
 declare global {
-  var app: Express;
-  var ACCESS_TOKEN: string;
+  namespace NodeJS {
+    interface Global {
+      app?: Express;
+      ACCESS_TOKEN?: string;
+    }
+  }
+ 
+  var app: Express | undefined;
+  var ACCESS_TOKEN: string | undefined;
 }
 
 export {};
