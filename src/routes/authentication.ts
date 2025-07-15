@@ -40,7 +40,7 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
       res.json({ token }); 
 
     } catch (err) {
-      console.error('❌ Login error:', err);
+      console.error('Login error:', err);
       res.status(500).send('Internal server error');
     }
   });
@@ -72,7 +72,7 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
         accountId: response.id,
       });
     } catch (err) {
-      console.error('❌ Register error:', err);
+      console.error('Register error:', err);
       res.status(500).send('Internal server error');
     }
   });
@@ -89,17 +89,17 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
         (err: VerifyErrors | null, decoded: string | JwtPayload | undefined) => {
           if (err || !decoded || typeof decoded === 'string') return res.sendStatus(403);
 
-          const newAccessToken = jwt.sign(
+          const newToken = jwt.sign(
             { id: decoded.id },
             process.env.ACCESS_TOKEN_SECRET!,
             { expiresIn: '15m' }
           );
 
-          res.json({ accessToken: newAccessToken });
+          res.json({ token: newToken });
         }
       );
     } catch (err) {
-      console.error('❌ Refresh Token error:', err);
+      console.error('Refresh Token error:', err);
       res.status(500).send('Internal server error');
     }
   });
@@ -125,7 +125,7 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
       res.clearCookie('refreshToken', { path: '/refresh-token' });
       res.sendStatus(204);
     } catch (err) {
-      console.error('❌ Logout error:', err);
+      console.error('Logout error:', err);
       res.status(500).send('Internal server error');
     }
   });
