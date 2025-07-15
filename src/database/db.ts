@@ -10,8 +10,10 @@ import { employeeDefaultData } from './defaultData/employee';
 import { accountSchema } from './schema/account';
 import bcrypt from 'bcryptjs';
 import { accountDefaultData } from './defaultData/account';
+import { RxDBUpdatePlugin } from 'rxdb/plugins/update';
   
 addRxPlugin(RxDBDevModePlugin); 
+addRxPlugin(RxDBUpdatePlugin);
 
 export async function createDb() {
 
