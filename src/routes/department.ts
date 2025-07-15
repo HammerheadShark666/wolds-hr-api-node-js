@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { RxDatabase } from 'rxdb';
 import { v4 as uuidv4 } from 'uuid';
-import { mapDepartment } from '../utils/mapper'; 
+import { mapDepartment } from '../utils/mapper';
 import { ApiDepartment, AppDepartment } from '../interface/department';
 import { WoldsHrDatabaseCollections } from '../database/collection/databaseCollection';
 

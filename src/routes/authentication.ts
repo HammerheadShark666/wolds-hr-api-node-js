@@ -16,13 +16,13 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
     try { 
 
       const { username, password } = req.body;
-      if (!username || !password) return res.status(400).json({ message: 'Missing fields' });
+      if (!username || !password) return res.status(400).json({ error: 'Missing fields' });
         
       const account = await db.accounts.findOne({ selector: { username } }).exec();
-      if (!account) return res.status(400).send("Invalid username or password.");
+      if (!account) return res.status(400).json({ error: 'Invalid username or password' });;
   
       const validPassword = await bcrypt.compare(password, account.password);
-      if (!validPassword) return res.status(400).send("Invalid username or password."); 
+      if (!validPassword) return res.status(400).json({ error: 'Invalid username or password' }); 
 
       const secret = process.env.ACCESS_TOKEN_SECRET;
       if (!secret) throw new Error('ACCESS_TOKEN_SECRET is missing');  
@@ -49,6 +49,7 @@ export function createAuthenticationRouter(db: RxDatabase<WoldsHrDatabaseCollect
     
     try {
       const { username, password } = req.body;
+      if (!username || !password) return res.status(400).json({ error: 'Missing fields' });
 
       const existingUser = await db.accounts.findOne({ selector: { username } }).exec();
       if (existingUser) return res.status(400).json({ error: "Username already exists." });
