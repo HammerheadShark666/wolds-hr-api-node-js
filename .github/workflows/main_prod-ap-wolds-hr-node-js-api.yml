@@ -27,6 +27,12 @@ jobs:
         with:
           node-version: '22.x'
 
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 🧪 Run Jest tests
+        run: npm test
+
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
 
