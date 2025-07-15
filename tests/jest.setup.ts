@@ -8,7 +8,7 @@ beforeAll(async () => {
   global.app = await createApp();
  
   const response = await request(global.app)
-    .post("/v1/login1")
+    .post("/v1/login")
     .send({ username: "john@hotmail.com", password: "Password#1" });
 
   if (response.status !== 200) {
