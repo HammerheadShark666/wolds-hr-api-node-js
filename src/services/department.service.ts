@@ -25,7 +25,8 @@ export async function updateDepartment(id: string, name: string): Promise<IDepar
 
   const updatedDepartment = await DepartmentModel.findByIdAndUpdate(
     id,                          
-    { $set: { name: 'name' } }
+    { $set: { name: name }},
+    { new: true } 
   );
   return updatedDepartment;
 }
