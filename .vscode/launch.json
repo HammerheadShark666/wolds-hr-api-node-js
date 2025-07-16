@@ -4,16 +4,15 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug Express App",
-      "program": "${workspaceFolder}/src/server.ts", // or index.js
-      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "name": "Debug Express App (ts-node)",
+      "program": "${workspaceFolder}/src/server.ts",
+      "runtimeArgs": ["-r", "ts-node/register"],
       "env": {
         "NODE_ENV": "development"
       },
       "envFile": "${workspaceFolder}/.env",
       "cwd": "${workspaceFolder}",
-      "skipFiles": ["<node_internals>/**"],
-      "outFiles": ["${workspaceFolder}/dist/**/*.js"]
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }

@@ -1,15 +1,13 @@
 import express from 'express';
-import { createDb } from './database/db';
-import { createDepartmentRouter } from './routes/department'; 
-import { createEmployeeRouter } from './routes/employee'; 
-import { createAuthenticationRouter } from './routes/authentication';
-import { createAccountsRouter } from './routes/account'; 
 import cors from 'cors';
 import { authenticateToken } from './middleware/authenticateToken';
 import cookieParser from 'cookie-parser';
-import listEndpoints from 'express-list-endpoints';
-import { createRegisterRouter } from './routes/register';
-import { createRefreshTokenRouter } from './routes/refreshToken';
+import listEndpoints from 'express-list-endpoints'; 
+import { createAuthenticationRouter } from './routes/authentication.routes';
+import { createRefreshTokenRouter } from './routes/refreshToken.routes';
+import { createRegisterRouter } from './routes/register.routes';
+import { createDepartmentRouter } from './routes/department.routes';
+import { createUsersRouter } from './routes/user.routes';
 
 export async function createApp() {
 
@@ -20,18 +18,15 @@ export async function createApp() {
     app.use(cors()); 
     app.use(cookieParser());  
     app.use(express.json()); 
-  
-    const db = await createDb();
+   
     const v1Router = express.Router();
 
-    v1Router.use('', createAuthenticationRouter(db));
-    v1Router.use('', createRefreshTokenRouter(db)); 
-    v1Router.use('', createRegisterRouter(db)); 
-
-    v1Router.use(authenticateToken); 
-    v1Router.use('/departments', createDepartmentRouter(db)); 
-    v1Router.use('/employees', createEmployeeRouter(db));  
-    v1Router.use('/accounts', createAccountsRouter(db));
+    v1Router.use('', createAuthenticationRouter());
+    v1Router.use('', createRefreshTokenRouter());  
+    v1Router.use('', createRegisterRouter());
+    v1Router.use(authenticateToken);  
+    v1Router.use('/departments', createDepartmentRouter());  
+    v1Router.use('/users', createUsersRouter());
   
     app.use('/v1', v1Router);  
 
@@ -40,7 +35,7 @@ export async function createApp() {
     console.log('--- End of endpoint list ---'); 
 
   } catch (err) {
-    console.error('❌ CreateApp error:', err); 
+    console.error('CreateApp error:', err); 
   }
 
   return app;
