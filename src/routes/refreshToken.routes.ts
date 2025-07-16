@@ -1,10 +1,8 @@
 import { Router } from 'express';
-import { RxDatabase } from 'rxdb'; 
-import { WoldsHrDatabaseCollections } from '../database/collection/databaseCollection'; 
 import jwt from 'jsonwebtoken'; 
 import { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 
-export function createRefreshTokenRouter(db: RxDatabase<WoldsHrDatabaseCollections>) {
+export function createRefreshTokenRouter() {
 
   const router = Router(); 
    
@@ -12,7 +10,8 @@ export function createRefreshTokenRouter(db: RxDatabase<WoldsHrDatabaseCollectio
 
     try { 
       const refreshToken = req.cookies.refreshToken;
-      if (!refreshToken) return res.sendStatus(401);
+      if (!refreshToken) 
+        return res.sendStatus(401);
 
       jwt.verify(
         refreshToken,
