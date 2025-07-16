@@ -6,12 +6,18 @@ declare global {
       app?: Express;
       ACCESS_TOKEN?: string;
       departmentId: string;
+      userId: string;
+      username: string;
+      password: string;
     }
   }
  
   var app: Express | undefined;
   var ACCESS_TOKEN: string | undefined;
   var departmentId: string | undefined;
+  var userId: string | undefined;
+  var username: string | undefined;
+  var password: string | undefined;
 }
 
 export {};

@@ -1,8 +1,5 @@
 import request from 'supertest';
-
-const username = 'john@hotmail.com';
-const password = 'Password#1';
-
+  
 let refreshToken = '';
 
 beforeAll(async () => { 
@@ -10,7 +7,7 @@ beforeAll(async () => {
   const response = await request(global.app!)
     .post("/v1/login") 
       .set("Content-Type", "application/json")
-      .send({ username: username, password: password });
+      .send({ username: global.username, password: global.password });
 
   expect(response.status).toBe(200);   
 

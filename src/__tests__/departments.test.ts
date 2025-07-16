@@ -3,12 +3,10 @@ import request from 'supertest';
 let departmentId = '';
 const departmentName = 'Warehouse';
 const updateDepartmentName = 'R&D';
-const invalidDepartmentId = "9c2d0e11-ef0e-4fed-92a0-549a4af6912"
+const invalidDepartmentId = "6877849fd6fc22ad3cdca489"
 
 beforeAll(async () => { 
-
-  // Add a new department, save department id to use in tests  
-
+  
   const response = await request(global.app!)
     .post("/v1/departments")
       .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)

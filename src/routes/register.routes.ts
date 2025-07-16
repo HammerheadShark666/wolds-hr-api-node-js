@@ -20,10 +20,12 @@ export function createRegisterRouter() {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt); 
  
-      const response = await createUser({ username, password: hashedPassword }) 
-  
+      const response = await createUser({ username, password: hashedPassword });
+      if (!response || !response._id) 
+        return res.status(500).json({ error: "Failed to create user." });     
+ 
       res.json({
-        message: "Account registered successfully",
+        message: "User registered successfully",
         userId: response._id,
       });
     } catch (err) {
