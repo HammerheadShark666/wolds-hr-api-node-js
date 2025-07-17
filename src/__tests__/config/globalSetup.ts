@@ -46,13 +46,3 @@ export default async function globalSetup() {
 
   console.log('Global setup completed');
 }
-
-
- // const loginResponse = await request(global.app)
-  //   .post("/v1/login")
-  //   .send({ username, password });
-
-  // if (loginResponse.status !== 200)
-  //   throw new Error('Login failed in global setup');
-
-  // global.ACCESS_TOKEN = loginResponse.body.token;
