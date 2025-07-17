@@ -1,7 +1,5 @@
 export interface AppUser {
   id: string;
-  username: string;
-  password: string;
+  username: string; 
   role: string;
-  tokens: string[];
 }

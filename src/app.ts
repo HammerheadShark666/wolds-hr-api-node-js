@@ -15,27 +15,27 @@ export async function createApp() {
 
   try 
   { 
-    app.use(cors()); 
-    app.use(cookieParser());  
-    app.use(express.json()); 
-   
+    app.use(cors());
+    app.use(cookieParser());
+    app.use(express.json());   
+
     const v1Router = express.Router();
 
     v1Router.use('', createAuthenticationRouter());
-    v1Router.use('', createRefreshTokenRouter());  
+    v1Router.use('', createRefreshTokenRouter());
     v1Router.use('', createRegisterRouter());
-    v1Router.use(authenticateToken);  
-    v1Router.use('/departments', createDepartmentRouter());  
+    v1Router.use(authenticateToken);
+    v1Router.use('/departments', createDepartmentRouter());
     v1Router.use('/users', createUsersRouter());
   
-    app.use('/v1', v1Router);  
-
+    app.use('/v1', v1Router);
+ 
     console.log('--- Listing all endpoints: ---');
-    console.log(listEndpoints(app));
+    console.dir(listEndpoints(app), { depth: null });
     console.log('--- End of endpoint list ---'); 
 
   } catch (err) {
-    console.error('CreateApp error:', err); 
+    console.error('CreateApp error:', err);
   }
 
   return app;

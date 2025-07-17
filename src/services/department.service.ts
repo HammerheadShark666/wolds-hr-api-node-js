@@ -1,15 +1,15 @@
 import { DepartmentModel, IDepartment } from '../models/department.model';
 
 export async function getDepartments(): Promise<IDepartment[] | null> {
-  return DepartmentModel.find().exec();
+  return await DepartmentModel.find().exec();
 }
 
 export async function getDepartmentById(id: string): Promise<IDepartment | null> { 
-  return DepartmentModel.findOne({ _id: id }).exec();
+  return await DepartmentModel.findOne({ _id: id }).exec();
 }
 
 export async function getDepartmentByName(name: string): Promise<IDepartment | null> { 
-  return DepartmentModel.findOne({ name: name }).exec();
+  return await DepartmentModel.findOne({ name: name }).exec();
 }
 
 export async function createDepartment(name: string): Promise<IDepartment | null> {

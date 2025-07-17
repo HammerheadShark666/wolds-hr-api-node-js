@@ -47,9 +47,7 @@ describe("POST /api/v1/register", () => {
   });   
 
   it("delete registered user, should return 200 and message User deleted", async () => {
-
-    console.log("ID = " + userId);
-
+ 
     const response = await request(global.app!)
         .delete(`/v1/users/${userId}`)
         .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
