@@ -1,36 +1,42 @@
 import request from 'supertest';
   
 let refreshToken = '';
-
-beforeAll(async () => { 
  
-  const response = await request(global.app!)
-    .post("/v1/login") 
-      .set("Content-Type", "application/json")
-      .send({ username: global.username, password: global.password });
+describe("POST /api/v1/login ", () => { 
 
-  expect(response.status).toBe(200);   
-
-  const cookiesHeader = response.headers['set-cookie'];
-  const cookiesArray = Array.isArray(cookiesHeader) ? cookiesHeader : [cookiesHeader];
+  it("should return 200, token and refresh token cookie ", async () => {
  
-  expect(cookiesArray).toBeDefined();
-  expect(Array.isArray(cookiesArray)).toBe(true);
+    const username = `john@hotmail.com`;
+    const password = "Password#1";
 
-  const refreshTokenCookie = cookiesArray.find((cookie: string) =>
-  cookie.startsWith('refreshToken=')); 
+    const response = await request(global.app!)
+      .post("/v1/login") 
+        .set("Content-Type", "application/json")
+        .send({ username, password });
 
-  expect(refreshTokenCookie).toBeDefined();
-  expect(refreshTokenCookie).toMatch(/HttpOnly/);
+    expect(response.status).toBe(200);   
 
-  const token = refreshTokenCookie!.split(';')[0].split('=')[1];
-  expect(typeof token).toBe('string');
-    
-  refreshToken = refreshTokenCookie; 
- 
-  expect(response.body).toBeDefined();
-  expect(response.body).toHaveProperty("token");
-  expect(typeof response.body.token).toBe('string');    
+    const cookiesHeader = response.headers['set-cookie'];
+    const cookiesArray = Array.isArray(cookiesHeader) ? cookiesHeader : [cookiesHeader];
+  
+    expect(cookiesArray).toBeDefined();
+    expect(Array.isArray(cookiesArray)).toBe(true);
+
+    const refreshTokenCookie = cookiesArray.find((cookie: string) =>
+    cookie.startsWith('refreshToken=')); 
+
+    expect(refreshTokenCookie).toBeDefined();
+    expect(refreshTokenCookie).toMatch(/HttpOnly/);
+
+    const token = refreshTokenCookie!.split(';')[0].split('=')[1];
+    expect(typeof token).toBe('string');
+      
+    refreshToken = refreshTokenCookie; 
+  
+    expect(response.body).toBeDefined();
+    expect(response.body).toHaveProperty("token");
+    expect(typeof response.body.token).toBe('string');    
+  }); 
 });
  
 describe("POST /api/v1/login (FAIL)", () => { 

@@ -4,7 +4,7 @@ import { createApp } from '../../app';
 import dotenv from 'dotenv'; 
 
 export default async function globalSetup() {
-
+ 
   dotenv.config();
   global.app = await createApp();
   await connectToDatabase();
@@ -14,24 +14,45 @@ export default async function globalSetup() {
   global.username = `john_${Date.now()}@hotmail.com`;
   global.password = "Password#1";
 
-  const response = await request(global.app)
+  //Register a user
+  const registerResponse = await request(global.app)
     .post("/v1/register")
     .set("Content-Type", "application/json")
     .send({ username: global.username, password: global.password }); 
 
-  if (!response.body || !response.body.userId)
+  if (!registerResponse.body || !registerResponse.body.userId)
     throw new Error('User registration failed in global setup');
 
-  global.userId = response.body.userId; 
+  global.userId = registerResponse.body.userId; 
+ 
+  //Login to register use and use this authenticated tests
+  const response = await request(global.app!)
+      .post("/v1/login") 
+        .set("Content-Type", "application/json")
+        .send({ username: global.username, password: global.password });
 
-  const loginResponse = await request(global.app)
-    .post("/v1/login")
-    .send({ username, password });
-
-  if (loginResponse.status !== 200)
+  if (response.status !== 200)
     throw new Error('Login failed in global setup');
-
-  global.ACCESS_TOKEN = loginResponse.body.token;
+   
+  const cookiesHeader = response.headers['set-cookie'];
+  const cookiesArray = Array.isArray(cookiesHeader) ? cookiesHeader : [cookiesHeader];
+  
+  const refreshTokenCookie = cookiesArray.find((cookie: string) =>
+    cookie.startsWith('refreshToken='));    
+  const token = refreshTokenCookie!.split(';')[0].split('=')[1]; 
+    
+  global.REFRESH_TOKEN = refreshTokenCookie;
+  global.ACCESS_TOKEN = response.body.token; 
 
   console.log('Global setup completed');
 }
+
+
+ // const loginResponse = await request(global.app)
+  //   .post("/v1/login")
+  //   .send({ username, password });
+
+  // if (loginResponse.status !== 200)
+  //   throw new Error('Login failed in global setup');
+
+  // global.ACCESS_TOKEN = loginResponse.body.token;
