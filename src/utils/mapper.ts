@@ -14,13 +14,11 @@ export function mapDepartment(department: IDepartment): AppDepartment {
 } 
 
 export function mapUser(user: IUser): AppUser {
-  const { id, username, password, role, tokens } = user;
+  const { _id, username, role } = user;
   const appUser: AppUser = {
-    id: id,
-    username: username,
-    password: password,
-    role: role,
-    tokens: tokens
+    id: _id.toString(),
+    username: username, 
+    role: role, 
   }; 
   return appUser;
 }

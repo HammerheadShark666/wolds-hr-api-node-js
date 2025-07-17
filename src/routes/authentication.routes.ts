@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
-import { getUserByEmail, getUserByToken, getUsers, removeTokenFromAccount } from '../services/user.service';
+import { getUserByEmail, getUserByRefreshToken, removeTokenFromAccount } from '../services/user.service';
 import type { StringValue } from 'ms';
 import { Response } from 'express';
 
@@ -47,7 +47,7 @@ export function createAuthenticationRouter() {
       if (!token) 
         return res.sendStatus(204);
  
-      const account = await getUserByToken(token);
+      const account = await getUserByRefreshToken(token);
       if (account) {
         await removeTokenFromAccount(token);
       }

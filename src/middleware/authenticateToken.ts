@@ -4,11 +4,11 @@ import { Request, Response, NextFunction } from 'express';
 export interface AuthenticatedRequest extends Request {
   account?: any;
 }
- 
+  
 export const authenticateToken = (req: AuthenticatedRequest, res: Response, next: NextFunction) => { 
 
   const authHeader = req.headers['authorization'];
-  const token = authHeader?.split(' ')[1]; 
+  const token = authHeader?.split(' ')[1];
 
   if (!token) return res.sendStatus(401);
 
