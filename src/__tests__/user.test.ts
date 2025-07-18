@@ -1,15 +1,39 @@
 import request from 'supertest';
  
+const username = 'testuser@hotmail.com';
+const password = 'Password#1';
 const role = 'user';
-const invalidEmail = 'sdkjf@ldjsdkjf.com'
-const invalidUserId = '6877239ab6fc76ad4cdca645'
- 
-describe("GET /api/v1/users/:email", () => { 
+const invalidEmail = 'testuserinvalid.com';
+const invalidUserId = '6833339ab6fc76ad4cdca645';
+let userId = '';
+
+describe("User API - Add a user", () => { 
 
   it("should return 200 and user details ", async () => {
       
     const response = await request(global.app!)
-      .get(`/v1/users/email/${global.username}`) 
+          .post("/v1/register") 
+            .set("Content-Type", "application/json")
+            .send({username: username, password: password}); 
+     
+        expect(response.body).toBeDefined();
+        expect(response.body).toHaveProperty("userId");
+        expect(typeof response.body.userId).toBe('string'); 
+        expect(response.body).toHaveProperty("message");
+        expect(response.body.message).toMatch("User registered successfully");  
+    
+        userId = response.body.userId;
+  });
+});
+
+
+ 
+describe("User API - Get a user by email", () => { 
+
+  it("should return 200 and user details ", async () => {
+      
+    const response = await request(global.app!)
+      .get(`/v1/users/email/${username}`) 
         .set("Content-Type", "application/json")
         .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`)
         .send(); 
@@ -22,7 +46,7 @@ describe("GET /api/v1/users/:email", () => {
     expect(response.body).toHaveProperty("role");
     expect(typeof response.body.id).toBe('string');  
 
-    expect(response.body.username).toBe(global.username); 
+    expect(response.body.username).toBe(username); 
     expect(response.body.role).toBe(role);
   });
 
@@ -51,12 +75,12 @@ describe("GET /api/v1/users/:email", () => {
   });
 });
 
-describe("GET /api/v1/users/:id", () => { 
+describe("User API - Get a user by id", () => { 
 
   it("should return 200 and user details ", async () => {
        
     const response = await request(global.app!)
-      .get(`/v1/users/id/${global.userId}`) 
+      .get(`/v1/users/id/${userId}`) 
         .set("Content-Type", "application/json")
         .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`)
         .send(); 
@@ -69,7 +93,7 @@ describe("GET /api/v1/users/:id", () => {
     expect(response.body).toHaveProperty("role");
     expect(typeof response.body.id).toBe('string');  
 
-    expect(response.body.username).toBe(global.username); 
+    expect(response.body.username).toBe(username); 
     expect(response.body.role).toBe(role);
   });
 
@@ -98,7 +122,7 @@ describe("GET /api/v1/users/:id", () => {
   });
 });
  
-describe("PUT /api/v1/users", () => {  
+describe("User API - Update a user", () => {  
 
   const updateUsername = "john3@hotmail.com";
   const updateRole = "admin";
@@ -112,7 +136,7 @@ describe("PUT /api/v1/users", () => {
       .put("/v1/users")
         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
         .set("Content-Type", "application/json")
-        .send({ id: global.userId, username: updateUsername, role: updateRole });
+        .send({ id: userId, username: updateUsername, role: updateRole });
  
     expect(response.status).toBe(200);    
     expect(response.body).toBeDefined();
@@ -158,10 +182,38 @@ describe("PUT /api/v1/users", () => {
       .put("/v1/users")
         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
         .set("Content-Type", "application/json")
-        .send({ id: global.userId, username: existingUsername, role: updateRole });
+        .send({ id: userId, username: existingUsername, role: updateRole });
   
     expect(response.status).toBe(400);    
     expect(response.body).toHaveProperty('error');  
     expect(response.body.error).toMatch('User with the usename already exists'); 
+  }); 
+});
+
+
+describe("User API - Delete a user", () => { 
+
+   it("delete user, should return 200 and message User deleted", async () => {
+   
+    const response = await request(global.app!)
+        .delete(`/v1/users/${userId}`)
+        .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
+        .send();
+  
+    expect(response.status).toBe(200);    
+    expect(response.body).toHaveProperty('message');  
+    expect(response.body.message).toMatch('User deleted'); 
+  });  
+
+  it("delete user, should return 404 and error User not found", async () => {
+   
+    const response = await request(global.app!)
+        .delete(`/v1/users/${invalidUserId}`)
+        .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
+        .send();
+  
+    expect(response.status).toBe(404);    
+    expect(response.body).toHaveProperty('error');  
+    expect(response.body.error).toMatch('User not found'); 
   });
 });

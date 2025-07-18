@@ -1,6 +1,6 @@
 import request from 'supertest';
 
-const username = 'john2@hotmail.com';
+const username = 'testregister@hotmail.com';
 const password = 'Password#1';
 let userId = '';
  
