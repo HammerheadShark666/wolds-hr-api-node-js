@@ -6,7 +6,7 @@ export interface IDepartment extends Document {
 }
 
 const DepartmentSchema = new Schema<IDepartment>({
-  name: { type: String, required: true, unique: true },  
+  name: { type: String, required: true, unique: true, maxlength: 75 },  
   createdAt: { type: Date, default: Date.now }
 });
 
