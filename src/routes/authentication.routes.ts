@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
-import { getUserByEmail, getUserByRefreshToken, removeTokenFromAccount } from '../services/user.service';
+import { getUserByEmail, getUserByRefreshToken } from '../services/user.service';
 import type { StringValue } from 'ms';
 import { Response } from 'express';
+import { removeTokenFromUser } from '../services/refreshToken.service';
 
 export function createAuthenticationRouter() {
 
@@ -49,7 +50,7 @@ export function createAuthenticationRouter() {
  
       const account = await getUserByRefreshToken(token);
       if (account) {
-        await removeTokenFromAccount(token);
+        await removeTokenFromUser(token);
       }
  
       res.clearCookie('refreshToken', { path: '/refresh-token' });
