@@ -31,21 +31,7 @@ export async function updateUser(id: string, username: string, role: string): Pr
  
   return updatedUser;
 }
-
-export async function updateUserTokens(userId: string, tokens: string[]) {
-  return await UserModel.findByIdAndUpdate(userId, { tokens }, { new: true }).exec();
-}
-
-export async function removeTokenFromAccount(token: string): Promise<boolean> {
-  const account = await UserModel.findOne({ tokens: token }).exec();
-  if (!account) return false;
-
-  account.tokens = account.tokens.filter(t => t !== token);
-  await account.save();
-
-  return true;
-}
-
+ 
 export async function deleteUser(id: string): Promise<IUser | null> {
   return await UserModel.findByIdAndDelete(id);
 }

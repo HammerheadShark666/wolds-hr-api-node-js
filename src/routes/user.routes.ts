@@ -85,7 +85,11 @@ export function createUsersRouter() {
 
       const id = req.params.id.toString();
       if (!id) 
-        return res.status(404).json({ error: 'User not found' });
+        return res.status(404).json({ error: 'User not found' }); 
+
+      const existingUser = await getUserById(id);  
+      if (!existingUser)
+        return res.status(404).json({ error: 'User not found' });   
 
       const deletedUser = await deleteUser(id);
      
