@@ -5,7 +5,7 @@ export async function updateUserTokens(userId: string, tokens: string[]) {
   return await UserModel.findByIdAndUpdate(userId, { tokens }, { new: true }).exec();
 }
 
-export async function removeTokenFromAccount(token: string): Promise<boolean> {
+export async function removeTokenFromUser(token: string): Promise<boolean> {
   const account = await UserModel.findOne({ tokens: token }).exec();
   if (!account) return false;
 
