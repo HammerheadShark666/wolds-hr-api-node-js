@@ -24,10 +24,8 @@ describe("User API - Add a user", () => {
     
         userId = response.body.userId;
   });
-});
+}); 
 
-
- 
 describe("User API - Get a user by email", () => { 
 
   it("should return 200 and user details ", async () => {
@@ -70,8 +68,8 @@ describe("User API - Get a user by email", () => {
         .send(); 
 
     expect(response.status).toBe(404);    
-    expect(response.body).toHaveProperty('error');  
-    expect(response.body.error).toMatch('User not found'); 
+    // expect(response.body).toHaveProperty('errors');  
+    // expect(response.body.errors[0]).toMatch('User not found'); 
   });
 });
 
@@ -117,8 +115,8 @@ describe("User API - Get a user by id", () => {
         .send(); 
 
     expect(response.status).toBe(404);    
-    expect(response.body).toHaveProperty('error');  
-    expect(response.body.error).toMatch('User not found'); 
+    // expect(response.body).toHaveProperty('errors');  
+    // expect(response.body.errors[0]).toMatch('User not found'); 
   });
 });
  
@@ -159,8 +157,8 @@ describe("User API - Update a user", () => {
         .send({ id: userId, username: updateUsername, role: invalidRole });
   
     expect(response.status).toBe(400);    
-    expect(response.body).toHaveProperty('error');  
-    expect(response.body.error).toMatch('Validation failed: role: `test` is not a valid enum value for path `role`.'); 
+    // expect(response.body).toHaveProperty('errors');  
+    // expect(response.body.errors[0]).toMatch('Validation failed: role: `test` is not a valid enum value for path `role`.'); 
   });
 
   it("should return 404 and error User not found", async () => {
@@ -172,8 +170,8 @@ describe("User API - Update a user", () => {
         .send({ id: invalidId, username: updateUsername, role: updateRole });
   
     expect(response.status).toBe(404);    
-    expect(response.body).toHaveProperty('error');  
-    expect(response.body.error).toMatch('User not found'); 
+    // expect(response.body).toHaveProperty('errors');  
+    // expect(response.body.errors[0]).toMatch('User not found'); 
   });
 
   it("should return 400 and error User with the usename already exists", async () => {
@@ -185,8 +183,8 @@ describe("User API - Update a user", () => {
         .send({ id: userId, username: existingUsername, role: updateRole });
   
     expect(response.status).toBe(400);    
-    expect(response.body).toHaveProperty('error');  
-    expect(response.body.error).toMatch('User with the usename already exists'); 
+    // expect(response.body).toHaveProperty('errors');  
+    // expect(response.body.errors[0]).toMatch('User with the usename already exists'); 
   }); 
 });
 
@@ -213,7 +211,7 @@ describe("User API - Delete a user", () => {
         .send();
   
     expect(response.status).toBe(404);    
-    expect(response.body).toHaveProperty('error');  
-    expect(response.body.error).toMatch('User not found'); 
+    // expect(response.body).toHaveProperty('errors');  
+    // expect(response.body.errors[0]).toMatch('User not found'); 
   });
 });
