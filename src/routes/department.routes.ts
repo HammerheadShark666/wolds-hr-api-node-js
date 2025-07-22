@@ -45,6 +45,8 @@ export function createDepartmentRouter() {
     const { id } = req.params;
     const { name } = req.body;
 
+     console.log("DEPTID2", id)
+
     const result = await updateDepartment(id, name);
     if (!result.success) {
       throw new HttpError(400, result.error.join(', ')); 
