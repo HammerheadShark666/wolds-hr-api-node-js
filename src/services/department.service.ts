@@ -3,18 +3,14 @@ import { DepartmentModel, IDepartment } from '../models/department.model';
 import { ServiceResult } from '../types/ServiceResult';
 import { mapDepartment } from '../utils/mapper'; 
 import { createDepartmentSchema } from '../validation/department/createDepartment.schema';
+import { deleteDepartmentSchema } from '../validation/department/deleteDepartment.schema';
 import { updateDepartmentSchema } from '../validation/department/updateDepartment.schema';
 import { idSchema } from '../validation/general/id.schema';
 
 export async function getDepartments(): Promise<ServiceResult<IDepartment[]>> {
   return { success: true, data: await DepartmentModel.find().exec() };
-}
-
-// export async function getDepartmentById(id: string): Promise<IDepartment | null> { 
-//   return await DepartmentModel.findOne({ _id: id }).exec(); 
-// }
- 
-
+} 
+  
 export async function getDepartmentById(id: unknown): Promise<ServiceResult<IDepartment>> {
   const parseResult = idSchema.safeParse(id);
 
@@ -23,7 +19,7 @@ export async function getDepartmentById(id: unknown): Promise<ServiceResult<IDep
   }
 
   try {
-    const department = await DepartmentModel.findOne({ _id: parseResult.data }).exec();
+    const department = await DepartmentModel.findById({ _id: parseResult.data }).exec();
 
     if (!department) {
       return { success: false, error: ['Department not found'] };
@@ -33,11 +29,7 @@ export async function getDepartmentById(id: unknown): Promise<ServiceResult<IDep
   } catch (err: any) {
     return { success: false, error: ['Unexpected error: ' + err.message] };
   }
-}
-
-
-
-
+} 
 
 export async function getDepartmentByName(name: string): Promise<IDepartment | null> { 
   return await DepartmentModel.findOne({ name: name }).exec();
@@ -94,6 +86,18 @@ export async function updateDepartment(id: string, name: string): Promise<Servic
   }
 } 
 
-export async function deleteDepartment(id: string): Promise<IDepartment | null> {
-  return await DepartmentModel.findByIdAndDelete(id);
+export async function deleteDepartment(id: string): Promise<ServiceResult<IDepartment | null>> {
+
+  const parsed = await deleteDepartmentSchema.safeParseAsync({ id }); 
+  if (!parsed.success) {
+    const errors = parsed.error.issues.map(issue => issue.message);
+    return { success: false, error: errors };
+  } 
+
+  try {
+    await DepartmentModel.findByIdAndDelete(id);
+    return { success: true, data: null };
+  } catch (err: any) {
+    return { success: false, error: ['Unexpected error: ' + err.message] };
+  }
 }

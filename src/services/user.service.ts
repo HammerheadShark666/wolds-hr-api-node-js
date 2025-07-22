@@ -5,7 +5,7 @@ export async function getUserByEmail(email: string): Promise<IUser | null> {
 }
 
 export async function getUserById(id: string): Promise<IUser | null> { 
-  return await UserModel.findOne({ _id: id }).exec();
+  return await UserModel.findById({ _id: id }).exec();
 }
 
 export async function getOtherUserHasUsername(id: string, username: string): Promise<IUser | null> { 

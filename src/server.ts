@@ -15,7 +15,7 @@ async function startServer() {
     wrapperApp.use('/api', coreApp);    
 
     await connectToDatabase();
-    console.log('Database connected');
+    console.log('Database connected'); 
 
     wrapperApp.listen(PORT, () => {
       console.log(`Server running at http://localhost:${PORT}/api`);
