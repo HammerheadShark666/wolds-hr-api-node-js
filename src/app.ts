@@ -8,6 +8,7 @@ import { createRefreshTokenRouter } from './routes/refreshToken.routes';
 import { createRegisterRouter } from './routes/register.routes';
 import { createDepartmentRouter } from './routes/department.routes';
 import { createUsersRouter } from './routes/user.routes';
+import { errorHandler } from './middleware/errorHandler';
 
 export async function createApp() {
 
@@ -29,6 +30,7 @@ export async function createApp() {
     v1Router.use('/users', createUsersRouter());
   
     app.use('/v1', v1Router);
+    app.use(errorHandler);
  
     console.log('--- Listing all endpoints: ---');
     console.dir(listEndpoints(app), { depth: null });
