@@ -112,11 +112,7 @@ describe("PUT /api/v1/departments", () => {
       .put("/v1/departments/" + departmentId)
         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
         .set("Content-Type", "application/json")
-        .send({ name: updateDepartmentName });
-
-    console.log("DEPTID", departmentId)
-    console.log("NANE", updateDepartmentName)
-    console.log("STATUS", response.statusCode)
+        .send({ name: updateDepartmentName }); 
  
     expect(response.status).toBe(200);    
     expect(response.body).toBeDefined();

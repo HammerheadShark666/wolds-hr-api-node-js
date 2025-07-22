@@ -62,12 +62,9 @@ export async function createDepartment(data: unknown): Promise<ServiceResult<App
 } 
 
 export async function updateDepartment(id: string, name: string): Promise<ServiceResult<AppDepartment>> {
-   
-  console.log("Update validation");
-
+     
   const parsed = await updateDepartmentSchema.safeParseAsync({ id, name });
   if (!parsed.success) {
-    console.log("VALIDATION ERRORS:", parsed.error.format());
     const errors = parsed.error.issues.map(issue => issue.message);
     return { success: false, error: errors };
   }

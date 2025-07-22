@@ -43,9 +43,7 @@ export function createDepartmentRouter() {
   router.put('/:id', asyncHandler(async (req, res) => {
 
     const { id } = req.params;
-    const { name } = req.body;
-
-     console.log("DEPTID2", id)
+    const { name } = req.body; 
 
     const result = await updateDepartment(id, name);
     if (!result.success) {
