@@ -11,6 +11,6 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
   },
-  "include": ["src/**/*", "src/__tests__/config/global.d.ts"],
+  "include": ["src/**/*", "src/__tests__/config/global.d.ts", "Temp/refreshToken.test.ts", "Temp/register.test.ts", "Temp/user.test.ts"],
   "exclude": ["node_modules", "dist"]
 }

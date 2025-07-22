@@ -11,7 +11,7 @@ beforeAll(async () => {
     .post("/v1/departments")
       .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
       .set("Content-Type", "application/json")
-      .send({ name: departmentName });
+      .send({ name: departmentName }); 
 
   expect(response.status).toBe(200);    
   expect(response.body).toBeDefined();
@@ -55,9 +55,9 @@ describe("POST /api/v1/departments", () => {
         .set("Content-Type", "application/json")
         .send({ name: '' }); 
 
-    expect(response.status).toBe(400);    
-    expect(response.body).toHaveProperty('error');  
-    expect(response.body.error).toMatch('Department name required'); 
+    expect(response.status).toBe(400);     
+    expect(response.body).toHaveProperty('errors');  
+    expect(response.body.errors[0]).toMatch('Department name must be at least 2 characters'); 
   });
 
   it("should return 400 and error Department already exists", async () => {
@@ -67,10 +67,10 @@ describe("POST /api/v1/departments", () => {
         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
         .set("Content-Type", "application/json")
         .send({ name: departmentName }); 
-
+        
     expect(response.status).toBe(400);    
-    expect(response.body).toHaveProperty('error');  
-    expect(response.body.error).toMatch('Department already exists'); 
+    expect(response.body).toHaveProperty('errors');  
+    expect(response.body.errors[0]).toMatch('Department name already exists'); 
   });
 });
 
@@ -91,28 +91,32 @@ describe("GET /api/v1/departments/:id", () => {
     expect(response.body.name).toBe(departmentName); 
   });
 
-  it("should return 404 and error Department not found", async () => {
+  it("should return 400 and error Department not found", async () => {
      
     const response = await request(global.app!)
       .get("/v1/departments/" + invalidDepartmentId)
         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
         .set("Content-Type", "application/json"); 
 
-    expect(response.status).toBe(404);    
-    expect(response.body).toHaveProperty('error');  
-    expect(response.body.error).toMatch('Department not found'); 
+    expect(response.status).toBe(400);    
+    expect(response.body).toHaveProperty('errors');  
+    expect(response.body.errors[0]).toMatch('Department not found'); 
   });
-});
+ });
   
 describe("PUT /api/v1/departments", () => {  
 
   it("should return 200 and department", async () => { 
 
     const response = await request(global.app!)
-      .put("/v1/departments")
+      .put("/v1/departments/" + departmentId)
         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
         .set("Content-Type", "application/json")
-        .send({ id: departmentId, name: updateDepartmentName });
+        .send({ name: updateDepartmentName });
+
+    console.log("DEPTID", departmentId)
+    console.log("NANE", updateDepartmentName)
+    console.log("STATUS", response.statusCode)
  
     expect(response.status).toBe(200);    
     expect(response.body).toBeDefined();
@@ -124,17 +128,17 @@ describe("PUT /api/v1/departments", () => {
     expect(response.body.name).toBe(updateDepartmentName); 
   });
   
-  it("should return 404 and error Department not found", async () => {
+  it("should return 400 and error Department not found", async () => {
       
     const response = await request(global.app!)
-      .put("/v1/departments")
+      .put("/v1/departments/" + invalidDepartmentId)
         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
         .set("Content-Type", "application/json")
-        .send({ id: invalidDepartmentId, name: departmentName }); 
+        .send({ name: departmentName }); 
 
-    expect(response.status).toBe(404);    
-    expect(response.body).toHaveProperty('error');  
-    expect(response.body.error).toMatch('Department not found'); 
+    expect(response.status).toBe(400);    
+    expect(response.body).toHaveProperty('errors');  
+    expect(response.body.errors[0]).toMatch('Department not found'); 
   });
 });
  
@@ -155,15 +159,15 @@ describe("DELETE /api/v1/departments/:id", () => {
     expect(response.body.message).toMatch('Department deleted'); 
   });  
 
-  it("should return 404 and error Department not found", async () => {
+  it("should return 400 and error Department not found", async () => {
      
     const response = await request(global.app!)
       .delete("/v1/departments/" + invalidDepartmentId)
         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
         .set("Content-Type", "application/json"); 
 
-    expect(response.status).toBe(404);    
-    expect(response.body).toHaveProperty('error');  
-    expect(response.body.error).toMatch('Department not found'); 
+    expect(response.status).toBe(400);    
+    expect(response.body).toHaveProperty('errors');  
+    expect(response.body.errors[0]).toMatch('Department not found'); 
   });
 });
