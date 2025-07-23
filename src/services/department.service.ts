@@ -1,7 +1,7 @@
-import { AppDepartment } from '../interface/department';
+import { DepartmentResponse } from '../interface/department';
 import { DepartmentModel, IDepartment } from '../models/department.model';
 import { ServiceResult } from '../types/ServiceResult';
-import { mapDepartment } from '../utils/mapper'; 
+import { toDepartmentResponse } from '../utils/mapper'; 
 import { createDepartmentSchema } from '../validation/department/createDepartment.schema';
 import { deleteDepartmentSchema } from '../validation/department/deleteDepartment.schema';
 import { updateDepartmentSchema } from '../validation/department/updateDepartment.schema';
@@ -35,7 +35,7 @@ export async function getDepartmentByName(name: string): Promise<IDepartment | n
   return await DepartmentModel.findOne({ name: name }).exec();
 }
 
-export async function createDepartment(data: unknown): Promise<ServiceResult<AppDepartment>> {
+export async function createDepartment(data: unknown): Promise<ServiceResult<DepartmentResponse>> {
   
   const parsed = await createDepartmentSchema.safeParseAsync(data);
   if (!parsed.success) {
@@ -46,7 +46,7 @@ export async function createDepartment(data: unknown): Promise<ServiceResult<App
   try {
     const department = new DepartmentModel(parsed.data);
     const saved = await department.save();  
-    return { success: true, data: mapDepartment(saved) };
+    return { success: true, data: toDepartmentResponse(saved) };
   } catch (err: any) {
     if (err.code === 11000) {
       return { success: false, error: ['Department name already exists'] };
@@ -61,7 +61,7 @@ export async function createDepartment(data: unknown): Promise<ServiceResult<App
   }
 } 
 
-export async function updateDepartment(id: string, name: string): Promise<ServiceResult<AppDepartment>> {
+export async function updateDepartment(id: string, name: string): Promise<ServiceResult<DepartmentResponse>> {
      
   const parsed = await updateDepartmentSchema.safeParseAsync({ id, name });
   if (!parsed.success) {
@@ -80,7 +80,7 @@ export async function updateDepartment(id: string, name: string): Promise<Servic
       return { success: false, error: ['Department not found'] };
     }
 
-    return { success: true, data: mapDepartment(updated) };
+    return { success: true, data: toDepartmentResponse(updated) };
   } catch (err: any) {
     return { success: false, error: ['Unexpected error: ' + err.message] };
   }

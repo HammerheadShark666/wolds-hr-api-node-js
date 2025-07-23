@@ -1,13 +1,13 @@
-export interface AppAuthenticated {
+export interface AuthenticatedResponse {
   token: string;
   refreshToken: string;
 }
 
-export interface AppAuthenticate {
+export interface AuthenticateRequest {
   username: string;
   password: string;
 }
 
-export interface AppLogout {
+export interface LogoutRequest {
   refreshToken: string;
 }

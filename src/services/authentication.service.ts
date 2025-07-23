@@ -1,4 +1,4 @@
-import { AppAuthenticate, AppAuthenticated, AppLogout } from "../interface/authenticated";
+import { AuthenticateRequest, AuthenticatedResponse, LogoutRequest } from "../interface/authenticated";
 import { UserModel } from "../models/user.model";
 import { ServiceResult } from "../types/ServiceResult";
 import { authenticateSchema } from "../validation/authentication/authenticate.schema";
@@ -7,7 +7,7 @@ import type { StringValue } from 'ms';
 import { getAccessTokenExpiry, getAccessTokenSecret, getRefreshTokenExpiry, getRefreshTokenSecret } from "../utils/authentication.helper";
 import { removeTokenFromUser } from "./refreshToken.service";
 
-export async function authenticateUser(data: AppAuthenticate): Promise<ServiceResult<AppAuthenticated>> {
+export async function authenticateUser(data: AuthenticateRequest): Promise<ServiceResult<AuthenticatedResponse>> {
   
   const parsed = await authenticateSchema.safeParseAsync(data);
   if (!parsed.success) {
@@ -30,7 +30,7 @@ export async function authenticateUser(data: AppAuthenticate): Promise<ServiceRe
         expiresIn: getRefreshTokenExpiry() as StringValue
     });
     
-    const tokens: AppAuthenticated = { token, refreshToken };
+    const tokens: AuthenticatedResponse = { token, refreshToken };
 
     return { success: true, data: tokens };
   } catch (err: any) {
@@ -44,7 +44,7 @@ export async function authenticateUser(data: AppAuthenticate): Promise<ServiceRe
   }
 }
 
-export async function logoutUser(data: AppLogout): Promise<ServiceResult<void>> {
+export async function logoutUser(data: LogoutRequest): Promise<ServiceResult<void>> {
 
   let user = await UserModel.findOne({ refreshToken: data.refreshToken })
   if(user) {
