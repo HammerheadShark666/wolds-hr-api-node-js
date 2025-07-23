@@ -1,38 +1,29 @@
-import { Router } from 'express';
-import bcrypt from 'bcryptjs';
-import { createUser, getUserByEmail } from '../services/user.service';
+import { Router } from 'express'; 
+import asyncHandler from 'express-async-handler';
+import { registerUser } from '../services/register.service';
+import { RegisterRequest } from '../interface/register';
 
 export function createRegisterRouter() {
 
   const router = Router();   
 
-  router.post("/register", async (req, res) => {
+  router.post("/register", asyncHandler(async (req, res): Promise<void> => {
     
     try {
-      const { username, password } = req.body;
-      if (!username || !password) 
-        return res.status(400).json({ error: 'Missing fields' });
-
-      const existingUser = await getUserByEmail(username);
-      if (existingUser) 
-        return res.status(400).json({ error: "Username already exists." });
-      
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt); 
  
-      const response = await createUser({ username, password: hashedPassword });
-      if (!response || !response._id) 
-        return res.status(500).json({ error: "Failed to create user." });     
- 
-      res.json({
-        message: "User registered successfully",
-        userId: response._id,
-      });
+      const registeredRequest: RegisterRequest = {username: req.body.username, password: req.body.password, confirmPassword: req.body.confirmPassword};
+      const result = await registerUser(registeredRequest);
+      if (!result.success) {  
+        res.status(400).json({ errors: result.error });
+        return;
+      }  
+       
+      res.status(200).json(result.data );   
     } catch (err) {
       console.error('Register error:', err);
       res.status(500).send('Internal server error');
     }
-  }); 
+  })); 
 
   return router;
 }

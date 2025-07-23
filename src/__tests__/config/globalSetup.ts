@@ -17,9 +17,9 @@ export default async function globalSetup() {
   //Register a user
   const registerResponse = await request(global.app)
     .post("/v1/register")
-    .set("Content-Type", "application/json")
-    .send({ username: global.username, password: global.password }); 
-
+      .set("Content-Type", "application/json")
+      .send({ username: global.username, password: global.password, confirmPassword: global.password }); 
+  
   if (!registerResponse.body || !registerResponse.body.userId)
     throw new Error('User registration failed in global setup');
 
