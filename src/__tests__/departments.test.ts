@@ -1,6 +1,6 @@
 import request from 'supertest';   
 
-let departmentId = '';
+let departmentId = ''; 
 const departmentName = 'Warehouse';
 const updateDepartmentName = 'R&D';
 const invalidDepartmentId = "6877849fd6fc22ad3cdca489"
@@ -47,7 +47,7 @@ describe("GET /api/v1/departments", () => {
     
 describe("POST /api/v1/departments", () => { 
  
-  it("should return 400 and error Department name required", async () => {
+  it("should return 400 and error when no department name", async () => {
     
     const response = await request(global.app!)
       .post("/v1/departments")
@@ -60,7 +60,7 @@ describe("POST /api/v1/departments", () => {
     expect(response.body.errors[0]).toMatch('Department name must be at least 2 characters'); 
   });
 
-  it("should return 400 and error Department already exists", async () => {
+  it("should return 400 and error when department already exists", async () => {
     
     const response = await request(global.app!)
       .post("/v1/departments")
@@ -91,7 +91,7 @@ describe("GET /api/v1/departments/:id", () => {
     expect(response.body.name).toBe(departmentName); 
   });
 
-  it("should return 400 and error Department not found", async () => {
+  it("should return 400 and error when department not found", async () => {
      
     const response = await request(global.app!)
       .get("/v1/departments/" + invalidDepartmentId)
@@ -106,7 +106,7 @@ describe("GET /api/v1/departments/:id", () => {
   
 describe("PUT /api/v1/departments", () => {  
 
-  it("should return 200 and department", async () => { 
+  it("should return 200 and department when department updated", async () => { 
 
     const response = await request(global.app!)
       .put("/v1/departments/" + departmentId)
@@ -124,7 +124,7 @@ describe("PUT /api/v1/departments", () => {
     expect(response.body.name).toBe(updateDepartmentName); 
   });
   
-  it("should return 400 and error Department not found", async () => {
+  it("should return 400 and error when department not found", async () => {
       
     const response = await request(global.app!)
       .put("/v1/departments/" + invalidDepartmentId)
@@ -140,7 +140,7 @@ describe("PUT /api/v1/departments", () => {
  
 describe("DELETE /api/v1/departments/:id", () => { 
 
-  it("should return 200 and message Department deleted", async () => {
+  it("should return 200 and message when deleted", async () => {
   
     const departmentName = 'Warehouse'; 
 
@@ -155,7 +155,7 @@ describe("DELETE /api/v1/departments/:id", () => {
     expect(response.body.message).toMatch('Department deleted'); 
   });  
 
-  it("should return 400 and error Department not found", async () => {
+  it("should return 400 and error when department not found", async () => {
      
     const response = await request(global.app!)
       .delete("/v1/departments/" + invalidDepartmentId)
