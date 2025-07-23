@@ -28,8 +28,7 @@ export function createAuthenticationRouter() {
       await logoutUser({ refreshToken: token });
  
       res.clearCookie('refreshToken', { path: '/refresh-token' });
-      res.sendStatus(204);
-     
+      res.sendStatus(204);     
   });
 
   return router;

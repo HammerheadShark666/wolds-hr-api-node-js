@@ -1,38 +1,27 @@
-import { Router } from 'express';
-import jwt from 'jsonwebtoken'; 
-import { JwtPayload, VerifyErrors } from 'jsonwebtoken';
+import { Router } from 'express'; 
+import { createTokenFromRefreshTokens } from '../services/refreshToken.service';
+import asyncHandler from 'express-async-handler';
 
 export function createRefreshTokenRouter() {
 
   const router = Router(); 
    
-  router.post('/refresh-token', (req, res) => {
-
-    try { 
+  router.post('/refresh-token', asyncHandler(async (req, res) => {
+    
       const refreshToken = req.cookies.refreshToken;
-      if (!refreshToken) 
-        return res.sendStatus(401);
+      if (!refreshToken) {
+        res.sendStatus(401);
+        return;
+      }
 
-      jwt.verify(
-        refreshToken,
-        process.env.REFRESH_TOKEN_SECRET!,
-        (err: VerifyErrors | null, decoded: string | JwtPayload | undefined) => {
-          if (err || !decoded || typeof decoded === 'string') return res.sendStatus(403);
+      const refreshTokenResponse = await createTokenFromRefreshTokens(refreshToken);
+      if (!refreshTokenResponse.success) {
+        res.status(401).json({ error: refreshTokenResponse.error[0] });
+        return;
+      }
 
-          const newToken = jwt.sign(
-            { id: decoded.id },
-            process.env.ACCESS_TOKEN_SECRET!,
-            { expiresIn: '15m' }
-          );
-
-          res.json({ token: newToken });
-        }
-      );
-    } catch (err) {
-      console.error('Refresh Token error:', err);
-      res.status(500).send('Internal server error');
-    }
-  }); 
+      res.status(200).json({ token: refreshTokenResponse.data.token });   
+  })); 
 
   return router;
 }
