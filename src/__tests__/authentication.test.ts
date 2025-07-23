@@ -45,8 +45,8 @@ describe("POST /api/v1/login (FAIL)", () => {
    
     const response = await request(global.app!)
       .post("/v1/login") 
-      .set("Content-Type", "application/json")
-      .send({ username: '', password: '' });
+        .set("Content-Type", "application/json")
+        .send({ username: '', password: '' });
 
     expect(response.status).toBe(400);     
     expect(response.body).toBeDefined();
@@ -58,7 +58,7 @@ describe("POST /api/v1/login (FAIL)", () => {
   it("should return 400 and error when invalid username", async () => {
     const response = await request(global.app!)
       .post("/v1/login") 
-      .set("Content-Type", "application/json")
+       .set("Content-Type", "application/json")
        .send({ username: 'testusername', password: password });
 
     expect(response.status).toBe(400);    
@@ -71,7 +71,7 @@ describe("POST /api/v1/login (FAIL)", () => {
   it("should return 400 and error when password not long enough, no uppercase, number, special character", async () => {
     const response = await request(global.app!)
       .post("/v1/login") 
-      .set("Content-Type", "application/json")
+       .set("Content-Type", "application/json")
        .send({ username: username, password: "dfdf" });
 
     expect(response.status).toBe(400);    
@@ -115,8 +115,7 @@ describe("POST /api/v1/login (FAIL)", () => {
  
 describe("POST /api/v1/logout", () => { 
  
-   it("should return 204 when no refresh token", async () => { 
-
+   it("should return 204 when no refresh token", async () => {
     const response = await request(global.app!)
       .post("/v1/logout") 
         .set("Content-Type", "application/json") 
@@ -125,8 +124,7 @@ describe("POST /api/v1/logout", () => {
      expect(response.status).toBe(204);      
   });
 
-  it("should return 204 when refresh token", async () => { 
-
+  it("should return 204 when refresh token", async () => {
     const response = await request(global.app!)
       .post("/v1/logout") 
         .set("Content-Type", "application/json")
@@ -136,8 +134,7 @@ describe("POST /api/v1/logout", () => {
     expect(response.status).toBe(204);    ;     
   }); 
 
-  it("should return 204 when invalid refresh token", async () => { 
-
+  it("should return 204 when invalid refresh token", async () => {
     const response = await request(global.app!)
       .post("/v1/logout") 
         .set("Content-Type", "application/json")

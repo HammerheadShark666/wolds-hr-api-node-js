@@ -6,8 +6,7 @@ export const updateDepartmentSchema = z.object({
   id: z.string().min(1, 'ID is required'),
   name: departmentNameSchema,
 }).superRefine(async (data, ctx) => {
-  const existing = await DepartmentModel.findOne({ name: data.name });
-  console.log("VALIDATING DUPLICATE:", existing);
+  const existing = await DepartmentModel.findOne({ name: data.name }); 
   if (existing && existing.id !== data.id) {
     ctx.addIssue({
       path: ['name'],

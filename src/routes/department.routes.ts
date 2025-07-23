@@ -3,7 +3,6 @@ import { toDepartmentResponse } from '../utils/mapper';
 import { DepartmentResponse,  } from '../interface/department'; 
 import { createDepartment, updateDepartment, getDepartmentById, getDepartmentByName, getDepartments, deleteDepartment } from '../services/department.service';
 import asyncHandler from 'express-async-handler';
-import {HttpError} from '../utils/classes/HttpError'
 
 export function createDepartmentRouter() {
   
@@ -13,7 +12,8 @@ export function createDepartmentRouter() {
     
     const result = await getDepartments();
     if (!result.success) {
-      throw new HttpError(400, result.error.join(', ')); 
+      res.status(400).json({ errors: result.error });
+      return;
     } 
 
     const response: DepartmentResponse[] = result.data.map(dept => toDepartmentResponse(dept));
@@ -24,7 +24,8 @@ export function createDepartmentRouter() {
 
     const result = await getDepartmentById(req.params.id);
     if (!result.success) {
-      throw new HttpError(400, result.error.join(', ')); 
+      res.status(400).json({ errors: result.error });
+      return;
     }
 
     res.status(200).json(toDepartmentResponse(result.data)); 
@@ -34,7 +35,8 @@ export function createDepartmentRouter() {
   
     const result = await createDepartment(req.body);
     if (!result.success) {
-      throw new HttpError(400, result.error.join(', ')); 
+      res.status(400).json({ errors: result.error });
+      return;
     } 
     
     res.status(200).json(result.data);     
@@ -47,7 +49,8 @@ export function createDepartmentRouter() {
 
     const result = await updateDepartment(id, name);
     if (!result.success) {
-      throw new HttpError(400, result.error.join(', ')); 
+      res.status(400).json({ errors: result.error });
+      return;
     }
 
     res.status(200).json(result.data);
@@ -59,7 +62,8 @@ export function createDepartmentRouter() {
 
     const result = await deleteDepartment(id);
     if (!result.success) { 
-      throw new HttpError(400, result.error.join(', '));
+      res.status(400).json({ errors: result.error });
+      return;
     }
 
     res.status(200).json({ message: 'Department deleted' });

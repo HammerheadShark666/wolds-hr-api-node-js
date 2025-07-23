@@ -32,9 +32,9 @@ export async function createApp() {
     app.use('/v1', v1Router);
     app.use(errorHandler);
  
-    console.log('--- Listing all endpoints: ---');
-    console.dir(listEndpoints(app), { depth: null });
-    console.log('--- End of endpoint list ---'); 
+    // console.log('--- Listing all endpoints: ---');
+    // console.dir(listEndpoints(app), { depth: null });
+    // console.log('--- End of endpoint list ---'); 
 
   } catch (err) {
     console.error('CreateApp error:', err);
