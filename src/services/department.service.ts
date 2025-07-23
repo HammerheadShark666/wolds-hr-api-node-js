@@ -5,7 +5,7 @@ import { toDepartmentResponse } from '../utils/mapper';
 import { createDepartmentSchema } from '../validation/department/createDepartment.schema';
 import { deleteDepartmentSchema } from '../validation/department/deleteDepartment.schema';
 import { updateDepartmentSchema } from '../validation/department/updateDepartment.schema';
-import { idSchema } from '../validation/general/id.schema';
+import { idSchema } from '../validation/fields/id.schema';
 
 export async function getDepartments(): Promise<ServiceResult<IDepartment[]>> {
   return { success: true, data: await DepartmentModel.find().exec() };

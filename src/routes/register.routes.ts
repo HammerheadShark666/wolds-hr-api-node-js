@@ -10,14 +10,14 @@ export function createRegisterRouter() {
   router.post("/register", asyncHandler(async (req, res): Promise<void> => {
      
     const registeredRequest: RegisterRequest = {username: req.body.username, password: req.body.password, confirmPassword: req.body.confirmPassword};
-    const result = await registerUser(registeredRequest);
+    const result = await registerUser(registeredRequest); 
+
     if (!result.success) {  
       res.status(400).json({ errors: result.error });
       return;
     }  
       
-    res.status(200).json(result.data );   
-    
+    res.status(200).json(result.data );    
   })); 
 
   return router;

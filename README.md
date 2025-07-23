@@ -9,3 +9,18 @@ npm start
 
 
  npx jest src/__tests__/authentication.test.ts --detectOpenHandles --runInBand
+
+
+
+
+ TODO 
+
+
+ id schema
+ email schema 
+
+ 
+ base auth for unique username
+
+ change register to create user  
+

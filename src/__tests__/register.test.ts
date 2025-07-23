@@ -1,7 +1,6 @@
 import request from 'supertest';
 
 const username = 'testregister@hotmail.com';
-const invalidPasswordUsername = 'testregisterinvalid@hotmail.com';
 const password = 'Password#1';
 let userId = '';
  
@@ -22,9 +21,9 @@ describe("POST /api/v1/register", () => {
     expect(response.body.message).toMatch("User registered successfully");  
 
     userId = response.body.userId;
-  });
+  }); 
 
-   it("should return 400 and error when username already exists ", async () => {
+  it("should return 400 and error when username already exists ", async () => {
     
     const response = await request(global.app!)
       .post("/v1/register") 
@@ -36,6 +35,18 @@ describe("POST /api/v1/register", () => {
     expect(response.body).toHaveProperty("errors");
     expect(response.body.errors[0]).toMatch("Username already exists");  
   });
+
+  it("delete registered user, should return 200 when deleted", async () => {
+
+    const response = await request(global.app!)
+        .delete(`/v1/users/${userId}`)
+        .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
+        .send();
+  
+    expect(response.status).toBe(200);    
+    expect(response.body).toHaveProperty('message');  
+    expect(response.body.message).toMatch('User deleted'); 
+  }); 
 
   it("should return 400 and error when no username passed ", async () => {
      
@@ -70,8 +81,7 @@ describe("POST /api/v1/register", () => {
         .set("Content-Type", "application/json")
         .send({ username: username, password: "dfdf", confirmPassword: "dfdf" });
 
-    expect(response.status).toBe(400);    
-
+    expect(response.status).toBe(400);  
     expect(response.body).toBeDefined();
     expect(response.body).toHaveProperty("errors");
     expect(response.body.errors).toBeInstanceOf(Array);
@@ -87,8 +97,7 @@ describe("POST /api/v1/register", () => {
         .set("Content-Type", "application/json")
         .send({ username: username, password: "PASSWORD#1", confirmPassword: "PASSWORD#1" });
 
-    expect(response.status).toBe(400);    
-
+    expect(response.status).toBe(400);     
     expect(response.body).toBeDefined();
     expect(response.body).toHaveProperty("errors");
     expect(response.body.errors).toBeInstanceOf(Array); 
@@ -108,15 +117,4 @@ describe("POST /api/v1/register", () => {
     expect(response.body.errors[0]).toMatch('Passwords do not match'); 
   }); 
 
-  it("delete registered user, should return 200 when deleted", async () => {
-
-    const response = await request(global.app!)
-        .delete(`/v1/users/${userId}`)
-        .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
-        .send();
-  
-    expect(response.status).toBe(200);    
-    expect(response.body).toHaveProperty('message');  
-    expect(response.body.message).toMatch('User deleted'); 
-  });  
 });  

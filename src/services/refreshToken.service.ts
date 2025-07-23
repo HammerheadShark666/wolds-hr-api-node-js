@@ -30,12 +30,7 @@ export async function createTokenFromRefreshTokens(refreshToken: string): Promis
     console.error("createTokenFromRefreshTokens error:", err);
     return { success: false, error: [err.message || "Failed to refresh token"] };
   }
-}
-
-
-
-
-
+}  
 
 export async function updateUserTokens(userId: string, tokens: string[]) {
   return await UserModel.findByIdAndUpdate(userId, { tokens }, { new: true }).exec();
