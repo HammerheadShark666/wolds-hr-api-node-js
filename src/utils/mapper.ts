@@ -1,21 +1,20 @@
-import { AppUser } from "../interface/user";
-import { AppDepartment } from "../interface/department";
-import { AppEmployee } from "../interface/employee";
+import { UserResponse } from "../interface/user";
+import { DepartmentResponse } from "../interface/department";
 import { IDepartment } from "../models/department.model";
 import { IUser } from "../models/user.model";
 
-export function mapDepartment(department: IDepartment): AppDepartment {
+export function toDepartmentResponse(department: IDepartment): DepartmentResponse {
   const { id, name } = department;
-  const appDepartment: AppDepartment = {
+  const appDepartment: DepartmentResponse = {
     id: id,
     name: name
   }; 
   return appDepartment;
 } 
 
-export function mapUser(user: IUser): AppUser {
+export function toUserResponse(user: IUser): UserResponse {
   const { _id, username, role } = user;
-  const appUser: AppUser = {
+  const appUser: UserResponse = {
     id: _id.toString(),
     username: username, 
     role: role, 

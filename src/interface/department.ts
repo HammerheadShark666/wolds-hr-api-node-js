@@ -1,4 +1,4 @@
-export interface AppDepartment{
+export interface DepartmentResponse{
   id: string;
   name: string;
 }
