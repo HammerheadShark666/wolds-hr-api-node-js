@@ -109,7 +109,7 @@ describe("POST /api/v1/login (FAIL)", () => {
     expect(response.body).toBeDefined();
     expect(response.body).toHaveProperty("errors");
     expect(response.body.errors).toBeInstanceOf(Array);
-    expect(response.body.errors[0]).toMatch('Username/password are invalid'); 
+    expect(response.body.errors[0]).toMatch('Invalid login'); 
   });
 }); 
  

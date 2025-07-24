@@ -4,7 +4,9 @@ export interface IUser extends Document {
   _id: Types.ObjectId;
   username: string;
   password: string;
-  role: 'admin' | 'user';
+  surname: string;
+  firstName: string;
+  role: 'admin' | 'clerk';
   tokens: string[];
   createdAt: Date;
 }
@@ -12,7 +14,9 @@ export interface IUser extends Document {
 const userSchema = new Schema<IUser>({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['admin', 'user'], default: 'user' },
+  surname: { type: String, required: true },
+  firstName: { type: String, required: true },
+  role: { type: String, enum: ['admin', 'clerk'], default: 'clerk' },
   tokens: { type: [String], default: [] },
   createdAt: { type: Date, default: Date.now }
 });

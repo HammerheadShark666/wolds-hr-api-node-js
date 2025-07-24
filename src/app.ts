@@ -1,14 +1,14 @@
 import express from 'express';
-import cors from 'cors';
-import { authenticateToken } from './middleware/authenticateToken';
+import cors from 'cors'; 
 import cookieParser from 'cookie-parser';
 import listEndpoints from 'express-list-endpoints'; 
-import { createAuthenticationRouter } from './routes/authentication.routes';
+import { createLoginRouter } from './routes/login.routes';
 import { createRefreshTokenRouter } from './routes/refreshToken.routes';
 import { createRegisterRouter } from './routes/register.routes';
 import { createDepartmentRouter } from './routes/department.routes';
 import { createUsersRouter } from './routes/user.routes';
 import { errorHandler } from './middleware/errorHandler';
+import { loginToken } from './middleware/loginToken';
 
 export async function createApp() {
 
@@ -22,10 +22,10 @@ export async function createApp() {
 
     const v1Router = express.Router();
 
-    v1Router.use('', createAuthenticationRouter());
+    v1Router.use('', createLoginRouter());
     v1Router.use('', createRefreshTokenRouter());
     v1Router.use('', createRegisterRouter());
-    v1Router.use(authenticateToken);
+    v1Router.use(loginToken);
     v1Router.use('/departments', createDepartmentRouter());
     v1Router.use('/users', createUsersRouter());
   

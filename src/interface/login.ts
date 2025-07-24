@@ -1,9 +1,9 @@
-export interface AuthenticatedResponse {
+export interface LoginResponse {
   token: string;
   refreshToken: string;
 }
 
-export interface AuthenticateRequest {
+export interface LoginRequest {
   username: string;
   password: string;
 }

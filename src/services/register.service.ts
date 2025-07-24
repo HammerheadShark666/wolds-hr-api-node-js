@@ -4,6 +4,8 @@ import { RegisteredResponse, RegisterRequest } from "../interface/register";
 import bcrypt from 'bcryptjs';
 import { createUser } from "./user.service";
 
+type Role = "admin" | "clerk";
+
 export async function registerUser(data: RegisterRequest): Promise<ServiceResult<RegisteredResponse>> {
   
   const parsed = await registerSchema.safeParseAsync(data);
@@ -17,7 +19,7 @@ export async function registerUser(data: RegisterRequest): Promise<ServiceResult
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(data.password, salt); 
 
-    const user = await createUser({ username: data.username, password: hashedPassword });
+    const user = await createUser({ username: data.username, password: hashedPassword, surname: data.surname, firstName: data.firstName, role: data.role as Role });
     if (!user || !user._id) {
       return { success: false, error: ['Failed to register user'] };
     }

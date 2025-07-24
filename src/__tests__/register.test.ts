@@ -11,7 +11,9 @@ describe("POST /api/v1/register", () => {
     const response = await request(global.app!)
       .post("/v1/register") 
         .set("Content-Type", "application/json")
-        .send({username: username, password: password, confirmPassword: password}); 
+        .send({username: username, password: password, confirmPassword: password, surname: 'Doe', firstName: 'John', role: 'clerk'}); 
+
+    console.log("Register response: ", response.body);
  
     expect(response.status).toBe(200);    
     expect(response.body).toBeDefined();

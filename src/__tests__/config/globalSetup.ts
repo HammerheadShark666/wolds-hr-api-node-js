@@ -14,18 +14,25 @@ export default async function globalSetup() {
   global.username = `john_${Date.now()}@hotmail.com`;
   global.password = "Password#1";
 
+  console.log("create user: ", global.username, global.password);
+
   //Register a user
   const registerResponse = await request(global.app)
     .post("/v1/register")
       .set("Content-Type", "application/json")
-      .send({ username: global.username, password: global.password, confirmPassword: global.password }); 
+      .send({ username: global.username, password: global.password, confirmPassword: global.password, surname: 'Doe', firstName: 'John', role: 'clerk' }); 
   
-  if (!registerResponse.body || !registerResponse.body.userId)
-    throw new Error('User registration failed in global setup');
+  console.log("created user: ", global.username, global.password);
+  console.log("body: ", registerResponse.body); 
 
+  if (!registerResponse.body || !registerResponse.body.userId)
+    throw new Error('User registration failed in global setup'); 
+  
   global.userId = registerResponse.body.userId; 
+
+   console.log("login user: ", global.username, global.password);
  
-  //Login to register use and use this authenticated tests
+  //Login to register use and use this login tests
   const response = await request(global.app!)
       .post("/v1/login") 
         .set("Content-Type", "application/json")
@@ -33,6 +40,8 @@ export default async function globalSetup() {
 
   if (response.status !== 200)
     throw new Error('Login failed in global setup');
+
+   console.log("Login successful, setting global tokens");
    
   const cookiesHeader = response.headers['set-cookie'];
   const cookiesArray = Array.isArray(cookiesHeader) ? cookiesHeader : [cookiesHeader];

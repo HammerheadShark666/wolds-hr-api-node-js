@@ -7,4 +7,7 @@ export interface RegisterRequest {
   username: string;
   password: string;
   confirmPassword: string;
+  firstName?: string;
+  surname?: string; 
+  role?: string;
 }

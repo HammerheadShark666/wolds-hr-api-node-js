@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import asyncHandler from 'express-async-handler';
-import { authenticateUser, logoutUser } from '../services/authentication.service';
+import { loginUser, logoutUser } from '../services/login.service';
 import { setRefreshTokenCookie } from '../utils/authentication.helper';
 
-export function createAuthenticationRouter() {
+export function createLoginRouter() {
 
   const router = Router();  
 
   router.post('/login', asyncHandler(async (req, res): Promise<void> => {
     
-      const result = await authenticateUser(req.body);
+      const result = await loginUser(req.body);
       if (!result.success) {  
         res.status(400).json({ errors: result.error });
         return;

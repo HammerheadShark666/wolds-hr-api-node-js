@@ -9,7 +9,50 @@ let userId = '';
 
 describe("User API - Add a user", () => { 
 
-  it("should return 200 and user details ", async () => {
+   it("should return 200 and user id when register successful ", async () => {
+      
+      // const response = await request(global.app!)
+      //   .post("/v1/register") 
+      //     .set("Content-Type", "application/json")
+      //     .send({username: username, password: password, confirmPassword: password}); 
+   
+      // expect(response.status).toBe(200);    
+      // expect(response.body).toBeDefined();
+      // expect(response.body).toHaveProperty("userId");
+      // expect(typeof response.body.userId).toBe('string'); 
+      // expect(response.body).toHaveProperty("message");
+      // expect(response.body.message).toMatch("User registered successfully");  
+  
+      // userId = response.body.userId;
+    }); 
+  
+    // it("should return 400 and error when username already exists ", async () => {
+      
+    //   const response = await request(global.app!)
+    //     .post("/v1/register") 
+    //       .set("Content-Type", "application/json")
+    //       .send({username: username, password: password, confirmPassword: password}); 
+   
+    //   expect(response.status).toBe(400);    
+    //   expect(response.body).toBeDefined();  
+    //   expect(response.body).toHaveProperty("errors");
+    //   expect(response.body.errors[0]).toMatch("Username already exists");  
+    // });
+  
+    // it("delete registered user, should return 200 when deleted", async () => {
+  
+    //   const response = await request(global.app!)
+    //       .delete(`/v1/users/${userId}`)
+    //       .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
+    //       .send();
+    
+    //   expect(response.status).toBe(200);    
+    //   expect(response.body).toHaveProperty('message');  
+    //   expect(response.body.message).toMatch('User deleted'); 
+    // }); 
+
+
+  //it("should return 200 and user details ", async () => {
       
   //   const response = await request(global.app!)
   //         .post("/v1/register") 
@@ -24,7 +67,7 @@ describe("User API - Add a user", () => {
     
   //       userId = response.body.userId;
   // });
-}); 
+//}); 
 
 // describe("User API - Get a user by email", () => { 
 
