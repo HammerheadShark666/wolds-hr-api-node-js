@@ -1,6 +1,6 @@
 import { Model } from "mongoose";
 
-export function uniqueValidator<T extends { [key: string]: any }>(
+export function validateUnique<T extends { [key: string]: any }>(
   model: Model<any>,
   field: keyof T,
   errorMessage?: string

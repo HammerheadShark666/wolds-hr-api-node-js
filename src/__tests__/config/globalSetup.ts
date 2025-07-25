@@ -9,49 +9,83 @@ export default async function globalSetup() {
   global.app = await createApp();
   await connectToDatabase();
 
-  console.log("globalSetup");
+  console.log("globalSetup"); 
 
-  global.username = `john_${Date.now()}@hotmail.com`;
-  global.password = "Password#1";
+  global.username = `john@hotmail.com`;
+  global.password = "Password#1"; 
 
-  console.log("create user: ", global.username, global.password);
+  await loginToMasterAccount(); 
+  await addNewUser(); 
+  await logoutOfMasterAccount();
+  await loginAsNewUser();  
 
-  //Register a user
-  const registerResponse = await request(global.app)
-    .post("/v1/register")
-      .set("Content-Type", "application/json")
-      .send({ username: global.username, password: global.password, confirmPassword: global.password, surname: 'Doe', firstName: 'John', role: 'clerk' }); 
+  console.log('Global setup completed');
+}
+
+function getRefreshTokenCookie(response: request.Response): string | null {
+
+  const cookiesHeader = response.headers['set-cookie'];
+  const cookiesArray = Array.isArray(cookiesHeader) ? cookiesHeader : [cookiesHeader];
   
-  console.log("created user: ", global.username, global.password);
-  console.log("body: ", registerResponse.body); 
-
-  if (!registerResponse.body || !registerResponse.body.userId)
-    throw new Error('User registration failed in global setup'); 
+  const refreshTokenCookie = cookiesArray.find((cookie: string) =>
+    cookie.startsWith('refreshToken='));  
   
-  global.userId = registerResponse.body.userId; 
+  return refreshTokenCookie;
+}
 
-   console.log("login user: ", global.username, global.password);
- 
-  //Login to register use and use this login tests
+async function loginToMasterAccount() {
+
   const response = await request(global.app!)
       .post("/v1/login") 
         .set("Content-Type", "application/json")
         .send({ username: global.username, password: global.password });
 
   if (response.status !== 200)
-    throw new Error('Login failed in global setup');
+    throw new Error('Login failed in global setup');  
 
-   console.log("Login successful, setting global tokens");
-   
-  const cookiesHeader = response.headers['set-cookie'];
-  const cookiesArray = Array.isArray(cookiesHeader) ? cookiesHeader : [cookiesHeader];
-  
-  const refreshTokenCookie = cookiesArray.find((cookie: string) =>
-    cookie.startsWith('refreshToken='));    
-  const token = refreshTokenCookie!.split(';')[0].split('=')[1]; 
+  const refreshTokenCookie = getRefreshTokenCookie(response);
     
   global.REFRESH_TOKEN = refreshTokenCookie;
   global.ACCESS_TOKEN = response.body.token; 
+}
 
-  console.log('Global setup completed');
+async function addNewUser() {
+ 
+  global.username = `john_${Date.now()}@hotmail.com`;
+  global.password = "Password#1";
+ 
+  const addedUserResponse = await request(global.app!)
+    .post("/v1/users/add")
+      .set("Content-Type", "application/json")
+      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .send({ username: global.username, password: global.password, confirmPassword: global.password, surname: 'Doe', firstName: 'John', role: 'clerk' }); 
+    
+  if (!addedUserResponse.body || !addedUserResponse.body.userId)
+    throw new Error('User registration failed in global setup'); 
+  
+  global.userId = addedUserResponse.body.userId;  
+}
+
+async function logoutOfMasterAccount() { 
+  const response = await request(global.app!)
+    .post("/v1/logout") 
+      .set("Content-Type", "application/json")
+      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .send(); 
+} 
+
+async function loginAsNewUser() {
+
+  const response = await request(global.app!)
+  .post("/v1/login") 
+    .set("Content-Type", "application/json")
+    .send({ username: global.username, password: global.password });
+
+  if (response.status !== 200)
+    throw new Error('Login failed in global setup');  
+
+  const refreshTokenCookie = getRefreshTokenCookie(response);
+    
+  global.REFRESH_TOKEN = refreshTokenCookie;
+  global.ACCESS_TOKEN = response.body.token; 
 }

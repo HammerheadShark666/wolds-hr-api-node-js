@@ -3,8 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import listEndpoints from 'express-list-endpoints'; 
 import { createLoginRouter } from './routes/login.routes';
-import { createRefreshTokenRouter } from './routes/refreshToken.routes';
-import { createRegisterRouter } from './routes/register.routes';
+import { createRefreshTokenRouter } from './routes/refreshToken.routes'; 
 import { createDepartmentRouter } from './routes/department.routes';
 import { createUsersRouter } from './routes/user.routes';
 import { errorHandler } from './middleware/errorHandler';
@@ -24,7 +23,6 @@ export async function createApp() {
 
     v1Router.use('', createLoginRouter());
     v1Router.use('', createRefreshTokenRouter());
-    v1Router.use('', createRegisterRouter());
     v1Router.use(loginToken);
     v1Router.use('/departments', createDepartmentRouter());
     v1Router.use('/users', createUsersRouter());

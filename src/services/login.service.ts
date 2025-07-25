@@ -1,55 +1,37 @@
 import { LoginRequest, LoginResponse, LogoutRequest } from "../interface/login";
 import { UserModel } from "../models/user.model";
-import { ServiceResult } from "../types/ServiceResult"; 
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import type { StringValue } from 'ms';
-import { getAccessTokenExpiry, getAccessTokenSecret, getRefreshTokenExpiry, getRefreshTokenSecret } from "../utils/authentication.helper";
+import { ServiceResult } from "../types/ServiceResult";
+import { getAccessToken, getRefreshToken, verifyPassword } from "../utils/authentication.helper";
 import { removeTokenFromUser } from "./refreshToken.service";
 import { loginSchema } from "../validation/login/login.schema";
+import { handleServiceError } from "../utils/error.helper";
+import { validate } from "../validation/validate";
 
 export async function loginUser(data: LoginRequest): Promise<ServiceResult<LoginResponse>> {
-  
-  const parsed = await loginSchema.safeParseAsync(data);
-  if (!parsed.success) {
-    const errors = parsed.error.issues.map(issue => issue.message);
-    return { success: false, error: errors };
-  }
- 
+    
+  const validationResult = await validate(loginSchema, data);  
+    if (!validationResult.success) {
+      return validationResult;
+    }   
+    const validData = validationResult.data; 
+
   try {
    
     const user = await UserModel.findOne({ username: data.username });
     if (!user) {
-      return { success: false, error: ['Username and password are invalid'] };
+      return { success: false, error: ['Invalid login'] };
     }
-
-    // console.log("parsed.data.password: ", parsed.data.password);
-    // console.log("user.password: ", user.password);
- 
-    const valid = await bcrypt.compare(parsed.data.password, user.password);
-    if (!valid) {
+  
+    const isValid = await verifyPassword(validData.password, user.password);
+    if (!isValid) {
       return { success: false, error: ["Invalid login"] };
-    }     
-    
-    const token = jwt.sign({ userId: user._id }, getAccessTokenSecret(), {
-        expiresIn: getAccessTokenExpiry() as StringValue
-    });
-
-    const refreshToken = jwt.sign({ userId: user._id }, getRefreshTokenSecret(), {
-        expiresIn: getRefreshTokenExpiry() as StringValue
-    });
-    
-    const tokens: LoginResponse = { token, refreshToken };
-
-    return { success: true, data: tokens };
-  } catch (err: any) {
-     
-    if (err.name === 'ValidationError') {
-      const messages = Object.values(err.errors).map((e: any) => e.message);
-      return { success: false, error: messages };
     }
-
-    return { success: false, error: ['Unexpected error: ' + err.message] };
+ 
+    const tokens: LoginResponse = { token: getAccessToken(user._id), refreshToken: getRefreshToken(user._id) };
+    return { success: true, data: tokens };
+  } 
+  catch (err: any) {     
+    return handleServiceError(err);
   }
 }
 

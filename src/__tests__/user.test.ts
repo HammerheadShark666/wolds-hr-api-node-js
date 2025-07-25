@@ -9,9 +9,23 @@ let userId = '';
 
 describe("User API - Add a user", () => { 
 
-   it("should return 200 and user id when register successful ", async () => {
+   it("should return 200 and user id when user added successful ", async () => {
       
-      // const response = await request(global.app!)
+    const response = await postUser({ username, password, confirmPassword: password, surname: 'Test', firstName: 'User', role });
+     
+    expect(response.status).toBe(200);    
+    expect(response.body).toBeDefined();
+    expect(response.body).toHaveProperty("userId");
+    expect(typeof response.body.userId).toBe('string'); 
+    // expect(response.body).toHaveProperty("message");
+    // expect(response.body.message).toMatch("User added successfully");  
+
+    console.log(response.body);
+
+    userId = response.body.userId;
+    
+    
+    // const response = await request(global.app!)
       //   .post("/v1/register") 
       //     .set("Content-Type", "application/json")
       //     .send({username: username, password: password, confirmPassword: password}); 
@@ -36,7 +50,7 @@ describe("User API - Add a user", () => {
     //   expect(response.status).toBe(400);    
     //   expect(response.body).toBeDefined();  
     //   expect(response.body).toHaveProperty("errors");
-    //   expect(response.body.errors[0]).toMatch("Username already exists");  
+    //   expect(response.body.errors).toContain("Username already exists");  
     // });
   
     // it("delete registered user, should return 200 when deleted", async () => {
@@ -112,7 +126,7 @@ describe("User API - Add a user", () => {
 
 //     expect(response.status).toBe(404);    
 //     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors[0]).toMatch('User not found'); 
+//     // expect(response.body.errors).toContain('User not found'); 
 //   });
 // });
 
@@ -159,7 +173,7 @@ describe("User API - Add a user", () => {
 
 //     expect(response.status).toBe(404);    
 //     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors[0]).toMatch('User not found'); 
+//     // expect(response.body.errors).toContain('User not found'); 
 //   });
 // });
  
@@ -201,7 +215,7 @@ describe("User API - Add a user", () => {
   
 //     expect(response.status).toBe(400);    
 //     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors[0]).toMatch('Validation failed: role: `test` is not a valid enum value for path `role`.'); 
+//     // expect(response.body.errors).toContain('Validation failed: role: `test` is not a valid enum value for path `role`.'); 
 //   });
 
 //   it("should return 404 and error User not found", async () => {
@@ -214,7 +228,7 @@ describe("User API - Add a user", () => {
   
 //     expect(response.status).toBe(404);    
 //     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors[0]).toMatch('User not found'); 
+//     // expect(response.body.errors).toContain('User not found'); 
 //   });
 
 //   it("should return 400 and error User with the usename already exists", async () => {
@@ -227,7 +241,7 @@ describe("User API - Add a user", () => {
   
 //     expect(response.status).toBe(400);    
 //     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors[0]).toMatch('User with the usename already exists'); 
+//     // expect(response.body.errors).toContain('User with the usename already exists'); 
 //   }); 
 // });
 
@@ -255,8 +269,21 @@ describe("User API - Add a user", () => {
   
 //     expect(response.status).toBe(404);    
 //     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors[0]).toMatch('User not found'); 
+//     // expect(response.body.errors).toContain('User not found'); 
 //   });
 // 
 
 });
+
+
+function postUser(data?: object) {
+  const req = request(global.app!)
+    .post("/v1/users")
+    .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+    .set("Content-Type", "application/json");
+  
+  if (data !== undefined) {
+    return req.send(data);
+  }
+  return req.send();
+}

@@ -4,6 +4,7 @@ import { UserModel, IUser } from '../models/user.model';
 import jwt from 'jsonwebtoken'; 
 import { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import { ServiceResult } from '../types/ServiceResult';
+import { handleServiceError } from '../utils/error.helper';
 
 export async function createTokenFromRefreshTokens(refreshToken: string): Promise<ServiceResult<RefreshTokenResponse>> {
   try {
@@ -27,8 +28,7 @@ export async function createTokenFromRefreshTokens(refreshToken: string): Promis
     return { success: true, data: refreshTokenResponse };
 
   } catch (err: any) {
-    console.error("createTokenFromRefreshTokens error:", err);
-    return { success: false, error: [err.message || "Failed to refresh token"] };
+    return handleServiceError(err);
   }
 }  
 

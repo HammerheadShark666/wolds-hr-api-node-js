@@ -1,73 +1,63 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { toDepartmentResponse } from '../utils/mapper';
 import { DepartmentResponse,  } from '../interface/department'; 
-import { createDepartment, updateDepartment, getDepartmentById, getDepartmentByName, getDepartments, deleteDepartment } from '../services/department.service';
+import { addDepartment, updateDepartment, getDepartmentById, getDepartmentByName, getDepartments, deleteDepartment } from '../services/department.service';
 import asyncHandler from 'express-async-handler';
+import { handleError } from '../utils/error.helper';
 
 export function createDepartmentRouter() {
   
-  const router = Router(); 
+  const router = Router();  
  
-  router.get('', asyncHandler(async (req, res) => {
-    
-    const result = await getDepartments();
-    if (!result.success) {
-      res.status(400).json({ errors: result.error });
-      return;
-    } 
+  router.get(
+    '', 
+    asyncHandler(async (req, res) => {    
+      const result = await getDepartments();
+      if (!result.success) return handleError(res, result.error);
 
-    const response: DepartmentResponse[] = result.data.map(dept => toDepartmentResponse(dept));
-    res.status(200).json(response); 
+      const response: DepartmentResponse[] = result.data.map(toDepartmentResponse);
+      res.status(200).json(response); 
   }));
 
-  router.get('/:id', asyncHandler(async (req, res) => {  
+  router.get(
+    '/:id',
+    asyncHandler(async (req: Request, res: Response) => {
+      const result = await getDepartmentById(req.params.id);
+      if (!result.success) return handleError(res, result.error);
 
-    const result = await getDepartmentById(req.params.id);
-    if (!result.success) {
-      res.status(400).json({ errors: result.error });
-      return;
-    }
+      res.status(200).json(toDepartmentResponse(result.data));
+    })
+  );
 
-    res.status(200).json(toDepartmentResponse(result.data)); 
-  }));
+  router.post(
+    '/',
+    asyncHandler(async (req: Request, res: Response) => {
+      const result = await addDepartment(req.body);
+      if (!result.success) return handleError(res, result.error);
 
-  router.post('/', asyncHandler(async (req, res) => { 
-  
-    const result = await createDepartment(req.body);
-    if (!result.success) {
-      res.status(400).json({ errors: result.error });
-      return;
-    } 
-    
-    res.status(200).json(result.data);     
-  }));
+      res.status(201).json(result.data);
+    })
+  );
 
-  router.put('/:id', asyncHandler(async (req, res) => {
+  router.put(
+    '/:id',
+    asyncHandler(async (req: Request, res: Response) => {
+      const result = await updateDepartment(req.params.id, req.body.name);
+      if (!result.success) return handleError(res, result.error);
 
-    const { id } = req.params;
-    const { name } = req.body; 
+      res.status(200).json(result.data);
+    })
+  );
 
-    const result = await updateDepartment(id, name);
-    if (!result.success) {
-      res.status(400).json({ errors: result.error });
-      return;
-    }
+  router.delete(
+    '/:id',
+    asyncHandler(async (req: Request, res: Response) => {
+      const result = await deleteDepartment(req.params.id);
+      if (!result.success) return handleError(res, result.error);
 
-    res.status(200).json(result.data);
-  }));
-
-  router.delete('/:id', asyncHandler(async (req, res) => {
-
-    const id = req.params.id.toString(); 
-
-    const result = await deleteDepartment(id);
-    if (!result.success) { 
-      res.status(400).json({ errors: result.error });
-      return;
-    }
-
-    res.status(200).json({ message: 'Department deleted' });
-  }));
+      res.status(200).json({ message: 'Department deleted' });
+    })
+  ); 
 
   return router;
 }

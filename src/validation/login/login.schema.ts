@@ -17,7 +17,7 @@ export const loginSchema = z
       ctx.addIssue({
       path: ['username'],
       code: 'custom',
-      message: 'Username/password are invalid',
+      message: 'Invalid login',
       });
     }   
   });
