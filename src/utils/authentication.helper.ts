@@ -1,4 +1,8 @@
 import { Response } from 'express';
+import jwt from 'jsonwebtoken'; 
+import { Types } from 'mongoose';
+import type { StringValue } from 'ms'; 
+import bcrypt from 'bcryptjs';
 
 export function getAccessTokenExpiry(): string {
   return process.env.ACCESS_TOKEN_EXPIRY || '15m';
@@ -29,4 +33,27 @@ export function setRefreshTokenCookie(res: Response, refreshToken: string): void
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     path: '/',
   });
+}
+
+export function getAccessToken(userId: Types.ObjectId): string {
+  const token = jwt.sign({ userId: userId }, getAccessTokenSecret(), {
+      expiresIn: getAccessTokenExpiry() as StringValue
+  });
+  return token;
+}
+
+export function getRefreshToken(userId: Types.ObjectId): string {
+  const refreshToken = jwt.sign({ userId: userId }, getRefreshTokenSecret(), {
+    expiresIn: getRefreshTokenExpiry() as StringValue
+  });
+  return refreshToken;
+}
+
+export async function createHashedPassword(password: string): Promise<string> {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(password, salt); 
+}
+
+export async function verifyPassword(inputPassword: string, hashedPassword: string): Promise<boolean> {
+  return await bcrypt.compare(inputPassword, hashedPassword);
 }

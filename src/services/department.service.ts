@@ -1,78 +1,92 @@
 import { DepartmentResponse } from '../interface/department';
 import { DepartmentModel, IDepartment } from '../models/department.model';
 import { ServiceResult } from '../types/ServiceResult';
+import { handleServiceError } from '../utils/error.helper';
 import { toDepartmentResponse } from '../utils/mapper'; 
-import { createDepartmentSchema } from '../validation/department/createDepartment.schema';
+import { addDepartmentSchema } from '../validation/department/addDepartment.schema';
 import { deleteDepartmentSchema } from '../validation/department/deleteDepartment.schema';
+import { departmentNameSchema } from '../validation/department/fields/departmentName.schema';
 import { updateDepartmentSchema } from '../validation/department/updateDepartment.schema';
-import { idSchema } from '../validation/general/id.schema';
+import { idSchema } from '../validation/fields/id.schema';
+import { validate } from '../validation/validate';
 
 export async function getDepartments(): Promise<ServiceResult<IDepartment[]>> {
-  return { success: true, data: await DepartmentModel.find().exec() };
+  try { 
+    const departments = await DepartmentModel.find().exec(); 
+    return { success: true, data: departments };
+  } catch (err: any) {
+    return { success: false, error: ['Unexpected error: ' + err.message] };
+  }
 } 
   
 export async function getDepartmentById(id: unknown): Promise<ServiceResult<IDepartment>> {
-  const parseResult = idSchema.safeParse(id);
-
-  if (!parseResult.success) {
-    return { success: false, error: parseResult.error.issues.map(i => i.message) };
-  }
+ 
+  const validationResult = await validate(idSchema, id);  
+  if (!validationResult.success) {
+    return validationResult;
+  }   
+  const validData = validationResult.data;
 
   try {
-    const department = await DepartmentModel.findById({ _id: parseResult.data }).exec();
-
+    const department = await DepartmentModel.findById(id).exec();
     if (!department) {
       return { success: false, error: ['Department not found'] };
     }
 
     return { success: true, data: department };
-  } catch (err: any) {
-    return { success: false, error: ['Unexpected error: ' + err.message] };
+  } 
+  catch (err: any) { 
+    return handleServiceError(err);
   }
 } 
 
-export async function getDepartmentByName(name: string): Promise<IDepartment | null> { 
-  return await DepartmentModel.findOne({ name: name }).exec();
+export async function getDepartmentByName(name: string): Promise<ServiceResult<IDepartment | null>> { 
+
+  const validationResult = await validate(departmentNameSchema, name);  
+  if (!validationResult.success) {
+    return validationResult;
+  }  
+  const validData = validationResult.data;
+  
+  try {
+    const department = await DepartmentModel.findOne({ name: validData }).exec();
+    return { success: true, data: department }; 
+  } 
+  catch (err: any) { 
+    return handleServiceError(err);
+  }
 }
 
-export async function createDepartment(data: unknown): Promise<ServiceResult<DepartmentResponse>> {
-  
-  const parsed = await createDepartmentSchema.safeParseAsync(data);
-  if (!parsed.success) {
-    const errors = parsed.error.issues.map(issue => issue.message);
-    return { success: false, error: errors };
-  }
+export async function addDepartment(data: unknown): Promise<ServiceResult<DepartmentResponse>> {
+    
+  const validationResult = await validate(addDepartmentSchema, data);  
+  if (!validationResult.success) {
+    return validationResult;
+  }  
+  const validData = validationResult.data;
  
   try {
-    const department = new DepartmentModel(parsed.data);
+    const department = new DepartmentModel(validData);
     const saved = await department.save();  
     return { success: true, data: toDepartmentResponse(saved) };
-  } catch (err: any) {
-    if (err.code === 11000) {
-      return { success: false, error: ['Department name already exists'] };
-    }
-
-    if (err.name === 'ValidationError') {
-      const messages = Object.values(err.errors).map((e: any) => e.message);
-      return { success: false, error: messages };
-    }
-
-    return { success: false, error: ['Unexpected error: ' + err.message] };
+  } 
+  catch (err: any) {  
+    return handleServiceError(err); 
   }
 } 
 
 export async function updateDepartment(id: string, name: string): Promise<ServiceResult<DepartmentResponse>> {
-     
-  const parsed = await updateDepartmentSchema.safeParseAsync({ id, name });
-  if (!parsed.success) {
-    const errors = parsed.error.issues.map(issue => issue.message);
-    return { success: false, error: errors };
-  }
+      
+  const validationResult = await validate(updateDepartmentSchema, { id, name });  
+  if (!validationResult.success) {
+    return validationResult;
+  }  
+  const validData = validationResult.data;
   
   try {
     const updated = await DepartmentModel.findByIdAndUpdate(
-      id,
-      { $set: { name: name } },
+      validData.id,
+      { $set: { name: validData.name } },
       { new: true }
     );
 
@@ -81,23 +95,25 @@ export async function updateDepartment(id: string, name: string): Promise<Servic
     }
 
     return { success: true, data: toDepartmentResponse(updated) };
-  } catch (err: any) {
-    return { success: false, error: ['Unexpected error: ' + err.message] };
+  } 
+  catch (err: any) { 
+    return handleServiceError(err);
   }
 } 
 
 export async function deleteDepartment(id: string): Promise<ServiceResult<IDepartment | null>> {
-
-  const parsed = await deleteDepartmentSchema.safeParseAsync({ id }); 
-  if (!parsed.success) {
-    const errors = parsed.error.issues.map(issue => issue.message);
-    return { success: false, error: errors };
-  } 
+  
+  const validationResult = await validate(deleteDepartmentSchema, { id });  
+  if (!validationResult.success) {
+    return validationResult;
+  }  
+  const validData = validationResult.data; 
 
   try {
-    await DepartmentModel.findByIdAndDelete(id);
+    await DepartmentModel.findByIdAndDelete(validData.id);
     return { success: true, data: null };
-  } catch (err: any) {
-    return { success: false, error: ['Unexpected error: ' + err.message] };
+  } 
+  catch (err: any) { 
+    return handleServiceError(err);
   }
 }

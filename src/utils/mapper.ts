@@ -1,6 +1,6 @@
-import { UserResponse } from "../interface/user";
+import { AddUserRequest, UpdateUserRequest, UserResponse } from "../interface/user";
 import { DepartmentResponse } from "../interface/department";
-import { IDepartment } from "../models/department.model";
+import { IDepartment } from "../models/department.model"; 
 import { IUser } from "../models/user.model";
 
 export function toDepartmentResponse(department: IDepartment): DepartmentResponse {
@@ -13,10 +13,11 @@ export function toDepartmentResponse(department: IDepartment): DepartmentRespons
 } 
 
 export function toUserResponse(user: IUser): UserResponse {
-  const { _id, username, role } = user;
+  const { id, surname, firstName, role } = user;
   const appUser: UserResponse = {
-    id: _id.toString(),
-    username: username, 
+    id: id.toString(),
+    surname: surname, 
+    firstName: firstName,
     role: role, 
   }; 
   return appUser;
