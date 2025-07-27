@@ -6,7 +6,7 @@ import { passwordSchema } from '../fields/password.schema';
 import { validateUnique } from '../validator/validateUnique';
 import { surnameSchema } from '../fields/surname.schema';
 import { roleSchema } from '../fields/userRole.schema';
-import { firstNameSchema } from '../fields/firstname.schema';
+import { firstNameSchema } from '../fields/firstName.schema';
 
 export const addUserSchema = z
   .object({
