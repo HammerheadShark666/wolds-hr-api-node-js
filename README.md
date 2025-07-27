@@ -8,7 +8,7 @@ npm run build
 npm start
 
 
- npx jest src/__tests__/authentication.test.ts --detectOpenHandles --runInBand
+ npx jest src/__tests__/users.test.ts --detectOpenHandles --runInBand
 
 
 

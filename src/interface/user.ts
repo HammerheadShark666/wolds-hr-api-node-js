@@ -27,6 +27,12 @@ export interface UpdatedUserResponse {
 export interface UpdateUserRequest {
   id: string;
   firstName?: string;
-  surname?: string; 
+  surname?: string;
+}
+
+export interface UserRequest {
+  id: string;
+  firstName?: string;
+  surname?: string;
   role?: string;
 }

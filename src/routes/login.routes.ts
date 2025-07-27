@@ -12,7 +12,13 @@ export function createLoginRouter() {
     '/login',
     asyncHandler(async (req: Request, res: Response) => {
       const result = await loginUser(req.body);
-      if (!result.success) return handleError(res, result.error);
+    //  if (!result.success) return handleError(res, result.error);
+
+      if (!result.success) {
+        res.status(result.code ?? 400).json({ error: result.error });
+        return;
+      }
+
 
       setRefreshTokenCookie(res, result.data.refreshToken); 
       res.status(200).json({ token: result.data.token });    

@@ -1,87 +1,113 @@
+import e from 'express';
 import request from 'supertest';
  
 const username = 'testuser@hotmail.com';
 const password = 'Password#1';
-const role = 'user';
+const role = 'clerk';
+const surname = 'Test';
+const firstName = 'User';
 const invalidEmail = 'testuserinvalid.com';
+const notFoundEmail = 'testusernotfound@hotmail.com';
 const invalidUserId = '6833339ab6fc76ad4cdca645';
 let userId = '';
 
 describe("User API - Add a user", () => { 
 
-   it("should return 200 and user id when user added successful ", async () => {
+  it("should return 200 and user id when user added successful ", async () => {
       
-    const response = await postUser({ username, password, confirmPassword: password, surname: 'Test', firstName: 'User', role });
-     
-    expect(response.status).toBe(200);    
+    const response = await postUser({ username, password, confirmPassword: password, surname, firstName, role: 'clerk' });
+    expect(response.status).toBe(201);    
     expect(response.body).toBeDefined();
     expect(response.body).toHaveProperty("userId");
-    expect(typeof response.body.userId).toBe('string'); 
-    // expect(response.body).toHaveProperty("message");
-    // expect(response.body.message).toMatch("User added successfully");  
+    expect(typeof response.body.userId).toBe('string');   
 
-    console.log(response.body);
-
-    userId = response.body.userId;
+    userId = response.body.userId; 
+  }); 
+  
+  it("should return 400 and error when username already exists ", async () => {
     
-    
-    // const response = await request(global.app!)
-      //   .post("/v1/register") 
-      //     .set("Content-Type", "application/json")
-      //     .send({username: username, password: password, confirmPassword: password}); 
-   
-      // expect(response.status).toBe(200);    
-      // expect(response.body).toBeDefined();
-      // expect(response.body).toHaveProperty("userId");
-      // expect(typeof response.body.userId).toBe('string'); 
-      // expect(response.body).toHaveProperty("message");
-      // expect(response.body.message).toMatch("User registered successfully");  
-  
-      // userId = response.body.userId;
-    }); 
-  
-    // it("should return 400 and error when username already exists ", async () => {
-      
-    //   const response = await request(global.app!)
-    //     .post("/v1/register") 
-    //       .set("Content-Type", "application/json")
-    //       .send({username: username, password: password, confirmPassword: password}); 
-   
-    //   expect(response.status).toBe(400);    
-    //   expect(response.body).toBeDefined();  
-    //   expect(response.body).toHaveProperty("errors");
-    //   expect(response.body.errors).toContain("Username already exists");  
-    // });
-  
-    // it("delete registered user, should return 200 when deleted", async () => {
-  
-    //   const response = await request(global.app!)
-    //       .delete(`/v1/users/${userId}`)
-    //       .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
-    //       .send();
-    
-    //   expect(response.status).toBe(200);    
-    //   expect(response.body).toHaveProperty('message');  
-    //   expect(response.body.message).toMatch('User deleted'); 
-    // }); 
+    const response = await postUser({ username, password, confirmPassword: password, surname: 'Test', firstName: 'User', role: 'clerk' });
+    expect(response.status).toBe(400);    
+    expect(response.body).toBeDefined();  
+    expect(response.body).toHaveProperty("error");
+    expect(response.body.error).toContain("Username already exists");  
+  });
+});
 
 
-  //it("should return 200 and user details ", async () => {
-      
-  //   const response = await request(global.app!)
-  //         .post("/v1/register") 
-  //           .set("Content-Type", "application/json")
-  //           .send({username: username, password: password}); 
-     
-  //       expect(response.body).toBeDefined();
-  //       expect(response.body).toHaveProperty("userId");
-  //       expect(typeof response.body.userId).toBe('string'); 
-  //       expect(response.body).toHaveProperty("message");
-  //       expect(response.body.message).toMatch("User registered successfully");  
+describe("User API - Get a user by id", () => { 
+
+  it("should return 200 and user details ", async () => {
+        
+    const response = await getUserById(userId); 
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeDefined();
+    expect(response.body).toHaveProperty("id");
+    expect(typeof response.body.id).toBe('string');  
+
+    expect(response.body).toHaveProperty("surname");
+    expect(typeof response.body.surname).toBe('string');
+    expect(response.body.surname).toBe(surname);
+
+    expect(response.body).toHaveProperty("firstName");
+    expect(typeof response.body.firstName).toBe('string');  
+    expect(response.body.firstName).toBe(firstName); 
+
+    expect(response.body).toHaveProperty("role");
+    expect(typeof response.body.role).toBe('string'); 
+    expect(response.body.role).toBe(role);
+  });
+
+  it("should return 404 and error User not found", async () => {
     
-  //       userId = response.body.userId;
-  // });
-//}); 
+    const response = await getUserById('');
+    expect(response.status).toBe(404);
+  });
+
+  it("should return 404 and error User not found", async () => {
+       
+    const response = await getUserById(invalidUserId);    
+    expect(response.status).toBe(404);
+  });  
+});
+
+describe("User API - Get a user by email", () => { 
+
+  it("should return 200 and user details ", async () => {
+        
+    const response = await getUserByEmail(username); 
+
+    expect(response.status).toBe(200);
+    expect(response.body).toBeDefined();
+    expect(response.body).toHaveProperty("id");
+    expect(typeof response.body.id).toBe('string');  
+
+    expect(response.body).toHaveProperty("surname");
+    expect(typeof response.body.surname).toBe('string');
+    expect(response.body.surname).toBe(surname);
+
+    expect(response.body).toHaveProperty("firstName");
+    expect(typeof response.body.firstName).toBe('string');  
+    expect(response.body.firstName).toBe(firstName); 
+
+    expect(response.body).toHaveProperty("role");
+    expect(typeof response.body.role).toBe('string'); 
+    expect(response.body.role).toBe(role);
+  });
+
+  it("should return 404 and error User not found", async () => {
+    
+    const response = await getUserByEmail('');
+    expect(response.status).toBe(404);
+  });
+
+  it("should return 404 and error User not found", async () => {
+       
+    const response = await getUserByEmail(notFoundEmail);    
+    expect(response.status).toBe(404);
+  });  
+}); 
 
 // describe("User API - Get a user by email", () => { 
 
@@ -130,52 +156,7 @@ describe("User API - Add a user", () => {
 //   });
 // });
 
-// describe("User API - Get a user by id", () => { 
 
-//   it("should return 200 and user details ", async () => {
-       
-//     const response = await request(global.app!)
-//       .get(`/v1/users/id/${userId}`) 
-//         .set("Content-Type", "application/json")
-//         .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`)
-//         .send(); 
-
-//     expect(response.body).toBeDefined();
-//     expect(response.body).toHaveProperty("id");
-//     expect(typeof response.body.id).toBe('string');  
-//     expect(response.body).toHaveProperty("username");
-//     expect(typeof response.body.id).toBe('string');  
-//     expect(response.body).toHaveProperty("role");
-//     expect(typeof response.body.id).toBe('string');  
-
-//     expect(response.body.username).toBe(username); 
-//     expect(response.body.role).toBe(role);
-//   });
-
-//   it("should return 404 and error User not found", async () => {
-      
-//     const response = await request(global.app!)
-//       .get(`/v1/users/id/`) 
-//         .set("Content-Type", "application/json")
-//         .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`)
-//         .send();  
-        
-//     expect(response.status).toBe(404);
-//   });
-
-//   it("should return 404 and error User not found", async () => {
-      
-//     const response = await request(global.app!)
-//       .get(`/v1/users/id/${invalidUserId}`) 
-//         .set("Content-Type", "application/json")
-//         .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`)
-//         .send(); 
-
-//     expect(response.status).toBe(404);    
-//     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors).toContain('User not found'); 
-//   });
-// });
  
 // describe("User API - Update a user", () => {  
 
@@ -246,44 +227,63 @@ describe("User API - Add a user", () => {
 // });
 
 
-// describe("User API - Delete a user", () => { 
+describe("User API - Delete a user", () => { 
 
-//    it("delete user, should return 200 and message User deleted", async () => {
+   it("delete user, should return 200 and message User deleted", async () => {
    
-//     const response = await request(global.app!)
-//         .delete(`/v1/users/${userId}`)
-//         .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
-//         .send();
+    const response = await request(global.app!)
+        .delete(`/v1/users/${userId}`)
+        .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
+        .send();
   
-//     expect(response.status).toBe(200);    
-//     expect(response.body).toHaveProperty('message');  
-//     expect(response.body.message).toMatch('User deleted'); 
-//   });  
+    expect(response.status).toBe(200);    
+    expect(response.body).toHaveProperty('message');  
+    expect(response.body.message).toMatch('User deleted'); 
+  });  
 
-//   it("delete user, should return 404 and error User not found", async () => {
+  // it("delete user, should return 404 and error User not found", async () => {
    
-//     const response = await request(global.app!)
-//         .delete(`/v1/users/${invalidUserId}`)
-//         .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
-//         .send();
+  //   const response = await request(global.app!)
+  //       .delete(`/v1/users/${invalidUserId}`)
+  //       .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
+  //       .send();
   
-//     expect(response.status).toBe(404);    
-//     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors).toContain('User not found'); 
-//   });
-// 
+  //   expect(response.status).toBe(404);    
+  //   // expect(response.body).toHaveProperty('errors');  
+  //   // expect(response.body.errors).toContain('User not found'); 
+  // });
+
 
 });
 
 
 function postUser(data?: object) {
   const req = request(global.app!)
-    .post("/v1/users")
-    .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
-    .set("Content-Type", "application/json");
+    .post("/v1/users/add")
+      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set("Content-Type", "application/json")
+      .send(data);
   
   if (data !== undefined) {
     return req.send(data);
   }
   return req.send();
 }
+
+async function getUserById(id: string) {
+  const response = await request(global.app!)
+    .get(`/v1/users/id/${id}`) 
+      .set("Content-Type", "application/json")
+      .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`);
+
+  return response;
+}
+
+async function getUserByEmail(email: string) {
+  const response = await request(global.app!)
+    .get(`/v1/users/email/${email}`) 
+      .set("Content-Type", "application/json")
+      .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`);
+
+  return response;
+} 

@@ -13,7 +13,11 @@ export function createDepartmentRouter() {
     '', 
     asyncHandler(async (req, res) => {    
       const result = await getDepartments();
-      if (!result.success) return handleError(res, result.error);
+     // if (!result.success) return handleError(res, result.error);
+      if (!result.success) {
+        res.status(result.code ?? 400).json({ error: result.error });
+        return;
+      }
 
       const response: DepartmentResponse[] = result.data.map(toDepartmentResponse);
       res.status(200).json(response); 
@@ -23,7 +27,11 @@ export function createDepartmentRouter() {
     '/:id',
     asyncHandler(async (req: Request, res: Response) => {
       const result = await getDepartmentById(req.params.id);
-      if (!result.success) return handleError(res, result.error);
+      if (!result.success) {
+        res.status(result.code ?? 400).json({ error: result.error });
+        return;
+      }
+      //if (!result.success) return handleError(res, result.error);
 
       res.status(200).json(toDepartmentResponse(result.data));
     })
@@ -33,7 +41,11 @@ export function createDepartmentRouter() {
     '/',
     asyncHandler(async (req: Request, res: Response) => {
       const result = await addDepartment(req.body);
-      if (!result.success) return handleError(res, result.error);
+      if (!result.success) {
+        res.status(result.code ?? 400).json({ error: result.error });
+        return;
+      }
+      //if (!result.success) return handleError(res, result.error);
 
       res.status(201).json(result.data);
     })
@@ -43,7 +55,11 @@ export function createDepartmentRouter() {
     '/:id',
     asyncHandler(async (req: Request, res: Response) => {
       const result = await updateDepartment(req.params.id, req.body.name);
-      if (!result.success) return handleError(res, result.error);
+      if (!result.success) {
+        res.status(result.code ?? 400).json({ error: result.error });
+        return;
+      }
+      //if (!result.success) return handleError(res, result.error);
 
       res.status(200).json(result.data);
     })
@@ -53,7 +69,11 @@ export function createDepartmentRouter() {
     '/:id',
     asyncHandler(async (req: Request, res: Response) => {
       const result = await deleteDepartment(req.params.id);
-      if (!result.success) return handleError(res, result.error);
+      if (!result.success) {
+        res.status(result.code ?? 400).json({ error: result.error });
+        return;
+      }
+     // if (!result.success) return handleError(res, result.error);
 
       res.status(200).json({ message: 'Department deleted' });
     })
