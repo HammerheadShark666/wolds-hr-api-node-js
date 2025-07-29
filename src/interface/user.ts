@@ -36,3 +36,8 @@ export interface UserRequest {
   surname?: string;
   role?: string;
 }
+
+export interface DeletedUserResponse {
+  message: string;
+  userId: string;
+}

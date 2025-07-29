@@ -10,19 +10,20 @@ import { validate } from "../validation/validate";
 export async function loginUser(data: LoginRequest): Promise<ServiceResult<LoginResponse>> {
     
   const validationResult = await validate(loginSchema, data);  
-    if (!validationResult.success) {
-      return validationResult;
-    }   
-    const validData = validationResult.data; 
+  if (!validationResult.success) {
+    return validationResult;
+  }    
 
   try {
+
+    const { username: validUsername, password: validPassword } = validationResult.data;
    
-    const user = await UserModel.findOne({ username: data.username });
+    const user = await UserModel.findOne({ username: validUsername });
     if (!user) {
       return { success: false, error: ['Invalid login'] };
     }
   
-    const isValid = await verifyPassword(validData.password, user.password);
+    const isValid = await verifyPassword(validPassword, user.password);
     if (!isValid) {
       return { success: false, error: ["Invalid login"] };
     }

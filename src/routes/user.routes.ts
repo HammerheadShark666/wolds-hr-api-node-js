@@ -1,10 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { addUser, deleteUser, usernameExists, getUserByEmail, getUserById, updateUser } from '../services/user.service';
-import { toUserResponse } from '../utils/mapper';
+import { addUser, deleteUser, usernameExists, getUserByUsername, getUserById, updateUser } from '../services/user.service';
 import asyncHandler from 'express-async-handler';
 import { AddUserRequest, UpdateUserRequest } from '../interface/user';
-import { handleError } from '../utils/error.helper';
-import { sendServiceError } from '../utils/sendServiceError.helper';
 
 export function createUsersRouter() {
   
@@ -24,9 +21,7 @@ export function createUsersRouter() {
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error });
         return;
-      }
-        
-        //return handleError(res, result.error);
+      } 
  
       res.status(201).json(result.data);
     })
@@ -40,45 +35,24 @@ export function createUsersRouter() {
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error});
         return;
-      }
-      //if (!result.success) return handleError(res, result.error);
+      } 
  
       res.status(200).json(result.data);
     })
   ); 
 
   router.get(
-      '/email/:email',
+      '/username/:username',
       asyncHandler(async (req: Request, res: Response) => {
 
-        const result = await getUserByEmail(req.params.email);
-
-       if (!result.success) {
-        res.status(result.code ?? 400).json({ error: result.error });
-        return;
-      }
-
-        //if (!result.success) return handleError(res, result.error);
+        const result = await getUserByUsername(req.params.username);
+        if (!result.success) {
+          res.status(result.code ?? 400).json({ error: result.error });
+          return;
+        } 
   
         res.status(200).json(result.data);
-      })
-    //   asyncHandler(async (req: Request, res: Response) => {
-    //     const email = req.params.email.toString();
-    //     if (!email) 
-    //     {
-    //       res.status(404).json({ error: 'User not found' });
-    //       return;
-    //     }
-
-    //     const existingUser = await getUserByEmail(email);
-    //     if(!existingUser)
-    //     {
-    //        res.status(404).json({ error: 'User not found' });
-    //        return; 
-    //     }
-      
-    //     res.status(200).json(toUserResponse(existingUser));
-    // })
+      })  
   ); 
  
   router.put(
@@ -92,9 +66,8 @@ export function createUsersRouter() {
 
        
       const result = await updateUser(updateUserRequest);
-
       if (!result.success) {
-        sendServiceError(res, result);
+        res.status(result.code ?? 400).json({ error: result.error });
         return;
       }
       //if (!result.success) return handleError(res, result.error);
@@ -117,6 +90,7 @@ export function createUsersRouter() {
   router.delete(
     '/:id',
     asyncHandler(async (req: Request, res: Response) => {
+      
       const id = req.params.id.toString();
     if (!id) 
     {

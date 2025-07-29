@@ -1,13 +1,11 @@
-import e from 'express';
-import request from 'supertest';
- 
+import request from 'supertest'; 
 const username = 'testuser@hotmail.com';
 const password = 'Password#1';
 const role = 'clerk';
 const surname = 'Test';
 const firstName = 'User';
-const invalidEmail = 'testuserinvalid.com';
-const notFoundEmail = 'testusernotfound@hotmail.com';
+const invalidUsername = 'testuserinvalid.com';
+const notFoundUsername = 'testusernotfound@hotmail.com';
 const invalidUserId = '6833339ab6fc76ad4cdca645';
 let userId = '';
 
@@ -72,11 +70,11 @@ describe("User API - Get a user by id", () => {
   });  
 });
 
-describe("User API - Get a user by email", () => { 
+describe("User API - Get a user by username", () => { 
 
   it("should return 200 and user details ", async () => {
         
-    const response = await getUserByEmail(username); 
+    const response = await getUserByUsername(username); 
 
     expect(response.status).toBe(200);
     expect(response.body).toBeDefined();
@@ -98,64 +96,17 @@ describe("User API - Get a user by email", () => {
 
   it("should return 404 and error User not found", async () => {
     
-    const response = await getUserByEmail('');
+    const response = await getUserByUsername('');
     expect(response.status).toBe(404);
   });
 
   it("should return 404 and error User not found", async () => {
        
-    const response = await getUserByEmail(notFoundEmail);    
+    const response = await getUserByUsername(notFoundUsername);    
     expect(response.status).toBe(404);
   });  
 }); 
-
-// describe("User API - Get a user by email", () => { 
-
-//   it("should return 200 and user details ", async () => {
-      
-//     const response = await request(global.app!)
-//       .get(`/v1/users/email/${username}`) 
-//         .set("Content-Type", "application/json")
-//         .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`)
-//         .send(); 
-
-//     expect(response.body).toBeDefined();
-//     expect(response.body).toHaveProperty("id");
-//     expect(typeof response.body.id).toBe('string');  
-//     expect(response.body).toHaveProperty("username");
-//     expect(typeof response.body.id).toBe('string');  
-//     expect(response.body).toHaveProperty("role");
-//     expect(typeof response.body.id).toBe('string');  
-
-//     expect(response.body.username).toBe(username); 
-//     expect(response.body.role).toBe(role);
-//   });
-
-//   it("should return 404 and error User not found", async () => {
-      
-//     const response = await request(global.app!)
-//       .get(`/v1/users/email/`) 
-//         .set("Content-Type", "application/json")
-//         .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`)
-//         .send();  
-
-//     expect(response.status).toBe(404);
-//   });
-
-//   it("should return 404 and error User not found", async () => {
-      
-//     const response = await request(global.app!)
-//       .get(`/v1/users/email/${invalidEmail}`) 
-//         .set("Content-Type", "application/json")
-//         .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`)
-//         .send(); 
-
-//     expect(response.status).toBe(404);    
-//     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors).toContain('User not found'); 
-//   });
-// });
-
+ 
 
  
 // describe("User API - Update a user", () => {  
@@ -279,9 +230,9 @@ async function getUserById(id: string) {
   return response;
 }
 
-async function getUserByEmail(email: string) {
+async function getUserByUsername(username: string) {
   const response = await request(global.app!)
-    .get(`/v1/users/email/${email}`) 
+    .get(`/v1/users/username/${username}`) 
       .set("Content-Type", "application/json")
       .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`);
 
