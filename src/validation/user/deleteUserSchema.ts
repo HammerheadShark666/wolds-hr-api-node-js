@@ -7,9 +7,7 @@ export const deleteUserSchema = z
     id: idSchema
   })
   .superRefine(async (data, ctx) => {   
-    const existing = await UserModel.findById(data.id); 
-
-    console.log("Existing = ", existing);
+    const existing = await UserModel.findById(data.id);  
     if (!existing) {
         ctx.addIssue({
         path: ['id'],

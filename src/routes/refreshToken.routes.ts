@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { createTokenFromRefreshTokens } from '../services/refreshToken.service';
+import { createTokenFromRefreshToken } from '../services/refreshToken.service';
 import asyncHandler from 'express-async-handler';
 
 export function createRefreshTokenRouter() {
@@ -8,17 +8,13 @@ export function createRefreshTokenRouter() {
 
   router.post(
     '/refresh-token',
-    asyncHandler(async (req: Request, res: Response) => {
+    asyncHandler(async (req: Request, res: Response) => { 
 
-      const refreshToken = req.cookies.refreshToken;
-      if (!refreshToken) {
-        res.sendStatus(401);
-        return;
-      }
-
-      const refreshTokenResponse = await createTokenFromRefreshTokens(refreshToken);
+      const refreshToken = req.cookies.refreshToken;   
+      const refreshTokenResponse = await createTokenFromRefreshToken(refreshToken);
       if (!refreshTokenResponse.success) {
-        res.status(401).json({ error: refreshTokenResponse.error[0] });
+        console.log(refreshTokenResponse)
+        res.status(401).json({ error: refreshTokenResponse.error });
         return;
       }
 
