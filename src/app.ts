@@ -15,7 +15,10 @@ export async function createApp() {
 
   try 
   { 
-    app.use(cors());
+    app.use(cors({
+      origin: process.env.FRONT_APP_END_URL,
+      credentials: true
+    }));
     app.use(cookieParser());
     app.use(express.json());   
 
