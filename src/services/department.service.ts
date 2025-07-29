@@ -1,4 +1,4 @@
-import { DepartmentResponse } from '../interface/department';
+import { DepartmentResponse, UpdatedDepartmentResponse } from '../interface/department';
 import { DepartmentModel, IDepartment } from '../models/department.model';
 import { ServiceResult } from '../types/ServiceResult';
 import { handleServiceError } from '../utils/error.helper';
@@ -77,7 +77,7 @@ export async function addDepartment(data: unknown): Promise<ServiceResult<Depart
   }
 } 
 
-export async function updateDepartment(id: string, name: string): Promise<ServiceResult<DepartmentResponse>> {
+export async function updateDepartment(id: string, name: string): Promise<ServiceResult<UpdatedDepartmentResponse>> {
       
   const validationResult = await validate(updateDepartmentSchema, { id, name });  
   if (!validationResult.success) {
@@ -88,17 +88,18 @@ export async function updateDepartment(id: string, name: string): Promise<Servic
 
     const { id: validId, name: validName } = validationResult.data;
 
-    const updated = await DepartmentModel.findByIdAndUpdate(
+    const updatedDepartment = await DepartmentModel.findByIdAndUpdate(
       validId,
       { $set: { name: validName } },
       { new: true }
     );
 
-    if (!updated) {
+    if (!updatedDepartment) {
       return { success: false, error: ['Department not found'] };
     }
 
-    return { success: true, data: toDepartmentResponse(updated) };
+    const updatedDepartmentResponse: UpdatedDepartmentResponse = { message: "Department updated successfully", departmentId: updatedDepartment.id }; 
+    return { success: true, data: updatedDepartmentResponse }; 
   } 
   catch (err: any) { 
     return handleServiceError(err);

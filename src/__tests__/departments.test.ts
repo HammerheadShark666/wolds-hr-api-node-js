@@ -13,8 +13,8 @@ beforeAll(async () => {
   expect(response.body).toBeDefined();
   expect(response.body).toHaveProperty("id");
   expect(response.body).toHaveProperty("name");   
-  expect(typeof response.body.id).toBe('string');  
-  expect(typeof response.body.name).toBe('string');  
+  expect(typeof response.body.id).toBe("string");  
+  expect(typeof response.body.name).toBe("string");  
   expect(response.body.name).toBe(departmentName);
 
   departmentId = response.body.id;
@@ -73,11 +73,12 @@ describe("PUT /api/v1/departments", () => {
     const response = await putDepartment(departmentId, updateDepartmentName); 
     expect(response.status).toBe(200);    
     expect(response.body).toBeDefined();
-    expect(response.body).toHaveProperty("id");
-    expect(response.body).toHaveProperty("name");   
-    expect(typeof response.body.id).toBe('string');  
-    expect(typeof response.body.name).toBe('string');  
-    expect(response.body.name).toBe(updateDepartmentName); 
+    expect(response.body).toHaveProperty("departmentId");
+    expect(response.body).toHaveProperty("message");   
+    expect(typeof response.body.departmentId).toBe("string");  
+    expect(typeof response.body.message).toBe("string");  
+    expect(response.body.departmentId).toBe(departmentId); 
+    expect(response.body.message).toBe("Department updated successfully")
   });
   
   it("should return 400 and error when department not found", async () => {       
@@ -105,8 +106,8 @@ describe("DELETE /api/v1/departments/:id", () => {
 function postDepartment(data?: object) {
   const req = request(global.app!)
     .post("/v1/departments")
-    .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
-    .set("Content-Type", "application/json");
+      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set("Content-Type", "application/json");
   
   if (data !== undefined) {
     return req.send(data);
@@ -117,7 +118,7 @@ function postDepartment(data?: object) {
 function getDepartments(params?: object) {
   let req = request(global.app!)
     .get("/v1/departments")
-    .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`);
+      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`);
 
   if (params !== undefined) {
     req = req.query(params);
@@ -129,20 +130,20 @@ function getDepartments(params?: object) {
 function putDepartment(departmentId: string, data: string) {
   return request(global.app!)
     .put(`/v1/departments/${departmentId}`)
-    .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
-    .set('Content-Type', 'application/json')
-    .send({ name: data });
+      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set('Content-Type', 'application/json')
+      .send({ name: data });
 }
 
 function deleteDepartment(id: string) {
   return request(global.app!)
     .delete(`/v1/departments/${id}`)
-    .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`);
+      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`);
 }
 
 function getDepartmentById(departmentId: string) {
   return request(global.app!)
     .get(`/v1/departments/${departmentId}`)
-    .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
-    .set('Content-Type', 'application/json');
+      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set('Content-Type', 'application/json');
 }

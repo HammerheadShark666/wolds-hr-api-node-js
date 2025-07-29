@@ -58,32 +58,18 @@ export function createUsersRouter() {
   router.put(
     '/',
     asyncHandler(async (req: Request, res: Response) => {
-   
+     
       const updateUserRequest: UpdateUserRequest = {
                                             id: req.body.id, 
                                             surname: req.body.surname, 
                                             firstName: req.body.firstName}; 
-
        
       const result = await updateUser(updateUserRequest);
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error });
         return;
-      }
-      //if (!result.success) return handleError(res, result.error);
- 
-      res.status(200).json(result.data);
-
-
-  
-      // const updatedUser = await updateUser(updateUserRequest);
-      // if(updatedUser== null)
-      // {
-      //   res.status(400).json({ error: 'User not updated' })
-      //   return;
-      // }        
-
-     // res.status(200).json(toUserResponse(updatedUser));  
+      } 
+      res.status(200).json(result.data); 
     })
   );
 
@@ -91,22 +77,12 @@ export function createUsersRouter() {
     '/:id',
     asyncHandler(async (req: Request, res: Response) => {
       
-      const id = req.params.id.toString();
-    if (!id) 
-    {
-      res.status(404).json({ error: 'User not found' });
-      return; 
-    }        
-
-    const existingUser = await getUserById(id);  
-    if (!existingUser)
-    {
-      res.status(404).json({ error: 'User not found' });
-      return;   
-    }
-
-    const deletedUser = await deleteUser(id);
-    res.status(200).json({ message: 'User deleted' });
+      const result = await deleteUser(req.params.id);
+      if (!result.success) {
+        res.status(result.code ?? 400).json({ error: result.error });
+        return;
+      }
+      res.status(200).json({ message: 'User deleted' });
     })
   ); 
   

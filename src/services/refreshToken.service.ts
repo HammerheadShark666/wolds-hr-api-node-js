@@ -10,7 +10,7 @@ export async function createTokenFromRefreshTokens(refreshToken: string): Promis
   try {
     const decoded = await new Promise<JwtPayload>((resolve, reject) => {
       jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, (err, decoded) => {
-        if (err || !decoded || typeof decoded === 'string') {
+        if (err || !decoded || typeof decoded === "string") {
           return reject(new Error("Failed to refresh token"));
         }
         resolve(decoded as JwtPayload);
