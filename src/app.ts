@@ -8,6 +8,7 @@ import { createDepartmentRouter } from './routes/department.routes';
 import { createUsersRouter } from './routes/user.routes';
 import { errorHandler } from './middleware/errorHandler';
 import { loginToken } from './middleware/loginToken';
+import {configureCors} from './utils/configureCors';
 
 export async function createApp() {
 
@@ -15,10 +16,7 @@ export async function createApp() {
 
   try 
   { 
-    app.use(cors({
-      origin: process.env.FRONT_APP_END_URL,
-      credentials: true
-    }));
+    app.use(configureCors());
     app.use(cookieParser());
     app.use(express.json());   
 
@@ -43,3 +41,8 @@ export async function createApp() {
 
   return app;
 } 
+
+const allowedOrigins = [
+  process.env.HOSTED_FRONT_APP_END_URL,
+  process.env.LOCAL_FRONT_APP_END_URL,
+];
