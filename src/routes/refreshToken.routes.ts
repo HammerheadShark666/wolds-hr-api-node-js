@@ -13,7 +13,6 @@ export function createRefreshTokenRouter() {
       const refreshToken = req.cookies.refreshToken;   
       const refreshTokenResponse = await createTokenFromRefreshToken(refreshToken);
       if (!refreshTokenResponse.success) {
-        console.log(refreshTokenResponse)
         res.status(401).json({ error: refreshTokenResponse.error });
         return;
       }
