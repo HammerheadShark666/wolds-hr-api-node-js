@@ -3,7 +3,6 @@ import { toDepartmentResponse } from '../utils/mapper';
 import { DepartmentResponse,  } from '../interface/department'; 
 import { addDepartment, updateDepartment, getDepartmentById, getDepartmentByName, getDepartments, deleteDepartment } from '../services/department.service';
 import asyncHandler from 'express-async-handler';
-import { handleError } from '../utils/error.helper';
 
 export function createDepartmentRouter() {
   
@@ -12,13 +11,11 @@ export function createDepartmentRouter() {
   router.get(
     '', 
     asyncHandler(async (req, res) => {    
-      const result = await getDepartments();
-     // if (!result.success) return handleError(res, result.error);
+      const result = await getDepartments();     
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error });
         return;
       }
-
       const response: DepartmentResponse[] = result.data.map(toDepartmentResponse);
       res.status(200).json(response); 
   }));
@@ -31,8 +28,6 @@ export function createDepartmentRouter() {
         res.status(result.code ?? 400).json({ error: result.error });
         return;
       }
-      //if (!result.success) return handleError(res, result.error);
-
       res.status(200).json(toDepartmentResponse(result.data));
     })
   );
@@ -44,9 +39,7 @@ export function createDepartmentRouter() {
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error });
         return;
-      }
-      //if (!result.success) return handleError(res, result.error);
-
+      } 
       res.status(201).json(result.data);
     })
   );
@@ -58,9 +51,7 @@ export function createDepartmentRouter() {
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error });
         return;
-      }
-      //if (!result.success) return handleError(res, result.error);
-
+      }      
       res.status(200).json(result.data);
     })
   );
@@ -73,8 +64,6 @@ export function createDepartmentRouter() {
         res.status(result.code ?? 400).json({ error: result.error });
         return;
       }
-     // if (!result.success) return handleError(res, result.error);
-
       res.status(200).json({ message: 'Department deleted' });
     })
   ); 

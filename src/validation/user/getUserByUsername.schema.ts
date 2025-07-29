@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { usernameSchema } from '../fields/username.schema';
 
-export const getUserByEmailSchema = z
+export const getUserByUsernameSchema = z
   .object({
-    email: usernameSchema
+    username: usernameSchema
   });

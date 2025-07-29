@@ -39,11 +39,11 @@ export function expectError(response: any, expectedMessage: string, statusCode: 
 // };
 
 
-export function handleError(res: Response, errors: string[] | { errors: string[]; code?: number }) {
-  if (Array.isArray(errors)) {
-    return res.status(400).json({ errors });
-  }
+// export function handleError(res: Response, errors: string[] | { errors: string[]; code?: number }) {
+//   if (Array.isArray(errors)) {
+//     return res.status(400).json({ errors });
+//   }
 
-  const statusCode = errors.code || 400;
-  return res.status(statusCode).json({ error: errors.errors });
-}
+//   const statusCode = errors.code || 400;
+//   return res.status(statusCode).json({ error: errors.errors });
+// }
