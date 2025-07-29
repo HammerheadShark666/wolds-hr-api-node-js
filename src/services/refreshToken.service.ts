@@ -5,13 +5,23 @@ import jwt from 'jsonwebtoken';
 import { JwtPayload, VerifyErrors } from 'jsonwebtoken';
 import { ServiceResult } from '../types/ServiceResult';
 import { handleServiceError } from '../utils/error.helper';
+import { refreshTokenSchema } from '../validation/fields/refreshToken.schema';
+import { validate } from '../validation/validate';
 
-export async function createTokenFromRefreshTokens(refreshToken: string): Promise<ServiceResult<RefreshTokenResponse>> {
+export async function createTokenFromRefreshToken(refreshToken: string): Promise<ServiceResult<RefreshTokenResponse>> {   
+  const validationResult = await validate(refreshTokenSchema, refreshToken);  
+  if (!validationResult.success) {
+    return validationResult;
+  }   
+     
   try {
+
+    const validRefreshToken  = validationResult.data;
+
     const decoded = await new Promise<JwtPayload>((resolve, reject) => {
-      jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, (err, decoded) => {
+      jwt.verify(validRefreshToken, process.env.REFRESH_TOKEN_SECRET!, (err, decoded) => {
         if (err || !decoded || typeof decoded === "string") {
-          return reject(new Error("Failed to refresh token"));
+          return { success: false, error: ['Refresh token not valid'] };
         }
         resolve(decoded as JwtPayload);
       });
