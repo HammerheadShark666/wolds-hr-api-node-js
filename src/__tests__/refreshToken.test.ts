@@ -7,7 +7,7 @@ describe("POST /api/v1/refresh-token", () => {
     expect(response.status).toBe(200); 
     expect(response.body).toBeDefined();
     expect(response.body).toHaveProperty("token");
-    expect(typeof response.body.token).toBe('string');     
+    expect(typeof response.body.token).toBe("string");     
   });
 
   it("should return 401 when no refresh token passed", async () => {

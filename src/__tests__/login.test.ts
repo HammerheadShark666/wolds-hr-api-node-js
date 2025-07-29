@@ -27,13 +27,13 @@ describe("POST /api/v1/login ", () => {
     expect(refreshTokenCookie).toMatch(/HttpOnly/);
 
     const token = refreshTokenCookie!.split(';')[0].split('=')[1];
-    expect(typeof token).toBe('string');
+    expect(typeof token).toBe("string");
       
     refreshToken = refreshTokenCookie; 
   
     expect(response.body).toBeDefined();
     expect(response.body).toHaveProperty("token");
-    expect(typeof response.body.token).toBe('string');    
+    expect(typeof response.body.token).toBe("string");    
   }); 
 });
  

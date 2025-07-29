@@ -1,12 +1,16 @@
-import request from 'supertest'; 
+import request from 'supertest';   
+import { expectError } from '../utils/error.helper';
+
 const username = 'testuser@hotmail.com';
 const password = 'Password#1';
 const role = 'clerk';
 const surname = 'Test';
 const firstName = 'User';
-const invalidUsername = 'testuserinvalid.com';
 const notFoundUsername = 'testusernotfound@hotmail.com';
 const invalidUserId = '6833339ab6fc76ad4cdca645';
+const updateSurname = "TestUpdate";
+const updateFirstName = "UserUpdate";
+
 let userId = '';
 
 describe("User API - Add a user", () => { 
@@ -17,7 +21,7 @@ describe("User API - Add a user", () => {
     expect(response.status).toBe(201);    
     expect(response.body).toBeDefined();
     expect(response.body).toHaveProperty("userId");
-    expect(typeof response.body.userId).toBe('string');   
+    expect(typeof response.body.userId).toBe("string");   
 
     userId = response.body.userId; 
   }); 
@@ -42,18 +46,18 @@ describe("User API - Get a user by id", () => {
     expect(response.status).toBe(200);
     expect(response.body).toBeDefined();
     expect(response.body).toHaveProperty("id");
-    expect(typeof response.body.id).toBe('string');  
+    expect(typeof response.body.id).toBe("string");  
 
     expect(response.body).toHaveProperty("surname");
-    expect(typeof response.body.surname).toBe('string');
+    expect(typeof response.body.surname).toBe("string");
     expect(response.body.surname).toBe(surname);
 
     expect(response.body).toHaveProperty("firstName");
-    expect(typeof response.body.firstName).toBe('string');  
+    expect(typeof response.body.firstName).toBe("string");  
     expect(response.body.firstName).toBe(firstName); 
 
     expect(response.body).toHaveProperty("role");
-    expect(typeof response.body.role).toBe('string'); 
+    expect(typeof response.body.role).toBe("string"); 
     expect(response.body.role).toBe(role);
   });
 
@@ -79,18 +83,18 @@ describe("User API - Get a user by username", () => {
     expect(response.status).toBe(200);
     expect(response.body).toBeDefined();
     expect(response.body).toHaveProperty("id");
-    expect(typeof response.body.id).toBe('string');  
+    expect(typeof response.body.id).toBe("string");  
 
     expect(response.body).toHaveProperty("surname");
-    expect(typeof response.body.surname).toBe('string');
+    expect(typeof response.body.surname).toBe("string");
     expect(response.body.surname).toBe(surname);
 
     expect(response.body).toHaveProperty("firstName");
-    expect(typeof response.body.firstName).toBe('string');  
+    expect(typeof response.body.firstName).toBe("string");  
     expect(response.body.firstName).toBe(firstName); 
 
     expect(response.body).toHaveProperty("role");
-    expect(typeof response.body.role).toBe('string'); 
+    expect(typeof response.body.role).toBe("string"); 
     expect(response.body.role).toBe(role);
   });
 
@@ -106,77 +110,32 @@ describe("User API - Get a user by username", () => {
     expect(response.status).toBe(404);
   });  
 }); 
+
+describe("User API - Update a user", () => {  
  
-
- 
-// describe("User API - Update a user", () => {  
-
-//   const updateUsername = "john3@hotmail.com";
-//   const updateRole = "admin";
-//   const invalidRole = "test";
-//   const invalidId = "6873423ab6fc23ad4cdca777";
-//   const existingUsername = "john@hotmail.com";
-
-//   it("should return 200 and department", async () => { 
-
-//     const response = await request(global.app!)
-//       .put("/v1/users")
-//         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
-//         .set("Content-Type", "application/json")
-//         .send({ id: userId, username: updateUsername, role: updateRole });
- 
-//     expect(response.status).toBe(200);    
-//     expect(response.body).toBeDefined();
-//     expect(response.body).toHaveProperty("id");
-//     expect(response.body).toHaveProperty("username");  
-//     expect(response.body).toHaveProperty("role");  
- 
-//     expect(typeof response.body.id).toBe('string');  
-//     expect(typeof response.body.username).toBe('string');  
-//     expect(response.body.username).toBe(updateUsername);
-//     expect(response.body.role).toBe(updateRole);
-//   })
+  it("should return 200 when updating successfully", async () => {   
+    const response = await putUser({ id: userId, surname: updateSurname, firstName: updateFirstName });  
+    expect(response.status).toBe(200);    
+    expect(response.body).toBeDefined();
+    expect(response.body).toHaveProperty("userId");
+    expect(typeof response.body.userId).toBe("string");
+    expect(response.body.userId).toBe(userId);
+    expect(response.body.message).toBe("User updated successfully"); 
+  })
   
-//   it("should return 400 and error Invalid role", async () => {
-      
-//     const response = await request(global.app!)
-//       .put("/v1/users")
-//         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
-//         .set("Content-Type", "application/json")
-//         .send({ id: userId, username: updateUsername, role: invalidRole });
-  
-//     expect(response.status).toBe(400);    
-//     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors).toContain('Validation failed: role: `test` is not a valid enum value for path `role`.'); 
-//   });
+  it("should return 400 and error Invalid surname, firstName", async () => {    
+    const response = await putUser({ id: userId, surname: "invalidSurnameinvalidSurnameinvalidSurnameinvalidSurnameinvalidSurname", firstName: "invalidFirstNameinvalidFirstNameinvalidFirstName" });
+    expect(response.status).toBe(400);    
+    expect(response.body).toHaveProperty('error');  
+    expect(response.body.error).toContain('Surname must be at most 50 characters long'); 
+    expect(response.body.error).toContain('First name must be at most 25 characters long'); 
+  });
 
-//   it("should return 404 and error User not found", async () => {
-      
-//     const response = await request(global.app!)
-//       .put("/v1/users")
-//         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
-//         .set("Content-Type", "application/json")
-//         .send({ id: invalidId, username: updateUsername, role: updateRole });
-  
-//     expect(response.status).toBe(404);    
-//     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors).toContain('User not found'); 
-//   });
-
-//   it("should return 400 and error User with the usename already exists", async () => {
-      
-//     const response = await request(global.app!)
-//       .put("/v1/users")
-//         .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
-//         .set("Content-Type", "application/json")
-//         .send({ id: userId, username: existingUsername, role: updateRole });
-  
-//     expect(response.status).toBe(400);    
-//     // expect(response.body).toHaveProperty('errors');  
-//     // expect(response.body.errors).toContain('User with the usename already exists'); 
-//   }); 
-// });
-
+  it("should return 404 and error User not found", async () => {       
+      const response = await putUser({ id: invalidUserId, surname: updateSurname, firstName: updateFirstName });
+      expectError(response, 'User not found', 404);  
+  });   
+});
 
 describe("User API - Delete a user", () => { 
 
@@ -192,21 +151,15 @@ describe("User API - Delete a user", () => {
     expect(response.body.message).toMatch('User deleted'); 
   });  
 
-  // it("delete user, should return 404 and error User not found", async () => {
-   
-  //   const response = await request(global.app!)
-  //       .delete(`/v1/users/${invalidUserId}`)
-  //       .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
-  //       .send();
-  
-  //   expect(response.status).toBe(404);    
-  //   // expect(response.body).toHaveProperty('errors');  
-  //   // expect(response.body.errors).toContain('User not found'); 
-  // });
-
+  it("delete user, should return 404 and error User not found", async () => {   
+    const response = await request(global.app!)
+        .delete(`/v1/users/${invalidUserId}`)
+        .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
+        .send();
+    expectError(response, 'User not found', 400); 
+  });
 
 });
-
 
 function postUser(data?: object) {
   const req = request(global.app!)
@@ -219,6 +172,16 @@ function postUser(data?: object) {
     return req.send(data);
   }
   return req.send();
+}
+
+function putUser(data?: object) {
+  const ressponse = request(global.app!)
+    .put("/v1/users")
+      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set("Content-Type", "application/json")
+      .send(data);
+
+  return ressponse;
 }
 
 async function getUserById(id: string) {

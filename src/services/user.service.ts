@@ -118,6 +118,9 @@ export async function getUserByUsername(username: string): Promise<ServiceResult
 export async function deleteUser(id: string): Promise<ServiceResult<DeletedUserResponse>> {
 
   const validationResult = await validate(deleteUserSchema, {id});  
+
+  console.log("validationResult ", validationResult)
+
   if (!validationResult.success) {
     return validationResult;
   }   
