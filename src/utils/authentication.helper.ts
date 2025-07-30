@@ -27,7 +27,16 @@ export function getRefreshTokenSecret(): string {
 }
 
 export function setRefreshTokenCookie(res: Response, refreshToken: string): void {
-  res.cookie('refreshToken', refreshToken, {
+  res.cookie('refresh_token', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/',
+  });
+}
+
+export function setAccessTokenCookie(res: Response, accessToken: string): void {
+  res.cookie('access_token', accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',

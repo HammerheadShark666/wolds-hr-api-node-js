@@ -10,10 +10,13 @@ export default async function globalTeardown() {
   if (!global.userId) {
     throw new Error('global.userId is undefined in globalTeardown');
   }
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
  
   const response = await request(global.app)
     .delete(`/v1/users/${global.userId}`)
-    .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
+    .set("Cookie", [global.ACCESS_TOKEN])
     .send();
 
   if (response.status !== 200) {

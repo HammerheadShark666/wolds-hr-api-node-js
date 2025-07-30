@@ -7,6 +7,7 @@ import { ServiceResult } from '../types/ServiceResult';
 import { handleServiceError } from '../utils/error.helper';
 import { refreshTokenSchema } from '../validation/fields/refreshToken.schema';
 import { validate } from '../validation/validate';
+import { getAccessTokenExpiry } from '../utils/authentication.helper';
 
 export async function createTokenFromRefreshToken(refreshToken: string): Promise<ServiceResult<RefreshTokenResponse>> {   
   const validationResult = await validate(refreshTokenSchema, refreshToken);  
@@ -27,13 +28,15 @@ export async function createTokenFromRefreshToken(refreshToken: string): Promise
       });
     });
 
-    const newToken = jwt.sign(
-      { id: decoded.id },
-      process.env.ACCESS_TOKEN_SECRET!,
-      { expiresIn: '15m' }
-    );
+    const expiryTime = getAccessTokenExpiry() as jwt.SignOptions['expiresIn']; 
 
-    const refreshTokenResponse: RefreshTokenResponse = { token: newToken };
+    const newAccessToken = jwt.sign(
+      { userId: decoded.userId },
+      process.env.ACCESS_TOKEN_SECRET!,
+      { expiresIn: expiryTime }
+    ); 
+
+    const refreshTokenResponse: RefreshTokenResponse = { accessToken: newAccessToken };
 
     return { success: true, data: refreshTokenResponse };
 

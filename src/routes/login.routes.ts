@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
 import { loginUser, logoutUser } from '../services/login.service';
-import { setRefreshTokenCookie } from '../utils/authentication.helper';
+import { setAccessTokenCookie, setRefreshTokenCookie } from '../utils/authentication.helper';
 
 export function createLoginRouter() {
 
@@ -16,17 +16,19 @@ export function createLoginRouter() {
         return;
       }
       setRefreshTokenCookie(res, result.data.refreshToken); 
-      res.status(200).json({ token: result.data.token });    
+      setAccessTokenCookie(res, result.data.accessToken); 
+      res.status(200).json({ message: 'Logged in' });    
     })
   );
 
   router.post(
     '/logout',
     asyncHandler(async (req: Request, res: Response) => {
-      const token = req.cookies.refreshToken;
+      const token = req.cookies.refresh_token;
       if (token) {
         await logoutUser({ refreshToken: token }); 
-        res.clearCookie('refreshToken', { path: '/refresh-token' });
+        res.clearCookie('refresh_token', { path: '/refresh-token' });
+        res.clearCookie('access_token', { path: '/refresh-token' });
       }      
       res.sendStatus(204);     
     })

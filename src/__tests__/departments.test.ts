@@ -104,9 +104,13 @@ describe("DELETE /api/v1/departments/:id", () => {
 
 
 function postDepartment(data?: object) {
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
   const req = request(global.app!)
     .post("/v1/departments")
-      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
   
   if (data !== undefined) {
@@ -116,9 +120,13 @@ function postDepartment(data?: object) {
 }
  
 function getDepartments(params?: object) {
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
   let req = request(global.app!)
     .get("/v1/departments")
-      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`);
+      .set("Cookie", [global.ACCESS_TOKEN]);
 
   if (params !== undefined) {
     req = req.query(params);
@@ -128,22 +136,34 @@ function getDepartments(params?: object) {
 }
 
 function putDepartment(departmentId: string, data: string) {
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
   return request(global.app!)
     .put(`/v1/departments/${departmentId}`)
-      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set("Cookie", [global.ACCESS_TOKEN])
       .set('Content-Type', 'application/json')
       .send({ name: data });
 }
 
 function deleteDepartment(id: string) {
+
+   if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
   return request(global.app!)
     .delete(`/v1/departments/${id}`)
-      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`);
+      .set("Cookie", [global.ACCESS_TOKEN]);
 }
 
 function getDepartmentById(departmentId: string) {
+
+   if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
   return request(global.app!)
     .get(`/v1/departments/${departmentId}`)
-      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set("Cookie", [global.ACCESS_TOKEN]) 
       .set('Content-Type', 'application/json');
 }

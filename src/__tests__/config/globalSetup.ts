@@ -22,15 +22,15 @@ export default async function globalSetup() {
   console.log('Global setup completed');
 }
 
-function getRefreshTokenCookie(response: request.Response): string | null {
+function getCookie(response: request.Response, cookieName: string): string | null {
 
   const cookiesHeader = response.headers['set-cookie'];
   const cookiesArray = Array.isArray(cookiesHeader) ? cookiesHeader : [cookiesHeader];
   
-  const refreshTokenCookie = cookiesArray.find((cookie: string) =>
-    cookie.startsWith('refreshToken='));  
+  const cookie = cookiesArray.find((cookie: string) =>
+    cookie.startsWith(cookieName + '='));  
   
-  return refreshTokenCookie;
+  return cookie;
 }
 
 async function loginToMasterAccount() {
@@ -42,22 +42,23 @@ async function loginToMasterAccount() {
 
   if (response.status !== 200)
     throw new Error('Login failed in global setup');  
-
-  const refreshTokenCookie = getRefreshTokenCookie(response);
-    
-  global.REFRESH_TOKEN = refreshTokenCookie;
-  global.ACCESS_TOKEN = response.body.token; 
+ 
+  global.REFRESH_TOKEN = getCookie(response, "refresh_token"); 
+  global.ACCESS_TOKEN =  getCookie(response, "access_token");
 }
 
 async function addNewUser() {
  
   global.username = `john_${Date.now()}@hotmail.com`;
   global.password = "Password#1";
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
  
   const addedUserResponse = await request(global.app!)
     .post("/v1/users/add")
       .set("Content-Type", "application/json")
-      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set("Cookie", [global.ACCESS_TOKEN])
       .send({ username: global.username, password: global.password, confirmPassword: global.password, surname: 'Doe', firstName: 'John', role: 'clerk' }); 
     
   if (!addedUserResponse.body || !addedUserResponse.body.userId)
@@ -67,10 +68,14 @@ async function addNewUser() {
 }
 
 async function logoutOfMasterAccount() { 
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
   const response = await request(global.app!)
     .post("/v1/logout") 
       .set("Content-Type", "application/json")
-      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set("Cookie", [global.ACCESS_TOKEN]) 
       .send(); 
 } 
 
@@ -84,8 +89,9 @@ async function loginAsNewUser() {
   if (response.status !== 200)
     throw new Error('Login failed in global setup');  
 
-  const refreshTokenCookie = getRefreshTokenCookie(response);
+  const refreshTokenCookie = getCookie(response, "refresh_token");
+  const accessTokenCookie =  getCookie(response, "access_token");
     
   global.REFRESH_TOKEN = refreshTokenCookie;
-  global.ACCESS_TOKEN = response.body.token; 
+  global.ACCESS_TOKEN = accessTokenCookie; 
 }

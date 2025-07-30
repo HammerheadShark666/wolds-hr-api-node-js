@@ -4,13 +4,13 @@ import { createApp } from './app';
 import { connectToDatabase } from './db/mongoose';
 
 const wrapperApp = express();  
-const PORT = process.env.PORT || 3000;
   
 async function startServer() {
   try {
 
     dotenv.config();
     
+    const PORT = process.env.PORT || 3000;
     const coreApp = await createApp(); 
     wrapperApp.use('/api', coreApp);    
 

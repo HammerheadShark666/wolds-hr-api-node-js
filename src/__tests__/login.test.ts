@@ -21,19 +21,28 @@ describe("POST /api/v1/login ", () => {
     expect(Array.isArray(cookiesArray)).toBe(true);
 
     const refreshTokenCookie = cookiesArray.find((cookie: string) =>
-    cookie.startsWith('refreshToken=')); 
+    cookie.startsWith('refresh_token=')); 
 
     expect(refreshTokenCookie).toBeDefined();
     expect(refreshTokenCookie).toMatch(/HttpOnly/);
 
-    const token = refreshTokenCookie!.split(';')[0].split('=')[1];
-    expect(typeof token).toBe("string");
+    const refreshTokenValue = refreshTokenCookie!.split(';')[0].split('=')[1];
+    expect(typeof refreshTokenValue).toBe("string");
       
-    refreshToken = refreshTokenCookie; 
+    refreshToken = refreshTokenCookie;  
+
+    const accessTokenCookie = cookiesArray.find((cookie: string) =>
+    cookie.startsWith('access_token')); 
+
+    expect(accessTokenCookie).toBeDefined();
+    expect(accessTokenCookie).toMatch(/HttpOnly/);
+
+    const accessTokenValue = accessTokenCookie!.split(';')[0].split('=')[1];
+    expect(typeof accessTokenValue).toBe("string");
   
     expect(response.body).toBeDefined();
-    expect(response.body).toHaveProperty("token");
-    expect(typeof response.body.token).toBe("string");    
+    expect(response.body).toHaveProperty("message");
+    expect(response.body.message).toBe("Logged in");    
   }); 
 });
  
