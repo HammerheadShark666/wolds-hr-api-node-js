@@ -28,7 +28,7 @@ export async function loginUser(data: LoginRequest): Promise<ServiceResult<Login
       return { success: false, error: ["Invalid login"] };
     }
  
-    const tokens: LoginResponse = { token: getAccessToken(user._id), refreshToken: getRefreshToken(user._id) };
+    const tokens: LoginResponse = { accessToken: getAccessToken(user._id), refreshToken: getRefreshToken(user._id) };
     return { success: true, data: tokens };
   } 
   catch (err: any) {     

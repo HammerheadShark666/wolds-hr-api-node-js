@@ -14,7 +14,7 @@ declare global {
   }
  
   var app: Express | undefined;
-  var ACCESS_TOKEN: string | undefined;
+  var ACCESS_TOKEN: string | null;
   var REFRESH_TOKEN: string | null;
   var departmentId: string | undefined;
   var userId: string | undefined;

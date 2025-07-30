@@ -139,32 +139,28 @@ describe("User API - Update a user", () => {
 
 describe("User API - Delete a user", () => { 
 
-   it("delete user, should return 200 and message User deleted", async () => {
-   
-    const response = await request(global.app!)
-        .delete(`/v1/users/${userId}`)
-        .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
-        .send();
-  
+   it("delete user, should return 200 and message User deleted", async () => {   
+    const response = await deleteUserById(userId);
     expect(response.status).toBe(200);    
     expect(response.body).toHaveProperty('message');  
     expect(response.body.message).toMatch('User deleted'); 
   });  
 
   it("delete user, should return 404 and error User not found", async () => {   
-    const response = await request(global.app!)
-        .delete(`/v1/users/${invalidUserId}`)
-        .set('Authorization', `Bearer ${global.ACCESS_TOKEN || ''}`)
-        .send();
+    const response = await deleteUserById(invalidUserId);
     expectError(response, 'User not found', 400); 
   });
 
 });
 
 function postUser(data?: object) {
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
   const req = request(global.app!)
     .post("/v1/users/add")
-      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json")
       .send(data);
   
@@ -175,9 +171,13 @@ function postUser(data?: object) {
 }
 
 function putUser(data?: object) {
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
   const ressponse = request(global.app!)
     .put("/v1/users")
-      .set('Authorization', `Bearer ${global.ACCESS_TOKEN}`)
+      .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json")
       .send(data);
 
@@ -185,19 +185,40 @@ function putUser(data?: object) {
 }
 
 async function getUserById(id: string) {
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
   const response = await request(global.app!)
     .get(`/v1/users/id/${id}`) 
       .set("Content-Type", "application/json")
-      .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`);
+      .set("Cookie", [global.ACCESS_TOKEN]);
 
   return response;
 }
 
 async function getUserByUsername(username: string) {
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
   const response = await request(global.app!)
     .get(`/v1/users/username/${username}`) 
       .set("Content-Type", "application/json")
-      .set("Authorization", `Bearer ${global.ACCESS_TOKEN}`);
+      .set("Cookie", [global.ACCESS_TOKEN]);
 
   return response;
-} 
+}
+
+async function deleteUserById(userId: string) {
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
+   const response = await request(global.app!)
+        .delete(`/v1/users/${userId}`)
+        .set("Cookie", [global.ACCESS_TOKEN])
+        .send();
+
+   return response;
+}

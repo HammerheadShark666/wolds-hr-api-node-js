@@ -1,5 +1,7 @@
+import { Request } from 'express';
+
 export interface LoginResponse {
-  token: string;
+  accessToken: string;
   refreshToken: string;
 }
 
@@ -11,3 +13,11 @@ export interface LoginRequest {
 export interface LogoutRequest {
   refreshToken: string;
 }
+
+export interface LoginRequestExtension extends Request {
+  account?: {
+    userId: string;
+    iat: number;
+    exp: number;
+  };
+} 
