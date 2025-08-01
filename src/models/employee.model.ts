@@ -12,6 +12,10 @@ export interface IEmployee extends Document {
   departmentId: Types.ObjectId;
   employeeImportId: Types.ObjectId;
   createdAt: Date;
+  department?: {
+    _id: Types.ObjectId;
+    name: string;
+  };
 }
 
 const EmployeeSchema = new Schema<IEmployee>({

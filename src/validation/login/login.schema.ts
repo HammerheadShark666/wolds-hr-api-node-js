@@ -11,13 +11,4 @@ export const loginSchema = z
   })
   .superRefine(async (data, ctx) => {
     validatePassword(data, ctx);
-
-    const user = await UserModel.findOne({ username: data.username })
-    if (!user) {
-      ctx.addIssue({
-      path: ['username'],
-      code: 'custom',
-      message: 'Invalid login',
-      });
-    }   
   });

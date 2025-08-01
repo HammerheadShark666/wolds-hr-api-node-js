@@ -26,13 +26,18 @@ export function toUserResponse(user: IUser): UserResponse {
 }
 
 export function toEmployeeSearchResponse(employee: IEmployee): EmployeeResponse {
-  const { _id, surname, firstName, email, phoneNumber } = employee;
+  const { _id, surname, firstName, email, phoneNumber, photo, department } = employee;
   const appEmployee: EmployeeResponse = {
     id: _id.toString(),
     surname: surname, 
     firstName: firstName,
     email: email,
-    phoneNumber: phoneNumber
+    phoneNumber: phoneNumber,
+    photo: photo,
+    department: {
+      id: department?._id.toString() ?? '',
+      name: department?.name ?? '',
+    },
   }; 
   return appEmployee;
 }

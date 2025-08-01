@@ -2,16 +2,16 @@ import { LoginRequest, LoginResponse, LogoutRequest } from "../interface/login";
 import { UserModel } from "../models/user.model";
 import { ServiceResult } from "../types/ServiceResult";
 import { getAccessToken, getRefreshToken, verifyPassword } from "../utils/authentication.helper";
-import { removeTokenFromUser } from "./refreshToken.service";
+import { removeTokenFromUserAsync } from "./refreshToken.service";
 import { loginSchema } from "../validation/login/login.schema";
 import { handleServiceError } from "../utils/error.helper";
 import { validate } from "../validation/validate";
 
-export async function loginUser(data: LoginRequest): Promise<ServiceResult<LoginResponse>> {
+export async function loginUserAsync(data: LoginRequest): Promise<ServiceResult<LoginResponse>> {
     
   const validationResult = await validate(loginSchema, data);  
   if (!validationResult.success) {
-    return validationResult;
+    return { success: false, code: 400, error: validationResult.error }
   }    
 
   try {
@@ -36,11 +36,11 @@ export async function loginUser(data: LoginRequest): Promise<ServiceResult<Login
   }
 }
 
-export async function logoutUser(data: LogoutRequest): Promise<ServiceResult<void>> {
+export async function logoutUserAsync(data: LogoutRequest): Promise<ServiceResult<void>> {
 
   let user = await UserModel.findOne({ refreshToken: data.refreshToken })
   if(user) {
-    await removeTokenFromUser(data.refreshToken);
+    await removeTokenFromUserAsync(data.refreshToken);
   } 
 
   return { success: true, data: undefined };

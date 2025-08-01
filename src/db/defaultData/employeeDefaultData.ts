@@ -1,19 +1,16 @@
-import mongoose from 'mongoose'; 
+import mongoose, { Types } from 'mongoose'; 
 import { EmployeeModel } from '../../models/employee.model';
-
-// Assume you already have a connected mongoose instance
-// and an array of departments loaded from DB:
+import { Department } from '../../types/department';
+import { EmployeeDefaultData } from '../../interface/employee';
+ 
 export async function insertDefaultEmployees() {
-  try {
-    // Fetch departments from DB first, so you have _id values
+  try { 
     const departments = await mongoose.model('Department').find().exec();
-
     if (departments.length === 0) {
       console.log('No departments found. Aborting insertion.');
       return;
     }
-
-    // Generate employee data
+ 
     const employees = getEmployeeDefaultData(departments); 
     const insertedEmployees = await EmployeeModel.insertMany(employees);
 
@@ -26,95 +23,77 @@ export async function insertDefaultEmployees() {
     console.error('Error inserting employees:', err);
   }
 }
-
-import { Types } from 'mongoose';
-
-function getRandomDepartmentId(departments: { _id: Types.ObjectId }[]) {
+  
+function getRandomDepartmentId(departments: Department[]) {
   const randomIndex = Math.floor(Math.random() * departments.length);
   return departments[randomIndex]._id;
-}
+} 
 
-export function getEmployeeDefaultData(departments: { _id: Types.ObjectId }[]) {
+function getEmployeeDefaultData(departments: Department[]) {
   const now = new Date();
 
-  return [
+  const employees: EmployeeDefaultData[] = [
     {
       surname: "Miller",
       firstName: "John",
-      dateOfBirth: new Date(1966, 2, 21),  // months are 0-based in JS Date
+      dateOfBirth: new Date(1966, 2, 21),
       hireDate: new Date(2021, 4, 27),
-      departmentId: getRandomDepartmentId(departments),
       email: "jmiller@hotmail.com",
       phoneNumber: "04545 560934",
       photo: "jmiller.jpg",
-      createdAt: now,
     },
     {
       surname: "How",
       firstName: "Helen",
       dateOfBirth: new Date(1996, 11, 3),
       hireDate: new Date(2024, 7, 12),
-      departmentId: getRandomDepartmentId(departments),
       email: "hhanigan@hotmail.com",
       phoneNumber: "12473 846285",
       photo: "hhow.jpg",
-      createdAt: now,
     },
     {
       surname: "Johns",
       firstName: "Jill",
       dateOfBirth: new Date(2005, 3, 11),
       hireDate: new Date(2022, 7, 22),
-      departmentId: getRandomDepartmentId(departments),
       email: "jjohns@hotmail.com",
       phoneNumber: "23465 889453",
-      photo: "",
-      createdAt: now,
     },
     {
       surname: "Johnston",
       firstName: "Neil",
       dateOfBirth: new Date(2002, 1, 22),
       hireDate: new Date(2023, 8, 21),
-      departmentId: getRandomDepartmentId(departments),
       email: "njohnston@hotmail.com",
       phoneNumber: "33243 432435",
-      photo: "",
-      createdAt: now,
     },
     {
       surname: "Johnstone",
       firstName: "Mary",
       dateOfBirth: new Date(1999, 8, 26),
       hireDate: new Date(2024, 2, 8),
-      departmentId: getRandomDepartmentId(departments),
       email: "mjohnstone@hotmail.com",
       phoneNumber: "38967 674523",
-      photo: "",
-      createdAt: now,
     },
     {
       surname: "Johnsen",
       firstName: "Henrik",
       dateOfBirth: new Date(1989, 7, 11),
       hireDate: new Date(2021, 3, 7),
-      departmentId: getRandomDepartmentId(departments),
       email: "hjohnsen@hotmail.com",
       phoneNumber: "23547 237573",
-      photo: "",
-      createdAt: now,
-    }
+    },
   ];
-}
 
- 
+  return employees.map(e => ({
+    ...e,
+    photo: e.photo ?? "",
+    departmentId: getRandomDepartmentId(departments),
+    createdAt: now,
+  }));
+} 
 
-function getRandomInt(min: number, max: number) {
-  // Inclusive min, exclusive max
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-
-export function getRandomEmployeeDefaultData(departments: { _id: Types.ObjectId }[]) {
+function getRandomEmployeeDefaultData(departments: Department[]) {
   const employees = [];
 
   const surnames = [
@@ -138,7 +117,7 @@ export function getRandomEmployeeDefaultData(departments: { _id: Types.ObjectId 
 
     // Random dateOfBirth between 1960 and 1999
     const dobYear = getRandomInt(1960, 2000);
-    const dobMonth = getRandomInt(0, 12); // JS month 0-11
+    const dobMonth = getRandomInt(0, 12);
     const dobDay = getRandomInt(1, 28);
 
     // Random hireDate between 2015 and 2023
@@ -160,4 +139,8 @@ export function getRandomEmployeeDefaultData(departments: { _id: Types.ObjectId 
   }
 
   return employees;
+}
+
+function getRandomInt(min: number, max: number) { 
+  return Math.floor(Math.random() * (max - min)) + min;
 }

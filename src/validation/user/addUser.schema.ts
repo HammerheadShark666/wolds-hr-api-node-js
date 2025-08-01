@@ -1,9 +1,7 @@
 import { z } from 'zod';  
-import { validatePassword } from '../validator/validatePassword';
-import { UserModel } from '../../models/user.model';
+import { validatePassword } from '../validator/validatePassword'; 
 import { usernameSchema } from '../fields/username.schema';
-import { passwordSchema } from '../fields/password.schema';
-import { validateUnique } from '../validator/validateUnique';
+import { passwordSchema } from '../fields/password.schema'; 
 import { surnameSchema } from '../fields/surname.schema';
 import { roleSchema } from '../fields/userRole.schema';
 import { firstNameSchema } from '../fields/firstName.schema';
@@ -19,5 +17,4 @@ export const addUserSchema = z
   })
   .superRefine(async (data, ctx) => {
     validatePassword(data, ctx);
-    await validateUnique(UserModel, 'username', 'Username already exists')(data, ctx);
   });

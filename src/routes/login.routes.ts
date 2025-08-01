@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
-import { loginUser, logoutUser } from '../services/login.service';
+import { loginUserAsync, logoutUserAsync } from '../services/login.service';
 import { setAccessTokenCookie, setRefreshTokenCookie } from '../utils/authentication.helper';
 
 export function createLoginRouter() {
@@ -10,7 +10,7 @@ export function createLoginRouter() {
   router.post(
     '/login',
     asyncHandler(async (req: Request, res: Response) => {
-      const result = await loginUser(req.body);  
+      const result = await loginUserAsync(req.body);  
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error });
         return;
@@ -26,7 +26,7 @@ export function createLoginRouter() {
     asyncHandler(async (req: Request, res: Response) => {
       const token = req.cookies.refresh_token;
       if (token) {
-        await logoutUser({ refreshToken: token }); 
+        await logoutUserAsync({ refreshToken: token }); 
         res.clearCookie('refresh_token', { path: '/refresh-token' });
         res.clearCookie('access_token', { path: '/refresh-token' });
       }      

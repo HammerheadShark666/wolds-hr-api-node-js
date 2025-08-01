@@ -1,23 +1,11 @@
 import { IEmployee } from "../models/employee.model";
+import { DepartmentResponse } from "./department";
 
 export interface AppEmployee {
   id: string;
   surname: string;
   firstName: string;
-}
-
-// export interface SearchEmployeeRequest {
-//   keyword: string | undefined;
-//   departmentId: number | undefined;
-//   page: number | undefined;
-//   pageSize: number | undefined;
-// }
-
-// export interface EmployeeSearchResponse {
-//   success: boolean;
-//   data?: IEmployee[];
-//   error?: string;
-// }
+} 
 
 export interface EmployeeSearchRequest {
   keyword?: string;
@@ -29,6 +17,7 @@ export interface EmployeeSearchRequest {
 export interface EmployeeSearchPagedResponse {
   page: number;
   pageSize: number;
+  totalPages: number;
   totalEmployees: number;
   employees: EmployeeResponse[];
   error?: string;
@@ -41,11 +30,22 @@ export interface EmployeeResponse {
   firstName: string;
   email: string;
   phoneNumber: string;
-}
-
+  department: DepartmentResponse;
+  photo: string;
+} 
 
 export interface EmployeeSearchResponse {
   success: boolean;
   data?: IEmployee[];
   error?: string;
+}
+
+export interface EmployeeDefaultData {
+  surname: string;
+  firstName: string;
+  dateOfBirth: Date;
+  hireDate: Date;
+  email: string;
+  phoneNumber: string;
+  photo?: string;
 }
