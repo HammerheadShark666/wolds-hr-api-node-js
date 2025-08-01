@@ -6,8 +6,7 @@ import { EmployeeDefaultData } from '../../interface/employee';
 export async function insertDefaultEmployees() {
   try { 
     const departments = await mongoose.model('Department').find().exec();
-    if (departments.length === 0) {
-      console.log('No departments found. Aborting insertion.');
+    if (departments.length === 0) { 
       return;
     }
  

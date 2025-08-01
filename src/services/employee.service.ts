@@ -17,9 +17,7 @@ export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): P
     countEmployeesAsync(keyword, departmentId),
     searchEmployeesAsync({ keyword, departmentId, page, pageSize }).then(r => r.data ?? [])
   ]); 
-
-  console.log(employees)
-
+ 
   return {
     page,
     pageSize,
@@ -39,7 +37,7 @@ export async function searchEmployeesAsync(query: EmployeeSearchRequest): Promis
     console.error('searchEmployeesAsync error:', err);
     return {
       success: false,
-      error: 'Failed to search employees. Please try again later.',
+      error: 'Failed to search employees.',
     };
   }
 } 

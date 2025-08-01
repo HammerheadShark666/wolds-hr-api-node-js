@@ -32,4 +32,3 @@ const EmployeeSchema = new Schema<IEmployee>({
 });
 
 export const EmployeeModel = model<IEmployee>('Employee', EmployeeSchema);
-  

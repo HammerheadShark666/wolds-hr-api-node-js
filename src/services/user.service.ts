@@ -37,7 +37,7 @@ export async function addUserAsync(data: AddUserRequest): Promise<ServiceResult<
     const addedUserResponse: AddedUserResponse = { message: "User added successfully", userId: user._id.toString() }; 
     return { success: true, data: addedUserResponse }; 
   } 
-  catch (err: any) {
+  catch (err: unknown) {
     return handleServiceError(err); 
   }
 } 
@@ -71,7 +71,7 @@ export async function updateUserAsync(data: UpdateUserRequest): Promise<ServiceR
     const updatedUserResponse: UpdatedUserResponse = { message: "User updated successfully", userId: data.id }; 
     return { success: true, data: updatedUserResponse }; 
   } 
-  catch (err: any) {
+  catch (err: unknown) {
     return handleServiceError(err); 
   }
 }
@@ -95,7 +95,7 @@ export async function getUserByIdAsync(id: string): Promise<ServiceResult<UserRe
 
     return { success: true, data: toUserResponse(user) }; 
   } 
-  catch (err: any) {
+  catch (err: unknown) {
     return handleServiceError(err); 
   }
 };
@@ -118,7 +118,7 @@ export async function getUserByUsernameAsync(username: string): Promise<ServiceR
 
     return { success: true, data: toUserResponse(user) }; 
   } 
-  catch (err: any) {
+  catch (err: unknown) {
     return handleServiceError(err); 
   }
 }; 
@@ -141,7 +141,7 @@ export async function deleteUserAsync(id: string): Promise<ServiceResult<Deleted
     await UserModel.findByIdAndDelete(validId);
     return { success: true, data: { userId: validId, message: 'User deleted successfully', }, }; 
   } 
-  catch (err: any) {
+  catch (err: unknown) {
     return handleServiceError(err); 
   } 
 }  

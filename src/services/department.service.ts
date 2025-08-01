@@ -5,8 +5,7 @@ import { handleServiceError } from '../utils/error.helper';
 import { toDepartmentResponse } from '../utils/mapper'; 
 import { addDepartmentSchema } from '../validation/department/addDepartment.schema';
 import { deleteDepartmentSchema } from '../validation/department/deleteDepartment.schema'; 
-import { getDepartmentByIdSchema } from '../validation/department/getDepartmentById.schema';
-import { getDepartmentByNameSchema } from '../validation/department/getDepartmentByName.schema';
+import { getDepartmentByIdSchema } from '../validation/department/getDepartmentById.schema'; 
 import { updateDepartmentSchema } from '../validation/department/updateDepartment.schema'; 
 import { validate } from '../validation/validate';
 
@@ -14,8 +13,8 @@ export async function getDepartmentsAsync(): Promise<ServiceResult<IDepartment[]
   try { 
     const departments = await DepartmentModel.find().exec(); 
     return { success: true, data: departments };
-  } catch (err: any) {
-    return { success: false, error: ['Unexpected error: ' + err.message], code: 500 };
+  } catch (err: unknown) {
+    return handleServiceError(err); 
   }
 } 
   
@@ -33,32 +32,15 @@ export async function getDepartmentByIdAsync(id: unknown): Promise<ServiceResult
     const department = await DepartmentModel.findById(validId).exec();
     if (!department) {
       return { success: false, error: ['Department not found'], code: 404 };
-    }
+    } 
 
     return { success: true, data: department };
   } 
-  catch (err: any) { 
+  catch (err: unknown) { 
     return handleServiceError(err);
   }
 } 
-
-export async function getDepartmentByNameAsync(name: string): Promise<ServiceResult<IDepartment | null>> { 
-
-  const validationResult = await validate(getDepartmentByNameSchema, name);  
-  if (!validationResult.success) {
-    return { success: false, code: 400, error: validationResult.error }
-  }
-  
-  try {
-    const { name: validName } = validationResult.data;
-    const department = await DepartmentModel.findOne({ name: validName }).exec();
-    return { success: true, data: department }; 
-  } 
-  catch (err: any) { 
-    return handleServiceError(err);
-  }
-}
-
+ 
 export async function addDepartmentAsync(data: unknown): Promise<ServiceResult<DepartmentResponse>> {
     
   const validationResult = await validate(addDepartmentSchema, data);  
@@ -77,7 +59,7 @@ export async function addDepartmentAsync(data: unknown): Promise<ServiceResult<D
     const saved = await department.save();  
     return { success: true, data: toDepartmentResponse(saved) };
   } 
-  catch (err: any) {  
+  catch (err: unknown) {  
     return handleServiceError(err); 
   }
 } 
@@ -111,7 +93,7 @@ export async function updateDepartmentAsync(id: string, name: string): Promise<S
     const updatedDepartmentResponse: UpdatedDepartmentResponse = { message: "Department updated successfully", departmentId: updatedDepartment.id }; 
     return { success: true, data: updatedDepartmentResponse }; 
   } 
-  catch (err: any) { 
+  catch (err: unknown) { 
     return handleServiceError(err);
   }
 } 
@@ -134,7 +116,7 @@ export async function deleteDepartmentAsync(id: string): Promise<ServiceResult<I
     await DepartmentModel.findByIdAndDelete(validId);
     return { success: true, data: null };
   } 
-  catch (err: any) { 
+  catch (err: unknown) { 
     return handleServiceError(err);
   }
 }

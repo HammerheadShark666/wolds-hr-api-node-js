@@ -41,7 +41,7 @@ export async function createTokenFromRefreshTokenAsync(refreshToken: string): Pr
 
     return { success: true, data: refreshTokenResponse };
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleServiceError(err);
   }
 }  

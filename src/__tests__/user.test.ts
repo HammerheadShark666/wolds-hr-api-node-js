@@ -34,8 +34,7 @@ describe("User API - Add a user", () => {
   it("should return 400 and error when password and confirmPassword don't match", async () => {
     const response = await postUser({ username: validUsername, password, confirmPassword: invalidConfirmPassword, surname, firstName, role });
     expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty("error");
-    console.log(response.body);
+    expect(response.body).toHaveProperty("error"); 
     expect(response.body.error).toContain("Passwords do not match");
   });
 });

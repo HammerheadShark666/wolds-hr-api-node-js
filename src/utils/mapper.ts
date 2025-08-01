@@ -1,4 +1,4 @@
-import { AddUserRequest, UpdateUserRequest, UserResponse } from "../interface/user";
+import { UserResponse } from "../interface/user";
 import { DepartmentResponse } from "../interface/department";
 import { IDepartment } from "../models/department.model"; 
 import { IUser } from "../models/user.model";

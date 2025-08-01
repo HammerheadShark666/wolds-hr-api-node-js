@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { toDepartmentResponse } from '../utils/mapper';
 import { DepartmentResponse,  } from '../interface/department'; 
-import { addDepartmentAsync, updateDepartmentAsync, getDepartmentByIdAsync, getDepartmentByNameAsync, getDepartmentsAsync, deleteDepartmentAsync } from '../services/department.service';
+import { addDepartmentAsync, updateDepartmentAsync, getDepartmentByIdAsync, getDepartmentsAsync, deleteDepartmentAsync } from '../services/department.service';
 import asyncHandler from 'express-async-handler';
 
 export function createDepartmentRouter() {
