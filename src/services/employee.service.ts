@@ -5,6 +5,8 @@ import { toEmployeeSearchResponse } from '../utils/mapper';
 
 const PAGE_SIZE = 5;
 
+//Service export functions
+
 export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): Promise<EmployeeSearchPagedResponse> {
 
   const { keyword, departmentId } = query;  
@@ -42,6 +44,8 @@ export async function searchEmployeesAsync(query: EmployeeSearchRequest): Promis
   }
 } 
 
+//Service helper functions
+
 async function countEmployeesAsync(keyword?: string, departmentId?: string): Promise<number> {
   try{
     const filter: any = {};
@@ -66,6 +70,8 @@ function parsePagination(query: EmployeeSearchRequest, defaults = { page: 1, pag
   const pageSize = typeof query.pageSize === 'number' ? query.pageSize : parseInt(query.pageSize ?? '', 10) || defaults.pageSize;
   return { page, pageSize };
 }
+
+//Service Pipelines
 
 function buildEmployeeSearchPipeline(query: EmployeeSearchRequest): any[] {
   const pipeline: any[] = [
@@ -114,6 +120,9 @@ function buildEmployeeSearchPipeline(query: EmployeeSearchRequest): any[] {
   return pipeline;
 }
  
+
+//Service Validation 
+
 function validatePagination(page: number, pageSize: number): [number, number]{
 
   let validPage = Number(page);

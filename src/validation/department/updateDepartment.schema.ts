@@ -1,5 +1,4 @@
-import { z } from 'zod'; 
-import { DepartmentModel } from '../../models/department.model';
+import { z } from 'zod';
 import { departmentNameSchema } from './fields/departmentName.schema';
 
 export const updateDepartmentSchema = z.object({

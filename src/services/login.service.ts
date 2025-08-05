@@ -7,6 +7,8 @@ import { loginSchema } from "../validation/login/login.schema";
 import { handleServiceError } from "../utils/error.helper";
 import { validate } from "../validation/validate";
 
+//Service export functions
+
 export async function loginUserAsync(data: LoginRequest): Promise<ServiceResult<LoginResponse>> {
     
   const validationResult = await validate(loginSchema, data);  
@@ -41,6 +43,8 @@ export async function logoutUserAsync(data: LogoutRequest): Promise<ServiceResul
 
   return { success: true, data: undefined };
 };
+
+//Service Validation 
 
 async function validateUserCredentials(username: string, password: string): Promise<ServiceResult<IUser>> {
 

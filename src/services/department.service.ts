@@ -9,6 +9,8 @@ import { getDepartmentByIdSchema } from '../validation/department/getDepartmentB
 import { updateDepartmentSchema } from '../validation/department/updateDepartment.schema'; 
 import { validate } from '../validation/validate';
 
+//Service export functions
+
 export async function getDepartmentsAsync(): Promise<ServiceResult<IDepartment[]>> {
   try { 
     const departments = await DepartmentModel.find().exec(); 

@@ -11,6 +11,8 @@ import { getUserByIdSchema } from '../validation/user/getUserById.schema';
 import { updateUserSchema } from '../validation/user/updateUser.schema';
 import { validate } from '../validation/validate';
 
+//Service export functions
+
 export async function addUserAsync(data: AddUserRequest): Promise<ServiceResult<AddedUserResponse>> {
    
   const validationResult = await validate(addUserSchema, data); 

@@ -1,6 +1,5 @@
 import { z } from 'zod';  
 import { validatePassword } from '../validator/validatePassword';
-import { UserModel } from '../../models/user.model';
 import { usernameSchema } from '../fields/username.schema';
 import { passwordSchema } from '../fields/password.schema';
 

@@ -9,6 +9,8 @@ import { refreshTokenSchema } from '../validation/fields/refreshToken.schema';
 import { validate } from '../validation/validate';
 import { getAccessTokenExpiry } from '../utils/authentication.helper';
 
+//Service export functions
+
 export async function createTokenFromRefreshTokenAsync(refreshToken: string): Promise<ServiceResult<RefreshTokenResponse>> {   
   
   const validationResult = await validate(refreshTokenSchema, refreshToken);  
