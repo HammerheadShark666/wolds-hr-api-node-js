@@ -6,7 +6,7 @@ import { createRefreshTokenRouter } from './routes/refreshToken.routes';
 import { createDepartmentRouter } from './routes/department.routes';
 import { createUsersRouter } from './routes/user.routes';
 import { errorHandler } from './middleware/errorHandler';
-import { loginToken } from './middleware/loginToken';
+import { validateAccessToken } from './middleware/accessToken';
 import {configureCors} from './utils/configureCors';
 import { createAuthenticateRouter } from './routes/authenticate.routes';
 import { createEmployeesRouter } from './routes/employee.routes';
@@ -26,7 +26,7 @@ export async function createApp() {
     v1Router.use('', createLoginRouter());
     v1Router.use('', createRefreshTokenRouter());
     v1Router.use('', createAuthenticateRouter());
-    v1Router.use(loginToken);
+    v1Router.use(validateAccessToken);
     v1Router.use('/departments', createDepartmentRouter());
     v1Router.use('/employees', createEmployeesRouter());
     v1Router.use('/users', createUsersRouter());
