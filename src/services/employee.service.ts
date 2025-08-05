@@ -1,5 +1,5 @@
 import { Types } from 'mongoose'; 
-import { EmployeeModel, IEmployee } from '../models/employee.model';
+import { EmployeeModel } from '../models/employee.model';
 import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse } from '../interface/employee';
 import { toEmployeeSearchResponse } from '../utils/mapper'; 
 
@@ -10,10 +10,10 @@ const PAGE_SIZE = 5;
 export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): Promise<EmployeeSearchPagedResponse> {
 
   const { keyword, departmentId } = query;  
-  let page = Number.isNaN(Number(query.page)) ? 1 : Number(query.page);
+  let page = Number.isNaN(Number(query.page)) ? 1 : Number(query.page);  
   let pageSize = Number.isNaN(Number(query.pageSize)) ? PAGE_SIZE : Number(query.pageSize);
- 
-  [page, pageSize] = validatePagination(page, pageSize);
+  
+  [page, pageSize] = validatePagination(page, pageSize); 
  
   const [totalEmployees, employees] = await Promise.all([
     countEmployeesAsync(keyword, departmentId),
@@ -31,7 +31,7 @@ export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): P
 } 
 
 export async function searchEmployeesAsync(query: EmployeeSearchRequest): Promise<EmployeeSearchResponse> {
-  try {
+  try { 
     const pipeline = buildEmployeeSearchPipeline(query);
     const result = await EmployeeModel.aggregate(pipeline);
     return { success: true, data: result };
@@ -67,7 +67,7 @@ async function countEmployeesAsync(keyword?: string, departmentId?: string): Pro
 
 function parsePagination(query: EmployeeSearchRequest, defaults = { page: 1, pageSize: PAGE_SIZE }) {
   const page = typeof query.page === 'number' ? query.page : parseInt(query.page ?? '', PAGE_SIZE) || defaults.page;
-  const pageSize = typeof query.pageSize === 'number' ? query.pageSize : parseInt(query.pageSize ?? '', 10) || defaults.pageSize;
+  const pageSize = typeof query.pageSize === 'number' ? query.pageSize : parseInt(query.pageSize ?? '', 10) || defaults.pageSize;    
   return { page, pageSize };
 }
 
@@ -109,7 +109,7 @@ function buildEmployeeSearchPipeline(query: EmployeeSearchRequest): any[] {
       },
     });
   }
-
+ 
   const { page, pageSize } = parsePagination(query);
   pipeline.push(
     { $sort: { surname: 1, firstName: 1 } },
@@ -124,7 +124,7 @@ function buildEmployeeSearchPipeline(query: EmployeeSearchRequest): any[] {
 //Service Validation 
 
 function validatePagination(page: number, pageSize: number): [number, number]{
-
+ 
   let validPage = Number(page);
   let validPageSize = Number(pageSize);
  
@@ -133,10 +133,9 @@ function validatePagination(page: number, pageSize: number): [number, number]{
   } 
 
   const DEFAULT_PAGE_SIZE = PAGE_SIZE;
-  const MAX_PAGE_SIZE = 100;
+  const MAX_PAGE_SIZE = 150;
   if (Number.isNaN(validPageSize ) || validPageSize  < 1 || validPageSize > MAX_PAGE_SIZE) {
     validPageSize  = DEFAULT_PAGE_SIZE;
-  }
-
+  } 
   return  [validPage, validPageSize];
 }

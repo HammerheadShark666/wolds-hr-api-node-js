@@ -16,12 +16,12 @@ beforeAll(async () => {
  
 describe("GET /api/v1/departments", () => {
   it("should return 200 and list departments", async () => {
-    const res = await getDepartments();
-    expect(res.status).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
+    const response = await getDepartments();
+    expect(response.status).toBe(200);
+    expect(Array.isArray(response.body)).toBe(true);
 
-    if (res.body.length > 0) {
-      expectDepartment(res.body[0]);
+    if (response.body.length > 0) {
+      expectDepartment(response.body[0]);
     }
   });
 });
@@ -98,7 +98,7 @@ function postDepartment(data?: object) {
   return req.send();
 }
  
-function getDepartments(params?: object) {
+function getDepartments() {
 
   if(global.ACCESS_TOKEN == null)
     throw new Error("Access token is missing");
@@ -106,10 +106,6 @@ function getDepartments(params?: object) {
   let req = request(global.app!)
     .get("/v1/departments")
       .set("Cookie", [global.ACCESS_TOKEN]);
-
-  if (params !== undefined) {
-    req = req.query(params);
-  }
 
   return req;
 }
