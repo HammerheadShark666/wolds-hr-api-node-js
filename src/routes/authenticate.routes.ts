@@ -1,12 +1,12 @@
 import { Response, Router } from 'express';   
-import { loginToken } from '../middleware/loginToken';
+import { validateAccessToken } from '../middleware/accessToken';
 import {  LoginRequestExtension } from '../interface/login'; 
   
 export function createAuthenticateRouter() {
 
   const router = Router();  
 
-  router.get('/authentication/me', loginToken, (req: LoginRequestExtension, res: Response) => {
+  router.get('/authentication/me', validateAccessToken, (req: LoginRequestExtension, res: Response) => {
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('Pragma', 'no-cache');
 

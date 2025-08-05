@@ -9,10 +9,13 @@ import { refreshTokenSchema } from '../validation/fields/refreshToken.schema';
 import { validate } from '../validation/validate';
 import { getAccessTokenExpiry } from '../utils/authentication.helper';
 
-export async function createTokenFromRefreshToken(refreshToken: string): Promise<ServiceResult<RefreshTokenResponse>> {   
+//Service export functions
+
+export async function createTokenFromRefreshTokenAsync(refreshToken: string): Promise<ServiceResult<RefreshTokenResponse>> {   
+  
   const validationResult = await validate(refreshTokenSchema, refreshToken);  
   if (!validationResult.success) {
-    return validationResult;
+    return { success: false, code: 400, error: validationResult.error }
   }   
      
   try {
@@ -40,16 +43,16 @@ export async function createTokenFromRefreshToken(refreshToken: string): Promise
 
     return { success: true, data: refreshTokenResponse };
 
-  } catch (err: any) {
+  } catch (err: unknown) {
     return handleServiceError(err);
   }
 }  
 
-export async function updateUserTokens(userId: string, tokens: string[]) {
+export async function updateUserTokensAsync(userId: string, tokens: string[]) {
   return await UserModel.findByIdAndUpdate(userId, { tokens }, { new: true }).exec();
 }
 
-export async function removeTokenFromUser(token: string): Promise<boolean> {
+export async function removeTokenFromUserAsync(token: string): Promise<boolean> {
   const account = await UserModel.findOne({ tokens: token }).exec();
   if (!account) return false;
 

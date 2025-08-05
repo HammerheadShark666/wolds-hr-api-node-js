@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { addUser, deleteUser, usernameExists, getUserByUsername, getUserById, updateUser } from '../services/user.service';
+import { addUserAsync, deleteUserAsync, getUserByUsernameAsync, getUserByIdAsync, updateUserAsync } from '../services/user.service';
 import asyncHandler from 'express-async-handler';
 import { AddUserRequest, UpdateUserRequest } from '../interface/user';
 
@@ -17,7 +17,7 @@ export function createUsersRouter() {
                                               firstName: req.body.firstName, 
                                               role: req.body.role};  
                                        
-      const result = await addUser(addUserRequest);
+      const result = await addUserAsync(addUserRequest);
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error });
         return;
@@ -31,7 +31,7 @@ export function createUsersRouter() {
     '/id/:id',
     asyncHandler(async (req: Request, res: Response) => {
 
-      const result = await getUserById(req.params.id.toString());
+      const result = await getUserByIdAsync(req.params.id.toString());
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error});
         return;
@@ -45,7 +45,7 @@ export function createUsersRouter() {
       '/username/:username',
       asyncHandler(async (req: Request, res: Response) => {
 
-        const result = await getUserByUsername(req.params.username);
+        const result = await getUserByUsernameAsync(req.params.username);
         if (!result.success) {
           res.status(result.code ?? 400).json({ error: result.error });
           return;
@@ -64,7 +64,7 @@ export function createUsersRouter() {
                                             surname: req.body.surname, 
                                             firstName: req.body.firstName}; 
        
-      const result = await updateUser(updateUserRequest);
+      const result = await updateUserAsync(updateUserRequest);
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error });
         return;
@@ -77,8 +77,8 @@ export function createUsersRouter() {
     '/:id',
     asyncHandler(async (req: Request, res: Response) => {
       
-      const result = await deleteUser(req.params.id);
-      if (!result.success) {
+      const result = await deleteUserAsync(req.params.id);
+      if (!result.success) { 
         res.status(result.code ?? 400).json({ error: result.error });
         return;
       }

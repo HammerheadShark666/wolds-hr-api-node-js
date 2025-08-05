@@ -1,35 +1,42 @@
 import request from 'supertest';
- 
-describe("POST /api/v1/refresh-token", () => { 
- 
-  it("should return 200 and token ", async () => {   
-    const response = await postRefreshToken(global.REFRESH_TOKEN!);
-    expect(response.status).toBe(200); 
+
+const LONG_INVALID_TOKEN = "x".repeat(500);
+const FAKE_INVALID_TOKEN = "invalid_token_123";
+
+describe("POST /api/v1/refresh-token", () => {
+
+  it("should return 200 and token when refresh token is valid", async () => {
+    const refreshToken = global.REFRESH_TOKEN;
+    if (!refreshToken) throw new Error("Missing global.REFRESH_TOKEN");
+
+    const response = await postRefreshToken(refreshToken);
+    expect(response.status).toBe(200);
     expect(response.body).toBeDefined();
-    expect(response.body).toHaveProperty("message");
-    expect(response.body.message).toBe("Token refreshed");     
+    expect(response.body).toHaveProperty("message", "Token refreshed");
   });
 
-  it("should return 401 when no refresh token passed", async () => {
-    const response = await postRefreshToken(""); 
+  it("should return 401 when no refresh token is provided", async () => {
+    const response = await postRefreshToken("");
     expect(response.status).toBe(401);
   });
 
-  it("should return 401 when refresh token is too big", async () => {
-    const response = await postRefreshToken("dfjletjerorgm34dfpogJ)j0s00394dpmgreojg034toegdfjletjerorgm34dfpogJ)j0s00394dpmgreojg034toegdfjletjerorgm34dfpogJ)j0s00394dpmgreojg034toegdfjletjerorgm34dfpogJ)j0s00394dpmgreojg034toegdfjletjerorgm34dfpogJ)j0s00394dpmgreojg034toeg"); 
-    expect(response.status).toBe(401);      
+  it("should return 401 when refresh token is too long", async () => {
+    const response = await postRefreshToken(LONG_INVALID_TOKEN);
+    expect(response.status).toBe(401);
   });
 
-  it("should return 401 when no invalid refresh token passed", async () => {
-    const response = await postRefreshToken("dfjletjerorgm34dfpogJ)j0s00394dpmgreojg034toeg"); 
-    expect(response.status).toBe(401);      
+  it("should return 401 when refresh token is invalid", async () => {
+    const response = await postRefreshToken(FAKE_INVALID_TOKEN);
+    expect(response.status).toBe(401);
   });
 });
  
-async function postRefreshToken(cookie: string) { 
-  return await request(global.app!)
-      .post("/v1/refresh-token") 
-        .set("Content-Type", "application/json") 
-        .set("Cookie", [cookie])
-        .send(); 
+//Api functions
+
+function postRefreshToken(cookieValue: string) {
+  return request(global.app!)
+    .post("/v1/refresh-token")
+    .set("Content-Type", "application/json")
+    .set("Cookie", [cookieValue])
+    .send();
 }

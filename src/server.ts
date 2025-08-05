@@ -2,6 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { createApp } from './app';
 import { connectToDatabase } from './db/mongoose';
+import { insertDefaultEmployees } from './db/defaultData/employeeDefaultData';
+import { EmployeeModel } from './models/employee.model';
 
 const wrapperApp = express();  
   
@@ -17,6 +19,8 @@ async function startServer() {
     await connectToDatabase();
     console.log('Database connected'); 
 
+    await insertDefaultEmployeesIfEmpty();
+
     wrapperApp.listen(PORT, () => {
       console.log(`Server running at http://localhost:${PORT}/api`);
     });
@@ -30,3 +34,10 @@ startServer().catch((err) => {
   console.log("DEPLOYED VERSION - " + new Date().toISOString());
   console.error("Failed to start server:", err);
 });
+
+async function insertDefaultEmployeesIfEmpty() {
+  const count = await EmployeeModel.countDocuments();
+  if (count === 0) {
+    await insertDefaultEmployees();
+  }
+}

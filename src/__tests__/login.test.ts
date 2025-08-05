@@ -1,103 +1,82 @@
 import request from 'supertest';
 import { expectError } from '../utils/error.helper';
   
-let refreshToken = '';
- 
-describe("POST /api/v1/login ", () => { 
-
-  it("should return 200, token and refresh token cookie when successfully logged in ", async () => {
- 
-    const username = `john@hotmail.com`;
-    const password = "Password#1";
-
+const username = "john@hotmail.com";
+const password = "Password#1";
+let refreshToken = "";
+  
+describe("POST /api/v1/login", () => {
+  it("should return 200, set access/refresh cookies, and message", async () => {
     const response = await postLogin(username, password);
 
-    expect(response.status).toBe(200);   
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty("message", "Logged in");
 
-    const cookiesHeader = response.headers['set-cookie'];
-    const cookiesArray = Array.isArray(cookiesHeader) ? cookiesHeader : [cookiesHeader];
-  
-    expect(cookiesArray).toBeDefined();
-    expect(Array.isArray(cookiesArray)).toBe(true);
+    const cookies = parseCookies(response.headers['set-cookie']);
 
-    const refreshTokenCookie = cookiesArray.find((cookie: string) =>
-    cookie.startsWith('refresh_token=')); 
+    expect(cookies).toHaveProperty("access_token");
+    expect(cookies).toHaveProperty("refresh_token");
 
-    expect(refreshTokenCookie).toBeDefined();
-    expect(refreshTokenCookie).toMatch(/HttpOnly/);
+    refreshToken = `refresh_token=${cookies.refresh_token}; HttpOnly`; 
 
-    const refreshTokenValue = refreshTokenCookie!.split(';')[0].split('=')[1];
-    expect(typeof refreshTokenValue).toBe("string");
-      
-    refreshToken = refreshTokenCookie;  
+    expect(typeof cookies.access_token).toBe("string");
+    expect(typeof cookies.refresh_token).toBe("string");
+  });
+}); 
 
-    const accessTokenCookie = cookiesArray.find((cookie: string) =>
-    cookie.startsWith('access_token')); 
-
-    expect(accessTokenCookie).toBeDefined();
-    expect(accessTokenCookie).toMatch(/HttpOnly/);
-
-    const accessTokenValue = accessTokenCookie!.split(';')[0].split('=')[1];
-    expect(typeof accessTokenValue).toBe("string");
-  
-    expect(response.body).toBeDefined();
-    expect(response.body).toHaveProperty("message");
-    expect(response.body.message).toBe("Logged in");    
-  }); 
-});
- 
-describe("POST /api/v1/login (FAIL)", () => { 
-  
-  it("should return 400 and error when no username passed ", async () => {   
+describe("POST /api/v1/login (FAIL)", () => {
+  it("should return 400 when username is missing", async () => {
     const response = await postLogin('', '');
     expectError(response, 'Invalid username format', 400);
   });
 
-  it("should return 400 and error when invalid username", async () => {  
+  it("should return 400 when username format is invalid", async () => {
     const response = await postLogin('testusername', password);
     expectError(response, 'Invalid username format', 400);
   });
 
-  it("should return 400 and error when username not found", async () => {
-    const response = await postLogin('testusername@hotmail.com', password);
+  it("should return 400 when username does not exist", async () => {
+    const response = await postLogin('nonexistent@example.com', password);
     expectError(response, 'Invalid login', 400);
   });
 
-  it("should return 400 and error when password not long enough, no uppercase, number, special character", async () => { 
-    const response = await postLogin(username, "dfdf");
+  it("should return 400 for password that fails complexity", async () => {
+    const response = await postLogin(username, "abc");
     expectError(response, 'Password must be at least 8 characters long', 400);
     expectError(response, 'Password must contain at least one uppercase letter', 400);
     expectError(response, 'Password must contain at least one number', 400);
     expectError(response, 'Password must contain at least one special character', 400);
   });
 
-  it("should return 400 and error when password has no lowercase", async () => {   
+  it("should return 400 when password has no lowercase letter", async () => {
     const response = await postLogin(username, "PASSWORD#1");
     expectError(response, 'Password must contain at least one lowercase letter', 400);
-  }); 
+  });
 
-  it("should return 400 and error when invalid password ", async () => {
+  it("should return 400 for incorrect password", async () => {
     const response = await postLogin(username, "Password#2");
     expectError(response, 'Invalid login', 400);
   });
 }); 
- 
-describe("POST /api/v1/logout", () => {  
-   it("should return 204 when no refresh token", async () => { 
-    const response = await postLogout(""); 
-    expect(response.status).toBe(204);      
+  
+describe("POST /api/v1/logout", () => {
+  it("should return 204 when no refresh token", async () => {
+    const response = await postLogout("");
+    expect(response.status).toBe(204);
   });
 
-  it("should return 204 when refresh token", async () => {    
-    const response = await postLogout(refreshToken!); 
-    expect(response.status).toBe(204);    ;     
-  }); 
+  it("should return 204 when refresh token is valid", async () => {
+    const response = await postLogout(refreshToken);
+    expect(response.status).toBe(204);
+  });
 
-  it("should return 204 when invalid refresh token", async () => {    
-    const response = await postLogout("dfewrvw345dfmgPFDPoip4i34[o53[45o3[45o34["); 
-    expect(response.status).toBe(204);    ;     
-  }); 
+  it("should return 204 when refresh token is invalid", async () => {
+    const response = await postLogout("invalid_token=123");
+    expect(response.status).toBe(204);
+  });
 });
+
+//Api functions
 
 async function postLogin(username?: string, password?: string) {
   return await request(global.app!)
@@ -112,4 +91,19 @@ async function postLogout(cookie: string) {
         .set("Content-Type", "application/json")
         .set("Cookie", [cookie]) 
         .send(); 
+}
+ 
+//Helpers
+
+function parseCookies(setCookieHeader: string[] | string): Record<string, string> {
+  const cookiesArray = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
+  const cookies: Record<string, string> = {};
+
+  cookiesArray.forEach(cookieStr => {
+    const [cookiePair] = cookieStr.split(';');
+    const [key, value] = cookiePair.split('=');
+    cookies[key.trim()] = value;
+  });
+
+  return cookies;
 }

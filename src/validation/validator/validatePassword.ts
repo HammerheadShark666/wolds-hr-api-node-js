@@ -63,14 +63,14 @@ export function validatePassword(data: PasswordData, ctx: RefinementCtx) {
     }
   } 
 
-  // if (
-  //   typeof data.confirmPassword === "string" &&
-  //   data.confirmPassword !== data.password
-  // ) {
-  //   ctx.addIssue({
-  //     path: ["confirmPassword"],
-  //     code: "custom",
-  //     message: "Passwords do not match",
-  //   });
-  // }
+  if (
+    typeof data.confirmPassword === "string" &&
+    data.confirmPassword !== data.password
+  ) {
+    ctx.addIssue({
+      path: ["confirmPassword"],
+      code: "custom",
+      message: "Passwords do not match",
+    });
+  }
 }

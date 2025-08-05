@@ -10,7 +10,7 @@ npm start
 
  npx jest src/__tests__/user.test.ts --detectOpenHandles --runInBand
 
-
+ npx jest src/__tests__/employee.test.ts --detectOpenHandles --runInBand
 
 
  TODO 

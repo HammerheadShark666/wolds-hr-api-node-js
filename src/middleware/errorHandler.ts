@@ -3,12 +3,12 @@ import { ZodError } from 'zod';
 import mongoose from 'mongoose';
 
 export function errorHandler(
-  err: any,
+  err: unknown,
   req: Request,
   res: Response,
   next: NextFunction
 ) {
-  console.error('❌ Error:', err);
+  console.error('Error:', err);
 
   // Handle Zod validation errors
   if (err instanceof ZodError) {
@@ -23,8 +23,14 @@ export function errorHandler(
   }
 
   // Handle custom errors (optional)
-  if (err.status && err.message) {
-    return res.status(err.status).json({ errors: [err.message] });
+   if (
+    typeof err === 'object' &&
+    err !== null &&
+    'status' in err &&
+    'message' in err
+  ) {
+    const customErr = err as { status: number; message: string };
+    return res.status(customErr.status).json({ errors: [customErr.message] });
   }
 
   // Fallback

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { createTokenFromRefreshToken } from '../services/refreshToken.service';
+import { createTokenFromRefreshTokenAsync } from '../services/refreshToken.service';
 import asyncHandler from 'express-async-handler';
 import { setAccessTokenCookie } from '../utils/authentication.helper';
 
@@ -12,7 +12,7 @@ export function createRefreshTokenRouter() {
     asyncHandler(async (req: Request, res: Response) => { 
   
       const refreshToken = req.cookies.refresh_token;   
-      const refreshTokenResponse = await createTokenFromRefreshToken(refreshToken);
+      const refreshTokenResponse = await createTokenFromRefreshTokenAsync(refreshToken);
       if (!refreshTokenResponse.success) {
         res.status(401).json({ error: refreshTokenResponse.error });
         return;
