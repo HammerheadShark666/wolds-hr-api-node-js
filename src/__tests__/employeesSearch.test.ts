@@ -1,23 +1,27 @@
 import request from "supertest"; 
+import { EmployeeResponse } from "../interface/employee"
 
+
+const KEYWORD = 'john';
 const PAGE_SIZE = 5;
+const ALL_EMPLOYEES_PAGE_SIZE = 120;
 let searchResultsTotal = 0;
 let totalPages = 0;
 
-describe("GET /api/v1/employees", () => {
+describe("GET /api/v1/employees (ignore department)", () => {
   beforeAll(async () => {
-    const response = await getSearchEmployees({ page: 1, pageSize: PAGE_SIZE });
+    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: '', page: 1, pageSize: PAGE_SIZE });
     searchResultsTotal = response.body.totalEmployees;
     totalPages = Math.ceil(searchResultsTotal / PAGE_SIZE);
   });
 
   it("should return 200 and first page of search results when first page is requested", async () => {
-    const response = await getSearchEmployees({ page: 1, pageSize: PAGE_SIZE });
+    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: '',page: 1, pageSize: PAGE_SIZE });
 
     const expectedCount = Math.min(PAGE_SIZE, searchResultsTotal);
 
     expect(response.status).toBe(200);
-    validatePaginationMeta(response.body, 1, totalPages);
+    validatePaginationMeta(response.body, 1, totalPages, PAGE_SIZE);
     validateEmployeesArray(response.body.employees, expectedCount);
   });
 
@@ -25,45 +29,128 @@ describe("GET /api/v1/employees", () => {
     const lastPage = Math.max(1, totalPages);
     const lastPageCount = searchResultsTotal % PAGE_SIZE || (searchResultsTotal === 0 ? 0 : PAGE_SIZE);
 
-    const response = await getSearchEmployees({ page: lastPage, pageSize: PAGE_SIZE }); 
+    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: '',page: lastPage, pageSize: PAGE_SIZE }); 
 
     expect(response.status).toBe(200);
-    validatePaginationMeta(response.body, lastPage, totalPages);
+    validatePaginationMeta(response.body, lastPage, totalPages, PAGE_SIZE);
     validateEmployeesArray(response.body.employees, lastPageCount);
   });
 
    it("should return 200 and first page of search results when page is zero", async () => {
-    const response = await getSearchEmployees({ page: 0, pageSize: PAGE_SIZE });
+    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: '',page: 0, pageSize: PAGE_SIZE });
 
     const expectedCount = Math.min(PAGE_SIZE, searchResultsTotal);
 
     expect(response.status).toBe(200);
-    validatePaginationMeta(response.body, 1, totalPages);
+    validatePaginationMeta(response.body, 1, totalPages, PAGE_SIZE);
     validateEmployeesArray(response.body.employees, expectedCount);
   });
 });
 
-//Api functions
+describe("GET /api/v1/employees (include department)", () => {
 
-function getSearchEmployees(params?: { page: number, pageSize: number }) {
+  let departmentId = '';
+  let departmentName = '';
+
+  beforeAll(async () => { 
+    const response = await getDepartments();
+    const departments = response.body; 
+    departmentId = departments[0].id;
+    departmentName = departments[0].name; 
+  });
+
+  it("should return 200 and all employees should have same department and keyword in surname", async () => {
+    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: departmentId, page: 1, pageSize: PAGE_SIZE });
+ 
+    searchResultsTotal = response.body.totalEmployees;
+    totalPages = Math.ceil(searchResultsTotal / PAGE_SIZE);
+
+    const expectedCount = Math.min(PAGE_SIZE, searchResultsTotal);
+
+    expect(response.status).toBe(200);
+    validatePaginationMeta(response.body, 1, totalPages, PAGE_SIZE);
+    validateEmployeesArray(response.body.employees, expectedCount);
+    
+    const employees: EmployeeResponse[] = response.body.employees;
+  
+    (employees).forEach((employee: EmployeeResponse) => {
+      expect(employee).toHaveProperty("department");
+      expect(employee.department).toHaveProperty("id");
+      expect(employee.department).toHaveProperty("name");
+      expect(employee.department.id).toBe(departmentId);
+      expect(employee.department.name).toBe(departmentName);
+    }); 
+  });
+
+  it("should return 200 and  all employees should have same department, surnames should include keyword and non keyword names", async () => { 
+
+    const response = await getSearchEmployees({ keyword: '', departmentId: departmentId, page: 1, pageSize: ALL_EMPLOYEES_PAGE_SIZE });
+    searchResultsTotal = response.body.totalEmployees;
+    totalPages = Math.ceil(searchResultsTotal / ALL_EMPLOYEES_PAGE_SIZE); 
+
+    const expectedCount = Math.min(ALL_EMPLOYEES_PAGE_SIZE, searchResultsTotal);
+
+    expect(response.status).toBe(200);
+    validatePaginationMeta(response.body, 1, totalPages, ALL_EMPLOYEES_PAGE_SIZE);
+    validateEmployeesArray(response.body.employees, expectedCount);
+    
+    const employees: EmployeeResponse[] = response.body.employees;
+
+    const countOfJohnSurnames = employees.filter(employee =>
+      employee.surname.toLowerCase().includes('john')
+    ).length;
+
+    const countOfNotJohnSurnames = employees.filter(employee =>
+      !employee.surname.toLowerCase().includes('john')
+    ).length;
+
+    expect(employees.length).toEqual(countOfJohnSurnames + countOfNotJohnSurnames); 
+  });
+
+ it("should return 200 and  all employees should include different departments", async () => { 
+
+    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: '', page: 1, pageSize: ALL_EMPLOYEES_PAGE_SIZE });
+    searchResultsTotal = response.body.totalEmployees;
+    totalPages = Math.ceil(searchResultsTotal / ALL_EMPLOYEES_PAGE_SIZE); 
+
+    const expectedCount = Math.min(ALL_EMPLOYEES_PAGE_SIZE, searchResultsTotal);
+
+    expect(response.status).toBe(200);
+    validatePaginationMeta(response.body, 1, totalPages, ALL_EMPLOYEES_PAGE_SIZE);
+    validateEmployeesArray(response.body.employees, expectedCount);
+    
+    const employees: EmployeeResponse[] = response.body.employees; 
+    const departmentCounts = countEmployeesPerDepartment(employees);
+    const totalEmployees = Object.values(departmentCounts).reduce((sum, count) => sum + count, 0);
+
+    expect(employees.length).toEqual(totalEmployees);
+  });
+});
+
+//Api functions 
+
+function getSearchEmployees(params?: { keyword:string, departmentId: string, page: number, pageSize: number }) {
+  
+  const keyword = params?.keyword ?? '';
+  const departmentId = params?.departmentId ?? '';
   const page = params?.page ?? 1;
-  const pageSize = params?.pageSize ?? PAGE_SIZE;
+  const pageSize = params?.pageSize ?? PAGE_SIZE; 
 
   if (!global.ACCESS_TOKEN)
     throw new Error("Access token is missing");
 
   return request(global.app!)
-    .get(`/v1/employees/search?keyword=john&page=${page}&pageSize=${pageSize}`)
+    .get(`/v1/employees/search?keyword=${keyword}&departmentId=${departmentId}&page=${page}&pageSize=${pageSize}`)
     .set("Cookie", [global.ACCESS_TOKEN]);
 }
 
 // Helpers
 
-function validatePaginationMeta(body: any, page: number, totalPages: number) {
+function validatePaginationMeta(body: any, page: number, totalPages: number, pageSize: number) {
   expect(body).toHaveProperty("totalPages", totalPages);
   expect(body).toHaveProperty("page", page);
   expect(body).toHaveProperty("totalEmployees", searchResultsTotal);
-  expect(body).toHaveProperty("pageSize", PAGE_SIZE);
+  expect(body).toHaveProperty("pageSize", pageSize);
 }
 
 function validateEmployeesArray(employees: any[], expectedLength: number) {
@@ -80,3 +167,25 @@ function validateEmployeesArray(employees: any[], expectedLength: number) {
   }
 }
 
+function getDepartments() {
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
+  let req = request(global.app!)
+    .get("/v1/departments")
+      .set("Cookie", [global.ACCESS_TOKEN]);
+
+  return req;
+}
+
+function countEmployeesPerDepartment(employees: EmployeeResponse[]): Record<string, number> {
+  const departmentCounts: Record<string, number> = {};
+
+  employees.forEach(employee => {
+    const deptName = employee.department?.name ?? 'Unknown';
+    departmentCounts[deptName] = (departmentCounts[deptName] || 0) + 1;
+  });
+
+  return departmentCounts;
+}
