@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { toDepartmentResponse } from '../utils/mapper';
-import { DepartmentResponse,  } from '../interface/department'; 
+import { DepartmentResponse, UpdateDepartmentRequest,  } from '../interface/department'; 
 import { addDepartmentAsync, updateDepartmentAsync, getDepartmentByIdAsync, getDepartmentsAsync, deleteDepartmentAsync } from '../services/department.service';
 import asyncHandler from 'express-async-handler';
 
@@ -47,7 +47,8 @@ export function createDepartmentRouter() {
   router.put(
     '/:id',
     asyncHandler(async (req: Request, res: Response) => {
-      const result = await updateDepartmentAsync(req.params.id, req.body.name);
+      const updateDepartmentRequest: UpdateDepartmentRequest = { id: req.params.id, name: req.body.name };
+      const result = await updateDepartmentAsync(updateDepartmentRequest);
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error });
         return;

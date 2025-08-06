@@ -18,18 +18,17 @@ export async function addUserAsync(data: AddUserRequest): Promise<ServiceResult<
   const validationResult = await validate(addUserSchema, data); 
   if (!validationResult.success) { 
     return { success: false, code: 400, error: validationResult.error }
-  }  
-  const validData = validationResult.data;
-  
+  }   
+
   try {   
    
-     if ((await usernameExistsAsync(validData.username))) {
+     if ((await usernameExistsAsync(data.username))) {
           return {success: false, code: 400, error: ['Username exists already']};
         }   
 
-    validData.password = await createHashedPassword(validData.password);
+    data.password = await createHashedPassword(data.password);
  
-    const user = new UserModel(validData);
+    const user = new UserModel(data);
     user.save();
  
     if (!user || !user._id) {
@@ -52,17 +51,15 @@ export async function updateUserAsync(data: UpdateUserRequest): Promise<ServiceR
   }   
 
   try {
-
-    const { id: validId, surname: validSurname, firstName: validFirstName } = validationResult.data;
  
-    const existingUser = await UserModel.findById(validId);  
+    const existingUser = await UserModel.findById(data.id);  
     if (!existingUser) {
       return {success: false, code: 404, error: ['User not found']};
     } 
  
     const updatedUser = await UserModel.findByIdAndUpdate(
-      validId,                          
-      { $set: { surname: validSurname, firstName: validFirstName } },
+      data.id,                          
+      { $set: { surname: data.surname, firstName: data.firstName } },
       { new: true, upsert: false, runValidators: true }
     );
 
@@ -86,10 +83,8 @@ export async function getUserByIdAsync(id: string): Promise<ServiceResult<UserRe
   }
 
   try { 
-
-    const { id: validId } = validationResult.data;
-
-    const user = await UserModel.findById(validId).exec();
+ 
+    const user = await UserModel.findById(id).exec();
     if (!user) {
       return {
         success: false, error: ['User not found'], code: 404 };
@@ -109,11 +104,9 @@ export async function getUserByUsernameAsync(username: string): Promise<ServiceR
     return { success: false, code: 400, error: validationResult.error }
   } 
 
-  try { 
+  try {  
 
-    const { username: validUsername } = validationResult.data;
-
-    const user = await UserModel.findOne({ username: validUsername }).exec();
+    const user = await UserModel.findOne({ username: username }).exec();
     if (!user) {
       return { success: false, error: ['User not found'], code: 404 };
     }
@@ -132,16 +125,14 @@ export async function deleteUserAsync(id: string): Promise<ServiceResult<Deleted
     return { success: false, code: 400, error: validationResult.error }
   };   
 
-  try {  
-
-    const { id: validId } = validationResult.data;
+  try {   
  
-    if (!(await userExistsAsync(validId))) {
+    if (!(await userExistsAsync(id))) {
       return {success: false, code: 404, error: ['User not found']};
     }   
 
-    await UserModel.findByIdAndDelete(validId);
-    return { success: true, data: { userId: validId, message: 'User deleted successfully', }, }; 
+    await UserModel.findByIdAndDelete(id);
+    return { success: true, data: { userId: id, message: 'User deleted successfully', }, }; 
   } 
   catch (err: unknown) {
     return handleServiceError(err); 
