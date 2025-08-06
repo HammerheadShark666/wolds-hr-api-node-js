@@ -1,6 +1,6 @@
 import request from "supertest"; 
-import { EmployeeResponse } from "../interface/employee"
-
+import { EmployeeResponse } from "../interface/employee";
+import { expectError } from "../utils/error.helper";
 
 const KEYWORD = 'john';
 const PAGE_SIZE = 5;
@@ -14,6 +14,11 @@ describe("GET /api/v1/employees (ignore department)", () => {
     searchResultsTotal = response.body.totalEmployees;
     totalPages = Math.ceil(searchResultsTotal / PAGE_SIZE);
   });
+
+  it("should return 400 and message when no criteria entered", async () => {
+    const response = await getSearchEmployees({ keyword: '', departmentId: '',page: 1, pageSize: PAGE_SIZE });    
+    expectError(response, 'Either keyword and/or department must be provided', 400);
+  }); 
 
   it("should return 200 and first page of search results when first page is requested", async () => {
     const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: '',page: 1, pageSize: PAGE_SIZE });
