@@ -1,4 +1,4 @@
-import { DepartmentResponse, UpdatedDepartmentResponse } from '../interface/department';
+import { AddDepartmentRequest, DepartmentResponse, UpdatedDepartmentResponse, UpdateDepartmentRequest } from '../interface/department';
 import { DepartmentModel, IDepartment } from '../models/department.model';
 import { ServiceResult } from '../types/ServiceResult';
 import { handleServiceError } from '../utils/error.helper';
@@ -20,7 +20,7 @@ export async function getDepartmentsAsync(): Promise<ServiceResult<IDepartment[]
   }
 } 
   
-export async function getDepartmentByIdAsync(id: unknown): Promise<ServiceResult<IDepartment>> {
+export async function getDepartmentByIdAsync(id: string): Promise<ServiceResult<IDepartment>> {
    
   const validationResult = await validate(getDepartmentByIdSchema, {id});  
   if (!validationResult.success) { 
@@ -28,10 +28,8 @@ export async function getDepartmentByIdAsync(id: unknown): Promise<ServiceResult
   }    
 
   try {
-
-    const { id: validId } = validationResult.data; 
-
-    const department = await DepartmentModel.findById(validId).exec();
+ 
+    const department = await DepartmentModel.findById(id).exec();
     if (!department) {
       return { success: false, error: ['Department not found'], code: 404 };
     } 
@@ -43,21 +41,20 @@ export async function getDepartmentByIdAsync(id: unknown): Promise<ServiceResult
   }
 } 
  
-export async function addDepartmentAsync(data: unknown): Promise<ServiceResult<DepartmentResponse>> {
+export async function addDepartmentAsync(data: AddDepartmentRequest): Promise<ServiceResult<DepartmentResponse>> {
     
   const validationResult = await validate(addDepartmentSchema, data);  
   if (!validationResult.success) {
     return { success: false, code: 400, error: validationResult.error }
-  }  
-  const validData = validationResult.data;
+  }   
  
   try {
 
-    if ((await departmentNameExistsAsync(validData.name))) {
+    if ((await departmentNameExistsAsync(data.name))) {
       return {success: false, code: 400, error: ['Department name exists already']};
     }   
 
-    const department = new DepartmentModel(validData);
+    const department = new DepartmentModel(data);
     const saved = await department.save();  
     return { success: true, data: toDepartmentResponse(saved) };
   } 
@@ -66,25 +63,23 @@ export async function addDepartmentAsync(data: unknown): Promise<ServiceResult<D
   }
 } 
 
-export async function updateDepartmentAsync(id: string, name: string): Promise<ServiceResult<UpdatedDepartmentResponse>> {
+export async function updateDepartmentAsync(data: UpdateDepartmentRequest): Promise<ServiceResult<UpdatedDepartmentResponse>> {
       
-  const validationResult = await validate(updateDepartmentSchema, { id, name });  
+  const validationResult = await validate(updateDepartmentSchema, { id: data.id, name: data.name });  
   if (!validationResult.success) {
     return { success: false, code: 400, error: validationResult.error }
   }   
   
   try {
-
-    const { id: validId, name: validName } = validationResult.data;
-
-    const existingDepartment = await DepartmentModel.findOne({ name: validName }); 
-    if (existingDepartment && existingDepartment.id !== validId) {
+ 
+    const existingDepartment = await DepartmentModel.findOne({ name: data.name }); 
+    if (existingDepartment && existingDepartment.id !== data.id) {
       return {success: false, code: 404, error: ['Department name exists already']};
     }
  
     const updatedDepartment = await DepartmentModel.findByIdAndUpdate(
-      validId,
-      { $set: { name: validName } },
+      data.id,
+      { $set: { name:data.name } },
       { new: true }
     );
 
@@ -108,14 +103,12 @@ export async function deleteDepartmentAsync(id: string): Promise<ServiceResult<I
   } 
 
   try {
-
-    const { id: validId } = validationResult.data;
-
-    if (!(await departmentExistsAsync(validId))) {
+   
+    if (!(await departmentExistsAsync(id))) {
       return {success: false, code: 404, error: ['Department not found']};
     }   
 
-    await DepartmentModel.findByIdAndDelete(validId);
+    await DepartmentModel.findByIdAndDelete(id);
     return { success: true, data: null };
   } 
   catch (err: unknown) { 

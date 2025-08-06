@@ -18,12 +18,9 @@ export async function createTokenFromRefreshTokenAsync(refreshToken: string): Pr
     return { success: false, code: 400, error: validationResult.error }
   }   
      
-  try {
-
-    const validRefreshToken  = validationResult.data;
-
+  try { 
     const decoded = await new Promise<JwtPayload>((resolve, reject) => {
-      jwt.verify(validRefreshToken, process.env.REFRESH_TOKEN_SECRET!, (err, decoded) => {
+      jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, (err, decoded) => {
         if (err || !decoded || typeof decoded === "string") {
           return { success: false, error: ['Refresh token not valid'] };
         }

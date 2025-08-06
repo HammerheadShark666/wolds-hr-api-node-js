@@ -16,11 +16,9 @@ export async function loginUserAsync(data: LoginRequest): Promise<ServiceResult<
     return { success: false, code: 400, error: validationResult.error }
   }    
 
-  try {
-
-    const { username, password } = validationResult.data;
+  try { 
    
-    const userCheck = await validateUserCredentials(username, password);
+    const userCheck = await validateUserCredentials(data.username, data.password);
     if (!userCheck.success) {
       return userCheck;
     }
