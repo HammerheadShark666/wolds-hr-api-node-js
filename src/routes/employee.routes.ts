@@ -16,7 +16,7 @@ export function createEmployeesRouter() {
         res.status(400).json({ error: result.error });
         return;
       } 
-      res.status(200).json(result); 
+      res.status(200).json(result.data); 
      })
   );
   

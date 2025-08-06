@@ -2,14 +2,23 @@ import { Types } from 'mongoose';
 import { EmployeeModel } from '../models/employee.model';
 import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse } from '../interface/employee';
 import { toEmployeeSearchResponse } from '../utils/mapper'; 
+import { validate } from '../validation/validate';
+import { ServiceResult } from '../types/ServiceResult';
+import { employeeSearchSchema } from '../validation/employee/employeeSearch.schema';
 
 const PAGE_SIZE = 5;
 
 //Service export functions
 
-export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): Promise<EmployeeSearchPagedResponse> {
+export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): Promise<ServiceResult<EmployeeSearchPagedResponse>> {
 
-  const { keyword, departmentId } = query;  
+  const { keyword, departmentId } = query;   
+
+  const validationResult = await validate(employeeSearchSchema, { keyword, departmentId });  
+  if (!validationResult.success) {
+    return { success: false, code: 400, error: validationResult.error }
+  }   
+
   let page = Number.isNaN(Number(query.page)) ? 1 : Number(query.page);  
   let pageSize = Number.isNaN(Number(query.pageSize)) ? PAGE_SIZE : Number(query.pageSize);
   
@@ -19,15 +28,15 @@ export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): P
     countEmployeesAsync(keyword, departmentId),
     searchEmployeesAsync({ keyword, departmentId, page, pageSize }).then(r => r.data ?? [])
   ]); 
- 
-  return {
+
+   return { success: true, data: {
     page,
     pageSize,
     totalEmployees,
     totalPages: Math.ceil(totalEmployees / pageSize),
     employees: employees.map(toEmployeeSearchResponse),
     success: true
-  };
+  }}; 
 } 
 
 export async function searchEmployeesAsync(query: EmployeeSearchRequest): Promise<EmployeeSearchResponse> {
