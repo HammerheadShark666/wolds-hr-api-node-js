@@ -26,11 +26,13 @@ export function toUserResponse(user: IUser): UserResponse {
 }
 
 export function toEmployeeSearchResponse(employee: IEmployee): EmployeeResponse {
-  const { _id, surname, firstName, email, phoneNumber, photo, department } = employee;
+  const { _id, surname, firstName, dateOfBirth, hireDate, email, phoneNumber, photo, department } = employee;
   const appEmployee: EmployeeResponse = {
     id: _id.toString(),
     surname: surname, 
     firstName: firstName,
+    dateOfBirth: dateOfBirth,
+    hireDate: hireDate,
     email: email,
     phoneNumber: phoneNumber,
     photo: photo,

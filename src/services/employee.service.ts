@@ -1,10 +1,12 @@
 import { Types } from 'mongoose'; 
-import { EmployeeModel } from '../models/employee.model';
-import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse } from '../interface/employee';
+import { EmployeeModel, IEmployee } from '../models/employee.model';
+import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse, AddEmployeeRequest, AddEmployeeResponse } from '../interface/employee';
 import { toEmployeeSearchResponse } from '../utils/mapper'; 
 import { validate } from '../validation/validate';
 import { ServiceResult } from '../types/ServiceResult';
 import { employeeSearchSchema } from '../validation/employee/employeeSearch.schema';
+import { handleServiceError } from '../utils/error.helper';
+import { addEmployeeSchema } from '../validation/employee/addEmployee.schema';
 
 const PAGE_SIZE = 5;
 
@@ -39,7 +41,66 @@ export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): P
   }}; 
 } 
 
-export async function searchEmployeesAsync(query: EmployeeSearchRequest): Promise<EmployeeSearchResponse> {
+export async function addEmployeeAsync(data: AddEmployeeRequest): Promise<ServiceResult<AddEmployeeResponse>> {
+     
+  const validationResult = await validate(addEmployeeSchema, data);  
+  if (!validationResult.success) {
+    return { success: false, code: 400, error: validationResult.error }
+  }   
+  
+  try {
+
+    // const employeeToSave = {
+    //   surname: data.surname,
+    //   firstName: data.firstName,
+    //   dateOfBirth: data.dateOfBirth ?? null,
+    //   hireDate: data.hireDate ?? null,
+    //   email: data.email ?? null,
+    //   phoneNumber: data.phoneNumber ?? null,
+    //   photo: null,
+    //   departmentId: data.departmentId ?? null,
+    //   employeeImportId: null
+    // };
+ 
+    const employee = new EmployeeModel(data);
+    const saved = await employee.save();  
+
+
+     console.log("status = ", 'true')
+      console.log("data = ", toEmployeeSearchResponse(saved))
+
+
+    return { success: true, data: toEmployeeSearchResponse(saved) };
+  } 
+  catch (err: unknown) {  
+    return handleServiceError(err); 
+  }
+} 
+
+export async function deleteEmployeeAsync(id: string): Promise<ServiceResult<null>> {
+  
+  // const validationResult = await validate(deleteDepartmentSchema, { id });  
+  // if (!validationResult.success) {
+  //   return { success: false, code: 400, error: validationResult.error }
+  // } 
+
+  try {
+   
+    // if (!(await departmentExistsAsync(id))) {
+    //   return {success: false, code: 404, error: ['Department not found']};
+    // }   
+
+    await EmployeeModel.findByIdAndDelete(id);
+    return { success: true, data: null };
+  } 
+  catch (err: unknown) { 
+    return handleServiceError(err);
+  }
+}
+
+//Service helper functions
+
+async function searchEmployeesAsync(query: EmployeeSearchRequest): Promise<EmployeeSearchResponse> {
   try { 
     const pipeline = buildEmployeeSearchPipeline(query);
     const result = await EmployeeModel.aggregate(pipeline);
@@ -51,9 +112,7 @@ export async function searchEmployeesAsync(query: EmployeeSearchRequest): Promis
       error: 'Failed to search employees.',
     };
   }
-} 
-
-//Service helper functions
+}  
 
 async function countEmployeesAsync(keyword?: string, departmentId?: string): Promise<number> {
   try{

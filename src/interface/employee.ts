@@ -1,12 +1,6 @@
 import { IEmployee } from "../models/employee.model";
 import { DepartmentResponse } from "./department";
-
-export interface AppEmployee {
-  id: string;
-  surname: string;
-  firstName: string;
-} 
-
+ 
 export interface EmployeeSearchRequest {
   keyword?: string;
   departmentId?: string;
@@ -28,6 +22,8 @@ export interface EmployeeResponse {
   id: string;
   surname: string;
   firstName: string;
+  dateOfBirth: Date,
+  hireDate: Date,
   email: string;
   phoneNumber: string;
   department: DepartmentResponse;
@@ -48,4 +44,26 @@ export interface EmployeeDefaultData {
   email: string;
   phoneNumber: string;
   photo?: string;
+} 
+
+export interface AddEmployeeRequest {  
+  surname: string;
+  firstName: string;
+  dateOfBirth?: Date;
+  hireDate?: Date;
+  email?: string;
+  phoneNumber?: string; 
+  departmentId?: string;
+}
+
+export interface AddEmployeeResponse {
+  id: string;
+  surname: string;
+  firstName: string;
+  dateOfBirth?: Date;
+  hireDate?: Date;
+  email?: string;
+  phoneNumber?: string; 
+  photo?: string;
+  departmentId?: string;
 }
