@@ -27,11 +27,7 @@ export function createEmployeesRouter() {
       if (!result.success) {
         res.status(result.code ?? 400).json({ error: result.error });
         return;
-      } 
-
-      console.log("status = ", result.success)
-      console.log("data = ", result.data)
-
+      }  
       res.status(201).json(result.data);
     })
   );

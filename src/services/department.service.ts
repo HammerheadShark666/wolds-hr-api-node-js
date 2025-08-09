@@ -104,7 +104,7 @@ export async function deleteDepartmentAsync(id: string): Promise<ServiceResult<I
 
   try {
    
-    if (!(await departmentExistsAsync(id))) {
+    if (!(await departmentExistsAsync(id))) { 
       return {success: false, code: 404, error: ['Department not found']};
     }   
 
@@ -117,7 +117,7 @@ export async function deleteDepartmentAsync(id: string): Promise<ServiceResult<I
 }
 
 export async function departmentExistsAsync(id: string): Promise<boolean> {
-  const exists = await DepartmentModel.exists({ _id: id }).exec();
+  const exists = await DepartmentModel.exists({ _id: id }).exec(); 
   return !!exists;
 }
 
