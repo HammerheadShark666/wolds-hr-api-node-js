@@ -1,10 +1,14 @@
 import { Types } from 'mongoose'; 
-import { EmployeeModel } from '../models/employee.model';
-import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse } from '../interface/employee';
+import { EmployeeModel, IEmployee } from '../models/employee.model';
+import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse, AddEmployeeRequest, AddEmployeeResponse } from '../interface/employee';
 import { toEmployeeSearchResponse } from '../utils/mapper'; 
 import { validate } from '../validation/validate';
 import { ServiceResult } from '../types/ServiceResult';
 import { employeeSearchSchema } from '../validation/employee/employeeSearch.schema';
+import { handleServiceError } from '../utils/error.helper';
+import { addEmployeeSchema } from '../validation/employee/addEmployee.schema';
+import { departmentExistsAsync } from './department.service';
+import { deleteDepartmentSchema } from '../validation/department/deleteDepartment.schema';
 
 const PAGE_SIZE = 5;
 
@@ -39,21 +43,71 @@ export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): P
   }}; 
 } 
 
-export async function searchEmployeesAsync(query: EmployeeSearchRequest): Promise<EmployeeSearchResponse> {
+export async function addEmployeeAsync(data: AddEmployeeRequest): Promise<ServiceResult<AddEmployeeResponse>> {
+     
+  const validationResult = await validate(addEmployeeSchema, data);  
+  if (!validationResult.success) {
+    return { success: false, code: 400, error: validationResult.error }
+  }   
+  
+  try {  
+ 
+    if(data.departmentId != undefined ) {
+      if (!(await departmentExistsAsync(data.departmentId))) {
+        return {success: false, code: 404, error: ['Department not found']};
+      }
+    } 
+
+    const employee = new EmployeeModel(data);
+    const saved = await employee.save();   
+    return { success: true, data: toEmployeeSearchResponse(saved) };
+  } 
+  catch (err: unknown) {  
+    return handleServiceError(err); 
+  }
+} 
+
+export async function deleteEmployeeAsync(id: string): Promise<ServiceResult<null>> {
+  
+  const validationResult = await validate(deleteDepartmentSchema, { id });  
+  if (!validationResult.success) {
+    return { success: false, code: 400, error: validationResult.error }
+  } 
+
+  try { 
+
+    if (!(await employeeExistsAsync(id))) { 
+      return {success: false, code: 404, error: ['Department not found']};
+    }   
+ 
+    await EmployeeModel.findByIdAndDelete(id); 
+
+    return { success: true, data: null };
+  } 
+  catch (err: unknown) { 
+    return handleServiceError(err);
+  }
+}
+
+export async function employeeExistsAsync(id: string): Promise<boolean> {
+  const exists = await EmployeeModel.exists({ _id: id }).exec(); 
+  return !!exists;
+}
+
+//Service helper functions
+
+async function searchEmployeesAsync(query: EmployeeSearchRequest): Promise<EmployeeSearchResponse> {
   try { 
     const pipeline = buildEmployeeSearchPipeline(query);
     const result = await EmployeeModel.aggregate(pipeline);
     return { success: true, data: result };
-  } catch (err) {
-    console.error('searchEmployeesAsync error:', err);
+  } catch (err) { 
     return {
       success: false,
       error: 'Failed to search employees.',
     };
   }
-} 
-
-//Service helper functions
+}  
 
 async function countEmployeesAsync(keyword?: string, departmentId?: string): Promise<number> {
   try{
@@ -68,8 +122,7 @@ async function countEmployeesAsync(keyword?: string, departmentId?: string): Pro
     }
 
     return EmployeeModel.countDocuments(filter);
-  } catch (err) {
-    console.error('countEmployeesAsync error:', err);
+  } catch (err) { 
     return 0;
   }
 }

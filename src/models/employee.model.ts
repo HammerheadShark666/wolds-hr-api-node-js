@@ -21,13 +21,13 @@ export interface IEmployee extends Document {
 const EmployeeSchema = new Schema<IEmployee>({
   surname: { type: String, required: true, maxlength: 25 },  
   firstName: { type: String, required: true, maxlength: 25 }, 
-  dateOfBirth: { type: Date, default: Date.now },
-  hireDate: { type: Date, default: Date.now },
-  email: { type: String, required: false, maxlength: 250, match: /.+@.+\..+/ },
-  phoneNumber: { type: String, maxlength: 25 }, 
-  photo:  { type: String, required: false, maxlength: 100 }, 
-  departmentId: { type: Schema.Types.ObjectId, ref: 'Department', required: false },
-  employeeImportId: { type: Schema.Types.ObjectId, ref: 'EmployeeImport', required: false },
+  dateOfBirth: { type: Date, default: null },
+  hireDate: { type: Date, default: null },
+  email: { type: String, required: false, default: null, maxlength: 250, match: /.+@.+\..+/ },
+  phoneNumber: { type: String, maxlength: 25, default: null }, 
+  photo:  { type: String, required: false, maxlength: 100, default: null }, 
+  departmentId: { type: Schema.Types.ObjectId, ref: 'Department', required: false, default: null },
+  employeeImportId: { type: Schema.Types.ObjectId, ref: 'EmployeeImport', required: false, default: null },
   createdAt: { type: Date, default: Date.now }
 });
 

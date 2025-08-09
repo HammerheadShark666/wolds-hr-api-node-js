@@ -114,13 +114,13 @@ function getRandomEmployeeDefaultData(departments: Department[]) {
     const surname = surnames[getRandomInt(0, surnames.length)];
     const email = `${firstName[0].toLowerCase()}${surname.toLowerCase()}${i}@example.com`;
 
-    // Random dateOfBirth between 1960 and 1999
-    const dobYear = getRandomInt(1960, 2000);
+    // Random dateOfBirth between 1950 and 2007
+    const dobYear = getRandomInt(1950, 2007);
     const dobMonth = getRandomInt(0, 12);
     const dobDay = getRandomInt(1, 28);
 
-    // Random hireDate between 2015 and 2023
-    const hireYear = getRandomInt(2015, 2024);
+    // Random hireDate between 2020 and current year
+    const hireYear = getRandomInt(2020, new Date().getFullYear());
     const hireMonth = getRandomInt(0, 12);
     const hireDay = getRandomInt(1, 28);
 
