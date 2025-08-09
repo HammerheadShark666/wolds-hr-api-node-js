@@ -81,12 +81,7 @@ describe("POST /api/v1/employees", () => {
     const addEmployeeRequest: AddEmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, departmentId: EMPLOYEE_NOT_FOUND_DEPARTMENT_ID}
     const response = await postEmployee(addEmployeeRequest); 
     expectError(response, 'Department not found', 404); 
-  });
- 
-  //photo
-   
-  
- 
+  });  
 });
 
 //update employee
