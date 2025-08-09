@@ -1,7 +1,7 @@
 import { Types } from 'mongoose'; 
 import { EmployeeModel, IEmployee } from '../models/employee.model';
-import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse, AddEmployeeRequest, AddEmployeeResponse } from '../interface/employee';
-import { toEmployeeSearchResponse } from '../utils/mapper'; 
+import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse, AddEmployeeRequest, AddEmployeeResponse, UpdateEmployeeRequest, UpdatedEmployeeResponse } from '../interface/employee';
+import { toEmployeeResponse } from '../utils/mapper'; 
 import { validate } from '../validation/validate';
 import { ServiceResult } from '../types/ServiceResult';
 import { employeeSearchSchema } from '../validation/employee/employeeSearch.schema';
@@ -9,6 +9,7 @@ import { handleServiceError } from '../utils/error.helper';
 import { addEmployeeSchema } from '../validation/employee/addEmployee.schema';
 import { departmentExistsAsync } from './department.service';
 import { deleteDepartmentSchema } from '../validation/department/deleteDepartment.schema';
+import { updateEmployeeSchema } from '../validation/employee/updateEmployee.schema';
 
 const PAGE_SIZE = 5;
 
@@ -38,7 +39,7 @@ export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): P
     pageSize,
     totalEmployees,
     totalPages: Math.ceil(totalEmployees / pageSize),
-    employees: employees.map(toEmployeeSearchResponse),
+    employees: employees.map(toEmployeeResponse),
     success: true
   }}; 
 } 
@@ -60,12 +61,56 @@ export async function addEmployeeAsync(data: AddEmployeeRequest): Promise<Servic
 
     const employee = new EmployeeModel(data);
     const saved = await employee.save();   
-    return { success: true, data: toEmployeeSearchResponse(saved) };
+    return { success: true, data: toEmployeeResponse(saved) };
   } 
   catch (err: unknown) {  
     return handleServiceError(err); 
   }
 } 
+
+export async function updateEmployeeAsync(id: string, data: UpdateEmployeeRequest): Promise<ServiceResult<UpdatedEmployeeResponse>> {
+
+  const validationResult = await validate(updateEmployeeSchema, data);  
+  if (!validationResult.success) {
+    return { success: false, code: 400, error: validationResult.error }
+  }   
+  
+  try {  
+ 
+        if(data.departmentId != undefined ) {
+          if (!(await departmentExistsAsync(data.departmentId))) {
+            return {success: false, code: 404, error: ['Department not found']};
+          }
+        }  
+
+        if(!(await employeeExistsAsync(id)))
+        {
+          return {success: false, code: 404, error: ['Employee not found']};
+        }
+     
+        const updatedEmployee = await EmployeeModel.findByIdAndUpdate(
+          id,
+          { $set: { surname: data.surname, 
+              firstName: data.firstName,
+              dateOfBirth: data.dateOfBirth,
+              hireDate: data.hireDate,
+              email: data.email,
+              phoneNumber: data.phoneNumber,
+              departmentId: data.departmentId
+           } },
+          { new: true }
+        );
+  
+        if (!updatedEmployee) {
+          return { success: false, error: ['Employee not updated'], code: 400 };
+        }
+    
+        return { success: true, data: toEmployeeResponse(updatedEmployee)}; 
+  } 
+  catch (err: unknown) {  
+    return handleServiceError(err); 
+  }
+}
 
 export async function deleteEmployeeAsync(id: string): Promise<ServiceResult<null>> {
   
@@ -74,13 +119,13 @@ export async function deleteEmployeeAsync(id: string): Promise<ServiceResult<nul
     return { success: false, code: 400, error: validationResult.error }
   } 
 
-  try { 
+  try {  
 
-    if (!(await employeeExistsAsync(id))) { 
-      return {success: false, code: 404, error: ['Department not found']};
+    if (!(await employeeExistsAsync(id))) {  
+      return {success: false, code: 404, error: ['Employee not found']};
     }   
- 
-    await EmployeeModel.findByIdAndDelete(id); 
+  
+    await EmployeeModel.findByIdAndDelete(id);  
 
     return { success: true, data: null };
   } 
@@ -181,8 +226,7 @@ function buildEmployeeSearchPipeline(query: EmployeeSearchRequest): any[] {
 
   return pipeline;
 }
- 
-
+  
 //Service Validation 
 
 function validatePagination(page: number, pageSize: number): [number, number]{
