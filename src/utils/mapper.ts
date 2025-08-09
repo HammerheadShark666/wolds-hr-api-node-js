@@ -23,9 +23,9 @@ export function toUserResponse(user: IUser): UserResponse {
     role: role, 
   }; 
   return appUser;
-}
+} 
 
-export function toEmployeeSearchResponse(employee: IEmployee): EmployeeResponse {
+export function toEmployeeResponse(employee: IEmployee): EmployeeResponse {
   const { _id, surname, firstName, dateOfBirth, hireDate, email, phoneNumber, photo, department } = employee;
   const appEmployee: EmployeeResponse = {
     id: _id.toString(),
@@ -41,5 +41,6 @@ export function toEmployeeSearchResponse(employee: IEmployee): EmployeeResponse 
       name: department?.name ?? '',
     },
   }; 
+ 
   return appEmployee;
 }

@@ -7,7 +7,6 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js'],
   testMatch: ['**/__tests__/**/*.test.ts'],
-  setupFilesAfterEnv: ['<rootDir>/src/__tests__/config/jest.setup.ts'],
   globalSetup: '<rootDir>/src/__tests__/config/globalSetup.ts',
   globalTeardown: '<rootDir>/src/__tests__/config/globalTeardown.ts',
    collectCoverage: true,

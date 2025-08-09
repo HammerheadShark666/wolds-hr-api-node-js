@@ -67,3 +67,25 @@ export interface AddEmployeeResponse {
   photo?: string;
   departmentId?: string;
 }
+
+export interface UpdateEmployeeRequest {  
+  surname: string;
+  firstName: string;
+  dateOfBirth?: Date;
+  hireDate?: Date;
+  email?: string;
+  phoneNumber?: string; 
+  departmentId?: string;
+}
+
+export interface UpdatedEmployeeResponse { 
+  id: string;
+  surname: string;
+  firstName: string;
+  dateOfBirth?: Date;
+  hireDate?: Date;
+  email?: string;
+  phoneNumber?: string; 
+  photo?: string;
+  departmentId?: string;
+}
