@@ -102,7 +102,7 @@ describe("User API - Update a user", () => {
       firstName: "invalidFirstNameinvalidFirstNameinvalidFirstName"
     });
     expect(response.status).toBe(400);
-    expect(response.body.error).toContain('Surname must be at most 50 characters long');
+    expect(response.body.error).toContain('Surname must be at most 25 characters long');
     expect(response.body.error).toContain('First name must be at most 25 characters long');
   });
 
