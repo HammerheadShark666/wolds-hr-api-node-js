@@ -2,6 +2,7 @@ import request from 'supertest';
 import { connectToDatabase } from '../../db/mongoose';
 import { createApp } from '../../app';
 import dotenv from 'dotenv'; 
+import 'tslib';
 
 export default async function globalSetup() {
  

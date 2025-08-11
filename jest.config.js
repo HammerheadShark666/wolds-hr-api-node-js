@@ -7,7 +7,7 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'js'],
   testMatch: ['**/__tests__/**/*.test.ts'],
-  globalSetup: '<rootDir>/src/__tests__/config/globalSetup.ts',
+  globalSetup: '<rootDir>/src/__tests__/config/globalSetup.ts', 
   globalTeardown: '<rootDir>/src/__tests__/config/globalTeardown.ts',
    collectCoverage: true,
    collectCoverageFrom: [

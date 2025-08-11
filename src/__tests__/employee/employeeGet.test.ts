@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { EmployeeRequest, EmployeeResponse } from '../../interface/employee';
+import { EmployeeRequest } from '../../interface/employee';
 import { expectError } from '../../utils/error.helper';
 import { expectEmployee } from './employeeExpectedHelper';
 
@@ -26,6 +26,12 @@ beforeAll(async () => {
                                   expectedDepartmentId: EMPLOYEE_DEPARTMENT_ID });
 
   employeeId = response.body.id;
+});
+
+afterAll(async () => {  
+  const res = await deleteEmployee(employeeId);
+  expect(res.status).toBe(200);
+  expect(res.body.message).toMatch('Employee deleted');
 });
 
 describe("GET /api/v1/employees", () => {
@@ -75,6 +81,19 @@ function getEmployee(id: string) {
 
   const req = request(global.app!)
     .get("/v1/employees/" + id)
+      .set("Cookie", [global.ACCESS_TOKEN])
+      .set("Content-Type", "application/json");
+   
+  return req.send();
+}
+
+function deleteEmployee(id: string) {
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing");
+
+  const req = request(global.app!)
+    .delete("/v1/employees/" + id)
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
    
