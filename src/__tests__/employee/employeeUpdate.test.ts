@@ -1,6 +1,7 @@
 import request from 'supertest';   
 import { expectError } from '../../utils/error.helper';
-import { UpdatedEmployeeResponse, UpdateEmployeeRequest } from '../../interface/employee';  
+import { EmployeeResponse, EmployeeRequest } from '../../interface/employee';  
+import { expectEmployee } from './employeeExpectedHelper';
 
 let employeeId = '';
  
@@ -50,7 +51,7 @@ describe("PUT /api/v1/employees", () => {
 
   it("should return 200 when updated successfully", async () => {
     
-    const updateEmployeeRequest: UpdateEmployeeRequest = { surname: UPDATE_EMPLOYEE_SURNAME, firstName: UPDATE_EMPLOYEE_FIRST_NAME, 
+    const updateEmployeeRequest: EmployeeRequest = { surname: UPDATE_EMPLOYEE_SURNAME, firstName: UPDATE_EMPLOYEE_FIRST_NAME, 
                                                      dateOfBirth: UPDATE_EMPLOYEE_DOB, hireDate: UPDATE_EMPLOYEE_HIRE_DATE, email: UPDATE_EMPLOYEE_EMAIL, 
                                                      phoneNumber: UPDATE_EMPLOYEE_PHONE_NUMBER, departmentId: UPDATE_EMPLOYEE_DEPARTMENT_ID }
     const response = await putEmployee(employeeId, updateEmployeeRequest); 
@@ -62,13 +63,13 @@ describe("PUT /api/v1/employees", () => {
   });
 
   it("should return 404 when employee id not found", async () => {
-    const updateEmployeeRequest: UpdateEmployeeRequest = { surname: UPDATE_EMPLOYEE_SURNAME, firstName: UPDATE_EMPLOYEE_FIRST_NAME }
+    const updateEmployeeRequest: EmployeeRequest = { surname: UPDATE_EMPLOYEE_SURNAME, firstName: UPDATE_EMPLOYEE_FIRST_NAME }
     const response = await putEmployee(EMPLOYEE_NOT_FOUND_ID, updateEmployeeRequest);
     expectError(response, 'Employee not found', 404);
   });
 
   it("should return 400 when surname/first name too big", async () => {
-    const updateEmployeeRequest: UpdateEmployeeRequest = { surname
+    const updateEmployeeRequest: EmployeeRequest = { surname
       : EMPLOYEE_SURNAME_OVERSIZED, firstName: EMPLOYEE_FIRST_NAME_OVERSIZED }
     const response = await putEmployee(employeeId, updateEmployeeRequest);
     expectError(response, 'Surname must be at most 25 characters long', 400);
@@ -76,38 +77,38 @@ describe("PUT /api/v1/employees", () => {
   });
 
   it("should return 400 when surname/first name not entered", async () => {
-    const updateEmployeeRequest: UpdateEmployeeRequest = { surname: "", firstName: "" }
+    const updateEmployeeRequest: EmployeeRequest = { surname: "", firstName: "" }
     const response = await putEmployee(employeeId, updateEmployeeRequest);
     expectError(response, 'Surname is required', 400);
     expectError(response, 'First name is required', 400);
   });
 
   it("should return 400 when email invalid", async () => {
-    const updateEmployeeRequest: UpdateEmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, email: EMPLOYEE_INVALID_EMAIL }
+    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, email: EMPLOYEE_INVALID_EMAIL }
     const response = await putEmployee(employeeId, updateEmployeeRequest); 
     expectError(response, 'Invalid email format', 400);
   });
 
   it("should return 400 when email too long", async () => {
-    const updateEmployeeRequest: UpdateEmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, email: EMPLOYEE_INVALID_EMAIL_TOO_LONG }
+    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, email: EMPLOYEE_INVALID_EMAIL_TOO_LONG }
     const response = await putEmployee(employeeId, updateEmployeeRequest); 
     expectError(response, 'Invalid email format', 400);
   });
 
   it("should return 400 when phone number too long", async () => {
-    const updateEmployeeRequest: UpdateEmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, phoneNumber: EMPLOYEE_INVALID_PHONE_NUMBER}
+    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, phoneNumber: EMPLOYEE_INVALID_PHONE_NUMBER}
     const response = await putEmployee(employeeId, updateEmployeeRequest); 
     expectError(response, 'Phone number must be less than or equal to 25 characters', 400); 
   });
 
   it("should return 400 when department id is not a valid id", async () => {
-    const updateEmployeeRequest: UpdateEmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, departmentId: EMPLOYEE_INVALID_DEPARTMENT_ID}
+    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, departmentId: EMPLOYEE_INVALID_DEPARTMENT_ID}
     const response = await putEmployee(employeeId, updateEmployeeRequest); 
     expectError(response, 'Invalid department Id', 400); 
   });
 
   it("should return 400 when department id not found", async () => {
-    const updateEmployeeRequest: UpdateEmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, departmentId: EMPLOYEE_NOT_FOUND_DEPARTMENT_ID}
+    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, departmentId: EMPLOYEE_NOT_FOUND_DEPARTMENT_ID}
     const response = await putEmployee(employeeId, updateEmployeeRequest); 
     expectError(response, 'Department not found', 404); 
   });  
@@ -115,7 +116,7 @@ describe("PUT /api/v1/employees", () => {
 
 //Api functions 
 
-function postEmployee(data?: UpdateEmployeeRequest) {
+function postEmployee(data?: EmployeeRequest) {
  
   if(global.ACCESS_TOKEN == null)
     throw new Error("Access token is missing");
@@ -131,7 +132,7 @@ function postEmployee(data?: UpdateEmployeeRequest) {
   return req.send();
 }
 
-function putEmployee(id?: string, data?: UpdateEmployeeRequest) {
+function putEmployee(id?: string, data?: EmployeeRequest) {
  
   if(global.ACCESS_TOKEN == null)
     throw new Error("Access token is missing");
@@ -158,47 +159,4 @@ function deleteEmployee(id: string) {
       .set("Content-Type", "application/json");
    
   return req.send();
-}
- 
-//Helpers
- 
-type ExpectEmployeeOptions = {
-  expectedSurname?: string;
-  expectedFirstName?: string;
-  expectedDateOfBirth?: Date;
-  expectedHireDate?: Date;
-  expectedEmail?: string;
-  expectedPhoneNumber?: string;
-  expectedDepartmentId?: string;
-};
-
-function expectEmployee(employee: Partial<UpdatedEmployeeResponse>, options: ExpectEmployeeOptions = {}) {
-  expect(employee).toBeDefined();
-  expect(employee).toEqual(
-    expect.objectContaining({
-      id: expect.any(String),
-      surname: expect.any(String),
-      firstName: expect.any(String),
-      dateOfBirth: expect.any(String),
-      hireDate: expect.any(String),
-      email: expect.any(String),
-      phoneNumber: employee.phoneNumber,
-      photo: employee.photo,
-      department: expect.objectContaining({
-        id: expect.any(String),
-        name: expect.any(String)
-      })
-    })
-  );
-
-  expect([null, expect.any(String)]).toContainEqual(employee.phoneNumber);
-  expect([null, expect.any(String)]).toContainEqual(employee.photo);
-
-  if (options.expectedSurname !== undefined) {
-    expect(employee.surname).toBe(options.expectedSurname);
-  }
-
-  if (options.expectedFirstName !== undefined) {
-    expect(employee.firstName).toBe(options.expectedFirstName);
-  }
 }

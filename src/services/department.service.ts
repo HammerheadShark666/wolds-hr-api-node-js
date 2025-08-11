@@ -4,9 +4,9 @@ import { ServiceResult } from '../types/ServiceResult';
 import { handleServiceError } from '../utils/error.helper';
 import { toDepartmentResponse } from '../utils/mapper'; 
 import { addDepartmentSchema } from '../validation/department/addDepartment.schema';
-import { deleteDepartmentSchema } from '../validation/department/deleteDepartment.schema'; 
 import { getDepartmentByIdSchema } from '../validation/department/getDepartmentById.schema'; 
 import { updateDepartmentSchema } from '../validation/department/updateDepartment.schema'; 
+import { idSchema } from '../validation/fields/id.schema';
 import { validate } from '../validation/validate';
 
 //Service export functions
@@ -97,7 +97,7 @@ export async function updateDepartmentAsync(data: UpdateDepartmentRequest): Prom
 
 export async function deleteDepartmentAsync(id: string): Promise<ServiceResult<IDepartment | null>> {
   
-  const validationResult = await validate(deleteDepartmentSchema, { id });  
+  const validationResult = await validate(idSchema, id);  
   if (!validationResult.success) {
     return { success: false, code: 400, error: validationResult.error }
   } 
