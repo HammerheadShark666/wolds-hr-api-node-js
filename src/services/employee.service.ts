@@ -168,8 +168,8 @@ export async function employeeExistsAsync(id: string): Promise<boolean> {
 async function searchEmployeesAsync(query: EmployeeSearchRequest): Promise<EmployeeSearchResponse> {
   try { 
     const pipeline = buildEmployeeSearchPipeline(query);
-    const result = await EmployeeModel.aggregate(pipeline);
-    return { success: true, data: result };
+    const response = await EmployeeModel.aggregate(pipeline);
+    return { success: true, data: response };
   } catch (err) { 
     return {
       success: false,

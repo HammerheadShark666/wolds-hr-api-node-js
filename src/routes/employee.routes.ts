@@ -25,48 +25,48 @@ export function createEmployeesRouter() {
     '/search', 
     asyncHandler(async (req: Request<{}, {}, {}, EmployeeSearchRequest>, res: Response) => {
    
-      const result = await searchEmployeesPagedAsync(req.query);  
-      if (!result.success) { 
-        res.status(400).json({ error: result.error });
+      const response = await searchEmployeesPagedAsync(req.query);  
+      if (!response.success) { 
+        res.status(400).json({ error: response.error });
         return;
       } 
-      res.status(200).json(result.data); 
+      res.status(200).json(response.data); 
      })
   );
 
   router.get(
     '/:id',
     asyncHandler(async (req: Request, res: Response) => { 
-      const result = await getEmployeeAsync(req.params.id);
-      if (!result.success) { 
-        res.status(result.code ?? 400).json({ error: result.error });
+      const response = await getEmployeeAsync(req.params.id);
+      if (!response.success) { 
+        res.status(response.code ?? 400).json({ error: response.error });
         return;
       }      
-      res.status(200).json(result.data);
+      res.status(200).json(response.data);
     })
   );
 
   router.post(
     '/',
     asyncHandler(async (req: Request, res: Response) => {
-      const result = await addEmployeeAsync(req.body);
-      if (!result.success) {
-        res.status(result.code ?? 400).json({ error: result.error });
+      const response = await addEmployeeAsync(req.body);
+      if (!response.success) {
+        res.status(response.code ?? 400).json({ error: response.error });
         return;
       }  
-      res.status(201).json(result.data);
+      res.status(201).json(response.data);
     })
   );
 
   router.put(
     '/:id',
     asyncHandler(async (req: Request, res: Response) => { 
-      const result = await updateEmployeeAsync(req.params.id, req.body);
-      if (!result.success) { 
-        res.status(result.code ?? 400).json({ error: result.error });
+      const response = await updateEmployeeAsync(req.params.id, req.body);
+      if (!response.success) { 
+        res.status(response.code ?? 400).json({ error: response.error });
         return;
       }      
-      res.status(200).json(result.data);
+      res.status(200).json(response.data);
     })
   );
 
@@ -74,9 +74,9 @@ export function createEmployeesRouter() {
     '/:id',
     asyncHandler(async (req: Request, res: Response) => { 
       
-      const result = await deleteEmployeeAsync(req.params.id); 
-      if (!result.success) {
-        res.status(result.code ?? 400).json({ error: result.error });
+      const response = await deleteEmployeeAsync(req.params.id); 
+      if (!response.success) {
+        res.status(response.code ?? 400).json({ error: response.error });
         return;
       }
       res.status(200).json({ message: 'Employee deleted' });
@@ -166,18 +166,18 @@ export function createEmployeesRouter() {
 //   }
 
 //   try {
-//     const result = await uploadEmployeePhoto(
+//     const response = await uploadEmployeePhoto(
 //       req.file.buffer,
 //       req.file.originalname,
 //       req.file.mimetype,
 //       req.params.id
 //     );
     
-//     if (!result.success) {
-//       return res.status(result.code || 500).json({ error: result.error });
+//     if (!response.success) {
+//       return res.status(response.code || 500).json({ error: response.error });
 //     }
     
-//     res.status(200).json({ data: result.data });
+//     res.status(200).json({ data: response.data });
 //   } catch (error) {
 //     console.error('Upload handler error:', error);
 //     res.status(500).send('Internal Server Error');
