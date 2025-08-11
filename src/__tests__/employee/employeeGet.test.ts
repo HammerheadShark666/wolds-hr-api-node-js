@@ -15,12 +15,12 @@ const EMPLOYEE_DEPARTMENT_ID = "687783fbb6fc23ad4cdca63e";
 const EMPLOYEE_NOT_FOUND_ID = "68973949b5282483aa4f9ff8";
 const EMPLOYEE_INVALID_ID = "68973949b5282483aa4f9";
 
-beforeAll(async () => {  
-
+beforeAll(async () => { 
+  
   const response = await postEmployee({ surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, 
                                         dateOfBirth: EMPLOYEE_DOB, hireDate: EMPLOYEE_HIRE_DATE, email: EMPLOYEE_EMAIL, 
                                         phoneNumber: EMPLOYEE_PHONE_NUMBER, departmentId: EMPLOYEE_DEPARTMENT_ID });
-      
+    
   expectEmployee(response.body, { expectedSurname: EMPLOYEE_SURNAME, expectedFirstName: EMPLOYEE_FIRST_NAME, expectedDateOfBirth: EMPLOYEE_DOB, 
                                   expectedHireDate: EMPLOYEE_HIRE_DATE, expectedEmail: EMPLOYEE_EMAIL, expectedPhoneNumber: EMPLOYEE_PHONE_NUMBER, 
                                   expectedDepartmentId: EMPLOYEE_DEPARTMENT_ID });
@@ -28,20 +28,24 @@ beforeAll(async () => {
   employeeId = response.body.id;
 });
 
-describe("DELETE /api/v1/employees", () => {
+describe("GET /api/v1/employees", () => {
 
-  it("should return 200 when deleted successfully", async () => {
-      const response = await deleteEmployee(employeeId); 
+  it("should return 200 and employee when found successfully", async () => {
+      const response = await getEmployee(employeeId); 
       expect(response.status).toBe(200);
+
+      expectEmployee(response.body, { expectedSurname: EMPLOYEE_SURNAME, expectedFirstName: EMPLOYEE_FIRST_NAME, expectedDateOfBirth: EMPLOYEE_DOB, 
+                                      expectedHireDate: EMPLOYEE_HIRE_DATE, expectedEmail: EMPLOYEE_EMAIL, expectedPhoneNumber: EMPLOYEE_PHONE_NUMBER, 
+                                      expectedDepartmentId: EMPLOYEE_DEPARTMENT_ID });
   });
 
   it("should return 400 when invalid id passed", async () => {
-      const response = await deleteEmployee(EMPLOYEE_INVALID_ID);  
+      const response = await getEmployee(EMPLOYEE_INVALID_ID);  
       expectError(response, 'Invalid Id', 400);
   });
 
   it("should return 404 when id that does not exist is passed", async () => {
-      const response = await deleteEmployee(EMPLOYEE_NOT_FOUND_ID);  
+      const response = await getEmployee(EMPLOYEE_NOT_FOUND_ID);  
       expectError(response, 'Employee not found', 404);
   });
 });
@@ -64,13 +68,13 @@ function postEmployee(data?: EmployeeRequest) {
   return req.send();
 }
 
-function deleteEmployee(id: string) {
+function getEmployee(id: string) {
 
   if(global.ACCESS_TOKEN == null)
     throw new Error("Access token is missing");
 
   const req = request(global.app!)
-    .delete("/v1/employees/" + id)
+    .get("/v1/employees/" + id)
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
    

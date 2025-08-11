@@ -18,18 +18,6 @@ export interface EmployeeSearchPagedResponse {
   success: boolean;
 }
 
-export interface EmployeeResponse {
-  id: string;
-  surname: string;
-  firstName: string;
-  dateOfBirth: Date,
-  hireDate: Date,
-  email: string;
-  phoneNumber: string;
-  department: DepartmentResponse;
-  photo: string;
-} 
-
 export interface EmployeeSearchResponse {
   success: boolean;
   data?: IEmployee[];
@@ -46,7 +34,7 @@ export interface EmployeeDefaultData {
   photo?: string;
 } 
 
-export interface AddEmployeeRequest {  
+export interface EmployeeRequest {  
   surname: string;
   firstName: string;
   dateOfBirth?: Date;
@@ -56,7 +44,7 @@ export interface AddEmployeeRequest {
   departmentId?: string;
 }
 
-export interface AddEmployeeResponse {
+export interface EmployeeResponse {
   id: string;
   surname: string;
   firstName: string;
@@ -66,26 +54,5 @@ export interface AddEmployeeResponse {
   phoneNumber?: string; 
   photo?: string;
   departmentId?: string;
-}
-
-export interface UpdateEmployeeRequest {  
-  surname: string;
-  firstName: string;
-  dateOfBirth?: Date;
-  hireDate?: Date;
-  email?: string;
-  phoneNumber?: string; 
-  departmentId?: string;
-}
-
-export interface UpdatedEmployeeResponse { 
-  id: string;
-  surname: string;
-  firstName: string;
-  dateOfBirth?: Date;
-  hireDate?: Date;
-  email?: string;
-  phoneNumber?: string; 
-  photo?: string;
-  departmentId?: string;
+  department: DepartmentResponse;
 }

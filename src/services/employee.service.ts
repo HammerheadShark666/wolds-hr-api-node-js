@@ -1,14 +1,13 @@
 import { Types } from 'mongoose'; 
 import { EmployeeModel, IEmployee } from '../models/employee.model';
-import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse, AddEmployeeRequest, AddEmployeeResponse, UpdateEmployeeRequest, UpdatedEmployeeResponse } from '../interface/employee';
+import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse, EmployeeRequest, EmployeeResponse } from '../interface/employee';
 import { toEmployeeResponse } from '../utils/mapper'; 
 import { validate } from '../validation/validate';
 import { ServiceResult } from '../types/ServiceResult';
 import { employeeSearchSchema } from '../validation/employee/employeeSearch.schema';
 import { handleServiceError } from '../utils/error.helper';
 import { addEmployeeSchema } from '../validation/employee/addEmployee.schema';
-import { departmentExistsAsync } from './department.service';
-import { deleteDepartmentSchema } from '../validation/department/deleteDepartment.schema';
+import { departmentExistsAsync } from './department.service'; 
 import { updateEmployeeSchema } from '../validation/employee/updateEmployee.schema';
 import { idSchema } from '../validation/fields/id.schema';
 
@@ -44,8 +43,33 @@ export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): P
     success: true
   }}; 
 } 
+
+export async function getEmployeeAsync(id: string): Promise<ServiceResult<EmployeeResponse>> {
+  
+  const validationResult = await validate(idSchema, id);  
+  if (!validationResult.success) {
+    return { success: false, code: 400, error: validationResult.error }
+  } 
+
+  try {  
+
+    if (!(await employeeExistsAsync(id))) {  
+      return {success: false, code: 404, error: ['Employee not found']};
+    }   
+  
+    var response = await EmployeeModel.findById(id);  
+    if(response == null){  
+      return {success: false, code: 404, error: ['Employee not found']};
+    }   
+
+    return { success: true, data: toEmployeeResponse(response)};
+  } 
+  catch (err: unknown) { 
+    return handleServiceError(err);
+  }
+} 
  
-export async function addEmployeeAsync(data: AddEmployeeRequest): Promise<ServiceResult<AddEmployeeResponse>> {
+export async function addEmployeeAsync(data: EmployeeRequest): Promise<ServiceResult<EmployeeResponse>> {
      
   const validationResult = await validate(addEmployeeSchema, data);  
   if (!validationResult.success) {
@@ -69,7 +93,7 @@ export async function addEmployeeAsync(data: AddEmployeeRequest): Promise<Servic
   }
 } 
 
-export async function updateEmployeeAsync(id: string, data: UpdateEmployeeRequest): Promise<ServiceResult<UpdatedEmployeeResponse>> {
+export async function updateEmployeeAsync(id: string, data: EmployeeRequest): Promise<ServiceResult<EmployeeResponse>> {
 
   const validationResult = await validate(updateEmployeeSchema, data);  
   if (!validationResult.success) {
@@ -84,8 +108,7 @@ export async function updateEmployeeAsync(id: string, data: UpdateEmployeeReques
           }
         }  
 
-        if(!(await employeeExistsAsync(id)))
-        {
+        if(!(await employeeExistsAsync(id))) {
           return {success: false, code: 404, error: ['Employee not found']};
         }
      
@@ -115,10 +138,8 @@ export async function updateEmployeeAsync(id: string, data: UpdateEmployeeReques
 
 export async function deleteEmployeeAsync(id: string): Promise<ServiceResult<null>> {
   
-  const validationResult = await validate(idSchema, id );  
-  if (!validationResult.success) {
-    console.log("id = ", id);
-    console.log("validationResult.error = ", validationResult.error);
+  const validationResult = await validate(idSchema, id);  
+  if (!validationResult.success) { 
     return { success: false, code: 400, error: validationResult.error }
   } 
 

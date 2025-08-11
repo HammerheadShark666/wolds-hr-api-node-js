@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
-import { addEmployeeAsync, deleteEmployeeAsync, searchEmployeesPagedAsync, updateEmployeeAsync } from '../services/employee.service';
+import { addEmployeeAsync, deleteEmployeeAsync, getEmployeeAsync, searchEmployeesPagedAsync, updateEmployeeAsync } from '../services/employee.service';
 import { EmployeeSearchRequest } from '../interface/employee';
 
 export function createEmployeesRouter() {
@@ -18,6 +18,18 @@ export function createEmployeesRouter() {
       } 
       res.status(200).json(result.data); 
      })
+  );
+
+  router.get(
+    '/:id',
+    asyncHandler(async (req: Request, res: Response) => { 
+      const result = await getEmployeeAsync(req.params.id);
+      if (!result.success) { 
+        res.status(result.code ?? 400).json({ error: result.error });
+        return;
+      }      
+      res.status(200).json(result.data);
+    })
   );
 
   router.post(
