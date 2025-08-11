@@ -1,5 +1,6 @@
 import { z } from 'zod'; 
+import { idSchema } from '../fields/id.schema';
 
 export const deleteDepartmentSchema = z.object({
-  id: z.string().min(1, 'ID is required') 
+  id: idSchema
 });

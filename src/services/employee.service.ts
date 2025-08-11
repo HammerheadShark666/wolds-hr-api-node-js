@@ -10,6 +10,7 @@ import { addEmployeeSchema } from '../validation/employee/addEmployee.schema';
 import { departmentExistsAsync } from './department.service';
 import { deleteDepartmentSchema } from '../validation/department/deleteDepartment.schema';
 import { updateEmployeeSchema } from '../validation/employee/updateEmployee.schema';
+import { idSchema } from '../validation/fields/id.schema';
 
 const PAGE_SIZE = 5;
 
@@ -43,7 +44,7 @@ export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): P
     success: true
   }}; 
 } 
-
+ 
 export async function addEmployeeAsync(data: AddEmployeeRequest): Promise<ServiceResult<AddEmployeeResponse>> {
      
   const validationResult = await validate(addEmployeeSchema, data);  
@@ -114,8 +115,10 @@ export async function updateEmployeeAsync(id: string, data: UpdateEmployeeReques
 
 export async function deleteEmployeeAsync(id: string): Promise<ServiceResult<null>> {
   
-  const validationResult = await validate(deleteDepartmentSchema, { id });  
+  const validationResult = await validate(idSchema, id );  
   if (!validationResult.success) {
+    console.log("id = ", id);
+    console.log("validationResult.error = ", validationResult.error);
     return { success: false, code: 400, error: validationResult.error }
   } 
 

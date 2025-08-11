@@ -1,6 +1,6 @@
 import request from 'supertest';   
-import { expectError } from '../utils/error.helper';
-import { UpdatedEmployeeResponse, UpdateEmployeeRequest } from '../interface/employee';  
+import { expectError } from '../../utils/error.helper';
+import { UpdatedEmployeeResponse, UpdateEmployeeRequest } from '../../interface/employee';  
 
 let employeeId = '';
  

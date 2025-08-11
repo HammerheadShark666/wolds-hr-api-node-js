@@ -1,6 +1,6 @@
 import request from "supertest"; 
-import { EmployeeResponse } from "../interface/employee";
-import { expectError } from "../utils/error.helper";
+import { EmployeeResponse } from "../../interface/employee";
+import { expectError } from "../../utils/error.helper";
 
 const KEYWORD = 'john';
 const PAGE_SIZE = 5;
