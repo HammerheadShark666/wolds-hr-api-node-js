@@ -1,13 +1,12 @@
-import request from 'supertest';   
-import { expectError } from '../utils/error.helper';
-import { AddEmployeeRequest, AddEmployeeResponse } from '../interface/employee'; 
-import { objectIdSchema } from '../validation/fields/objectId.schema';
+import request from 'supertest';
+import { AddEmployeeRequest, AddEmployeeResponse } from '../../interface/employee';
+import { expectError } from '../../utils/error.helper';
 
 let employeeId = '';
 
 const EMPLOYEE_SURNAME = "Jones";
 const EMPLOYEE_SURNAME_OVERSIZED = "OversizedSurnameOversizedSurnameOversizedSurname";
-const EMPLOYEE_FIRST_NAME = "Mandy"
+const EMPLOYEE_FIRST_NAME = "Mandy";
 const EMPLOYEE_FIRST_NAME_OVERSIZED = "OversizedFirstNameOversizedFirstNameOversizedFirstName";
 const EMPLOYEE_DOB = new Date("05-23-2000");
 const EMPLOYEE_HIRE_DATE = new Date("03-11-2021");
@@ -83,20 +82,10 @@ describe("POST /api/v1/employees", () => {
     expectError(response, 'Department not found', 404); 
   });  
 });
-
-//update employee
-//add photo
-//edit photo
-
+  
 describe("DELETE /api/v1/employees", () => {
-
-
-
-   it("should return 200 and message when deleted", async () => {
-
-
-    console.log("delete employeeId = ", employeeId)
-
+ 
+   it("should return 200 and message when deleted", async () => {   
     const res = await deleteEmployee(employeeId);
     expect(res.status).toBe(200);
     expect(res.body.message).toMatch('Employee deleted');
