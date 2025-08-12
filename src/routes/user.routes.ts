@@ -17,13 +17,13 @@ export function createUsersRouter() {
                                               firstName: req.body.firstName, 
                                               role: req.body.role};  
                                        
-      const result = await addUserAsync(addUserRequest);
-      if (!result.success) {
-        res.status(result.code ?? 400).json({ error: result.error });
+      const response = await addUserAsync(addUserRequest);
+      if (!response.success) {
+        res.status(response.code ?? 400).json({ error: response.error });
         return;
       } 
  
-      res.status(201).json(result.data);
+      res.status(201).json(response.data);
     })
   );
  
@@ -31,13 +31,13 @@ export function createUsersRouter() {
     '/id/:id',
     asyncHandler(async (req: Request, res: Response) => {
 
-      const result = await getUserByIdAsync(req.params.id.toString());
-      if (!result.success) {
-        res.status(result.code ?? 400).json({ error: result.error});
+      const response = await getUserByIdAsync(req.params.id.toString());
+      if (!response.success) {
+        res.status(response.code ?? 400).json({ error: response.error});
         return;
       } 
  
-      res.status(200).json(result.data);
+      res.status(200).json(response.data);
     })
   ); 
 
@@ -45,13 +45,13 @@ export function createUsersRouter() {
       '/username/:username',
       asyncHandler(async (req: Request, res: Response) => {
 
-        const result = await getUserByUsernameAsync(req.params.username);
-        if (!result.success) {
-          res.status(result.code ?? 400).json({ error: result.error });
+        const response = await getUserByUsernameAsync(req.params.username);
+        if (!response.success) {
+          res.status(response.code ?? 400).json({ error: response.error });
           return;
         } 
   
-        res.status(200).json(result.data);
+        res.status(200).json(response.data);
       })  
   ); 
  
@@ -64,12 +64,12 @@ export function createUsersRouter() {
                                             surname: req.body.surname, 
                                             firstName: req.body.firstName}; 
        
-      const result = await updateUserAsync(updateUserRequest);
-      if (!result.success) {
-        res.status(result.code ?? 400).json({ error: result.error });
+      const response = await updateUserAsync(updateUserRequest);
+      if (!response.success) {
+        res.status(response.code ?? 400).json({ error: response.error });
         return;
       } 
-      res.status(200).json(result.data); 
+      res.status(200).json(response.data); 
     })
   );
 
@@ -77,9 +77,9 @@ export function createUsersRouter() {
     '/:id',
     asyncHandler(async (req: Request, res: Response) => {
       
-      const result = await deleteUserAsync(req.params.id);
-      if (!result.success) { 
-        res.status(result.code ?? 400).json({ error: result.error });
+      const response = await deleteUserAsync(req.params.id);
+      if (!response.success) { 
+        res.status(response.code ?? 400).json({ error: response.error });
         return;
       }
       res.status(200).json({ message: 'User deleted' });

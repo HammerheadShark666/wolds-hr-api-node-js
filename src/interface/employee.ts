@@ -56,3 +56,8 @@ export interface EmployeeResponse {
   departmentId?: string;
   department: DepartmentResponse;
 }
+
+export interface UploadEmployeePhotoResponse {
+  id: string;
+  filename: string;
+}
