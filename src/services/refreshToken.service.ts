@@ -8,6 +8,7 @@ import { handleServiceError } from '../utils/error.helper';
 import { refreshTokenSchema } from '../validation/fields/refreshToken.schema';
 import { validate } from '../validation/validate';
 import { getAccessTokenExpiry } from '../utils/authentication.helper';
+import { AUTHENTICATION_ERRORS } from '../utils/constants';
 
 //Service export functions
 
@@ -22,7 +23,7 @@ export async function createTokenFromRefreshTokenAsync(refreshToken: string): Pr
     const decoded = await new Promise<JwtPayload>((resolve, reject) => {
       jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!, (err, decoded) => {
         if (err || !decoded || typeof decoded === "string") {
-          return { success: false, error: ['Refresh token not valid'] };
+          return { success: false, error: [AUTHENTICATION_ERRORS.REFRESH_TOKEN_NOT_VALID] };
         }
         resolve(decoded as JwtPayload);
       });

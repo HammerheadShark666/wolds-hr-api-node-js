@@ -3,8 +3,9 @@ import dotenv from 'dotenv';
 import { ServiceResult } from '../types/ServiceResult';
 import { UploadEmployeePhotoResponse } from '../interface/employee'; 
 import { EmployeeModel } from '../models/employee.model';
-import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
+import { generateFileName } from '../utils/file.helper';
+import { uploadPhotoToAzureStorage } from '../utils/azureStorage.helper';  
+import { AZURE_STORAGE_ERRORS, EMPLOYEE_ERRORS, GENERAL_ERRORS } from '../utils/constants';
  
 dotenv.config();
 
@@ -12,11 +13,11 @@ const AZURE_STORAGE_CONNECTION_STRING = process.env.AZURE_STORAGE_CONNECTION_STR
 const CONTAINER_NAME = process.env.AZURE_CONTAINER_NAME || '';
 
 if (!AZURE_STORAGE_CONNECTION_STRING) {
-  throw new Error('Azure Storage connection string not set in .env');
+  throw new Error(AZURE_STORAGE_ERRORS.CONNECTION_STRING_NOT_FOUND);
 }
 
 if (!CONTAINER_NAME) {
-  throw new Error('Azure Storage container string not set in .env');
+  throw new Error(AZURE_STORAGE_ERRORS.CONTAINER_NOT_FOUND);
 }
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(AZURE_STORAGE_CONNECTION_STRING);
@@ -25,7 +26,7 @@ export async function uploadEmployeePhoto(fileBuffer: Buffer, uploadFileName: st
   
   const existingEmployee = await EmployeeModel.findById(id);  
   if (!existingEmployee) {  
-    return {success: false, code: 404, error: ['Employee not found']};
+    return {success: false, code: 404, error: [EMPLOYEE_ERRORS.NOT_FOUND]};
   }   
 
   const currentFileName = existingEmployee.photo ?? "";
@@ -42,7 +43,7 @@ export async function uploadEmployeePhoto(fileBuffer: Buffer, uploadFileName: st
     return { success: true, data };
   } catch (err: any) {
     console.error('UploadEmployeePhoto error:', err);
-    return { success: false, code: 500, error: [err.message || 'Upload failed'] };
+    return { success: false, code: 500, error: [err.message || GENERAL_ERRORS.UPLOAD_FAILED] };
   }
 } 
 
@@ -67,15 +68,4 @@ async function deletePreviousPhoto(currentFileName: string, containerClient: Con
   }
 
   await blockBlobClient.delete();
-}
-
-async function uploadPhotoToAzureStorage(containerClient: ContainerClient, filename: string, fileBuffer: Buffer, mimeType: string) {
-  const blockBlobClient = containerClient.getBlockBlobClient(filename);
-  await blockBlobClient.uploadData(fileBuffer, {
-    blobHTTPHeaders: { blobContentType: mimeType },
-  }); 
-} 
- 
-function generateFileName(originalName: string): string { 
-  return `${uuidv4()}${path.extname(originalName)}`;
 }

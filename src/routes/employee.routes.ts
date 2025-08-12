@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
-import { addEmployeeAsync, deleteEmployeeAsync, getEmployeeAsync, searchEmployeesPagedAsync, updateEmployeeAsync } from '../services/employee.service';
+import { addEmployeeAsync, deleteEmployeeAsyncAsync, getEmployeeAsyncAsync, searchEmployeesPagedAsync, updateEmployeeAsync } from '../services/employee.service';
 import { EmployeeSearchRequest } from '../interface/employee';
 //import multer from 'multer';
 //import { uploadEmployeePhoto } from '../services/employeePhoto.service';
@@ -37,7 +37,7 @@ export function createEmployeesRouter() {
   router.get(
     '/:id',
     asyncHandler(async (req: Request, res: Response) => { 
-      const response = await getEmployeeAsync(req.params.id);
+      const response = await getEmployeeAsyncAsync(req.params.id);
       if (!response.success) { 
         res.status(response.code ?? 400).json({ error: response.error });
         return;
@@ -74,7 +74,7 @@ export function createEmployeesRouter() {
     '/:id',
     asyncHandler(async (req: Request, res: Response) => { 
       
-      const response = await deleteEmployeeAsync(req.params.id); 
+      const response = await deleteEmployeeAsyncAsync(req.params.id); 
       if (!response.success) {
         res.status(response.code ?? 400).json({ error: response.error });
         return;

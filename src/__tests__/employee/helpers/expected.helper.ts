@@ -1,4 +1,4 @@
-import { EmployeeResponse } from "../../interface/employee";
+import { EmployeeResponse } from "../../../interface/employee";
 
 export type ExpectEmployeeOptions = {
   expectedSurname?: string;

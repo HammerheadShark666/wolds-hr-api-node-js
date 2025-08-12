@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { Types } from 'mongoose';
 import type { StringValue } from 'ms'; 
 import bcrypt from 'bcryptjs';
+import { AUTHENTICATION_ERRORS, COOKIES, GLOBAL } from './constants';
 
 export function getAccessTokenExpiry(): string {
   return process.env.ACCESS_TOKEN_EXPIRY || '15m';
@@ -15,31 +16,31 @@ export function getRefreshTokenExpiry(): string {
 export function getAccessTokenSecret(): string {
   const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
   if (!accessTokenSecret)
-        throw new Error('Access token secret missing'); 
+        throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_SECRET_MISSING); 
   return accessTokenSecret;
 }
 
 export function getRefreshTokenSecret(): string {
   const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
   if (!refreshTokenSecret)
-        throw new Error('Refresh token secret missing'); 
+        throw new Error(AUTHENTICATION_ERRORS.REFRESH_TOKEN_SECRET_MISSING); 
   return refreshTokenSecret;
 }
 
 export function setRefreshTokenCookie(res: Response, refreshToken: string): void {
-  res.cookie('refresh_token', refreshToken, {
+  res.cookie(COOKIES.REFRESH_TOKEN, refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
+    sameSite: process.env.NODE_ENV === GLOBAL.PRODUCTION ? GLOBAL.NONE : GLOBAL.LAX,
     path: '/',
   });
 }
 
 export function setAccessTokenCookie(res: Response, accessToken: string): void {
-  res.cookie('access_token', accessToken, {
+  res.cookie(COOKIES.ACCESS_TOKEN, accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
+    sameSite: process.env.NODE_ENV === GLOBAL.PRODUCTION ? GLOBAL.NONE : GLOBAL.LAX,
     path: '/',
   });
 }

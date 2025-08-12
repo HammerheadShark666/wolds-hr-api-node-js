@@ -10,7 +10,7 @@ export async function insertDefaultEmployees() {
       return;
     }
  
-    const employees = getEmployeeDefaultData(departments); 
+    const employees = getEmployeeAsyncDefaultData(departments); 
     const insertedEmployees = await EmployeeModel.insertMany(employees);
 
     const randomEmployees = getRandomEmployeeDefaultData(departments);
@@ -28,7 +28,7 @@ function getRandomDepartmentId(departments: Department[]) {
   return departments[randomIndex]._id;
 } 
 
-function getEmployeeDefaultData(departments: Department[]) {
+function getEmployeeAsyncDefaultData(departments: Department[]) {
   const now = new Date();
 
   const employees: EmployeeDefaultData[] = [

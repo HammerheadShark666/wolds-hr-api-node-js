@@ -10,6 +10,7 @@ import { getUserByUsernameSchema } from '../validation/user/getUserByUsername.sc
 import { getUserByIdSchema } from '../validation/user/getUserById.schema';
 import { updateUserSchema } from '../validation/user/updateUser.schema';
 import { validate } from '../validation/validate';
+import { USER_ERRORS, USER_MESSAGES } from '../utils/constants';
 
 //Service export functions
 
@@ -23,7 +24,7 @@ export async function addUserAsync(data: AddUserRequest): Promise<ServiceResult<
   try {   
    
      if ((await usernameExistsAsync(data.username))) {
-          return {success: false, code: 400, error: ['Username exists already']};
+          return {success: false, code: 400, error: [USER_ERRORS.USERNAME_EXISTS]};
         }   
 
     data.password = await createHashedPassword(data.password);
@@ -32,10 +33,10 @@ export async function addUserAsync(data: AddUserRequest): Promise<ServiceResult<
     user.save();
  
     if (!user || !user._id) {
-      return { success: false, error: ['Failed to add user'] };
+      return { success: false, error: [USER_ERRORS.FAILED_TO_ADD] };
     }
 
-    const addedUserResponse: AddedUserResponse = { message: "User added successfully", userId: user._id.toString() }; 
+    const addedUserResponse: AddedUserResponse = { message: USER_MESSAGES.ADDED_SUCCESSFULLY, userId: user._id.toString() }; 
     return { success: true, data: addedUserResponse }; 
   } 
   catch (err: unknown) {
@@ -54,7 +55,7 @@ export async function updateUserAsync(data: UpdateUserRequest): Promise<ServiceR
  
     const existingUser = await UserModel.findById(data.id);  
     if (!existingUser) {
-      return {success: false, code: 404, error: ['User not found']};
+      return {success: false, code: 404, error: [USER_ERRORS.NOT_FOUND]};
     } 
  
     const updatedUser = await UserModel.findByIdAndUpdate(
@@ -67,7 +68,7 @@ export async function updateUserAsync(data: UpdateUserRequest): Promise<ServiceR
       return { success: false, error: ['Error updating user'], code: 404 };
     }
   
-    const updatedUserResponse: UpdatedUserResponse = { message: "User updated successfully", userId: data.id }; 
+    const updatedUserResponse: UpdatedUserResponse = { message: USER_MESSAGES.UPDATED_SUCCESSFULLY, userId: data.id }; 
     return { success: true, data: updatedUserResponse }; 
   } 
   catch (err: unknown) {
@@ -87,7 +88,7 @@ export async function getUserByIdAsync(id: string): Promise<ServiceResult<UserRe
     const user = await UserModel.findById(id).exec();
     if (!user) {
       return {
-        success: false, error: ['User not found'], code: 404 };
+        success: false, error: [USER_ERRORS.NOT_FOUND], code: 404 };
     }
 
     return { success: true, data: toUserResponse(user) }; 
@@ -108,7 +109,7 @@ export async function getUserByUsernameAsync(username: string): Promise<ServiceR
 
     const user = await UserModel.findOne({ username: username }).exec();
     if (!user) {
-      return { success: false, error: ['User not found'], code: 404 };
+      return { success: false, error: [USER_ERRORS.NOT_FOUND], code: 404 };
     }
 
     return { success: true, data: toUserResponse(user) }; 
@@ -128,11 +129,11 @@ export async function deleteUserAsync(id: string): Promise<ServiceResult<Deleted
   try {   
  
     if (!(await userExistsAsync(id))) {
-      return {success: false, code: 404, error: ['User not found']};
+      return {success: false, code: 404, error: [USER_ERRORS.NOT_FOUND]};
     }   
 
     await UserModel.findByIdAndDelete(id);
-    return { success: true, data: { userId: id, message: 'User deleted successfully', }, }; 
+    return { success: true, data: { userId: id, message: USER_MESSAGES.DELETED_SUCCESSFULLY, }, }; 
   } 
   catch (err: unknown) {
     return handleServiceError(err); 

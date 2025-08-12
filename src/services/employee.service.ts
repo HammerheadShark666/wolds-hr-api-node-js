@@ -1,5 +1,5 @@
 import { Types } from 'mongoose'; 
-import { EmployeeModel, IEmployee } from '../models/employee.model';
+import { EmployeeModel } from '../models/employee.model';
 import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse, EmployeeRequest, EmployeeResponse } from '../interface/employee';
 import { toEmployeeResponse } from '../utils/mapper'; 
 import { validate } from '../validation/validate';
@@ -10,6 +10,7 @@ import { addEmployeeSchema } from '../validation/employee/addEmployee.schema';
 import { departmentExistsAsync } from './department.service'; 
 import { updateEmployeeSchema } from '../validation/employee/updateEmployee.schema';
 import { idSchema } from '../validation/fields/id.schema';
+import { DEPARTMENT_ERRORS, EMPLOYEE_ERRORS } from '../utils/constants';
 
 const PAGE_SIZE = 5;
 
@@ -44,7 +45,7 @@ export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): P
   }}; 
 } 
 
-export async function getEmployeeAsync(id: string): Promise<ServiceResult<EmployeeResponse>> {
+export async function getEmployeeAsyncAsync(id: string): Promise<ServiceResult<EmployeeResponse>> {
   
   const validationResult = await validate(idSchema, id);  
   if (!validationResult.success) {
@@ -54,12 +55,12 @@ export async function getEmployeeAsync(id: string): Promise<ServiceResult<Employ
   try {  
 
     if (!(await employeeExistsAsync(id))) {  
-      return {success: false, code: 404, error: ['Employee not found']};
+      return {success: false, code: 404, error: [EMPLOYEE_ERRORS.NOT_FOUND]};
     }   
   
     var response = await EmployeeModel.findById(id);  
     if(response == null){  
-      return {success: false, code: 404, error: ['Employee not found']};
+      return {success: false, code: 404, error: [EMPLOYEE_ERRORS.NOT_FOUND]};
     }   
 
     return { success: true, data: toEmployeeResponse(response)};
@@ -80,7 +81,7 @@ export async function addEmployeeAsync(data: EmployeeRequest): Promise<ServiceRe
  
     if(data.departmentId != undefined ) {
       if (!(await departmentExistsAsync(data.departmentId))) {
-        return {success: false, code: 404, error: ['Department not found']};
+        return {success: false, code: 404, error: [DEPARTMENT_ERRORS.NOT_FOUND]};
       }
     } 
 
@@ -104,12 +105,12 @@ export async function updateEmployeeAsync(id: string, data: EmployeeRequest): Pr
  
         if(data.departmentId != undefined ) {
           if (!(await departmentExistsAsync(data.departmentId))) {
-            return {success: false, code: 404, error: ['Department not found']};
+            return {success: false, code: 404, error: [DEPARTMENT_ERRORS.NOT_FOUND]};
           }
         }  
 
         if(!(await employeeExistsAsync(id))) {
-          return {success: false, code: 404, error: ['Employee not found']};
+          return {success: false, code: 404, error: [EMPLOYEE_ERRORS.NOT_FOUND]};
         }
      
         const updatedEmployee = await EmployeeModel.findByIdAndUpdate(
@@ -126,7 +127,7 @@ export async function updateEmployeeAsync(id: string, data: EmployeeRequest): Pr
         );
   
         if (!updatedEmployee) {
-          return { success: false, error: ['Employee not updated'], code: 400 };
+          return { success: false, error: [EMPLOYEE_ERRORS.NOT_UPDATED], code: 400 };
         }
     
         return { success: true, data: toEmployeeResponse(updatedEmployee)}; 
@@ -136,7 +137,7 @@ export async function updateEmployeeAsync(id: string, data: EmployeeRequest): Pr
   }
 }
 
-export async function deleteEmployeeAsync(id: string): Promise<ServiceResult<null>> {
+export async function deleteEmployeeAsyncAsync(id: string): Promise<ServiceResult<null>> {
   
   const validationResult = await validate(idSchema, id);  
   if (!validationResult.success) { 
@@ -146,7 +147,7 @@ export async function deleteEmployeeAsync(id: string): Promise<ServiceResult<nul
   try {  
 
     if (!(await employeeExistsAsync(id))) {  
-      return {success: false, code: 404, error: ['Employee not found']};
+      return {success: false, code: 404, error: [EMPLOYEE_ERRORS.NOT_FOUND]};
     }   
   
     await EmployeeModel.findByIdAndDelete(id);  

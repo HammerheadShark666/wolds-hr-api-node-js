@@ -16,7 +16,7 @@ beforeAll(async () => {
  
 describe("GET /api/v1/departments", () => {
   it("should return 200 and list departments", async () => {
-    const response = await getDepartments();
+    const response = await getDepartmentsAsync();
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBe(true);
 
@@ -98,7 +98,7 @@ function postDepartment(data?: object) {
   return req.send();
 }
  
-function getDepartments() {
+function getDepartmentsAsync() {
 
   if(global.ACCESS_TOKEN == null)
     throw new Error("Access token is missing");

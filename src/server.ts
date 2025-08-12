@@ -4,6 +4,7 @@ import { createApp } from './app';
 import { connectToDatabase } from './db/mongoose';
 import { insertDefaultEmployees } from './db/defaultData/employeeDefaultData';
 import { EmployeeModel } from './models/employee.model';
+import { SERVER } from './utils/constants';
 
 const wrapperApp = express();  
   
@@ -12,9 +13,9 @@ async function startServer() {
 
     dotenv.config();
     
-    const PORT = process.env.PORT || 3000;
+    const PORT = process.env.PORT || SERVER.DEFAULT_PORT;
     const coreApp = await createApp(); 
-    wrapperApp.use('/api', coreApp);    
+    wrapperApp.use(SERVER.API_PATH, coreApp);    
 
     await connectToDatabase();
     console.log('Database connected'); 
