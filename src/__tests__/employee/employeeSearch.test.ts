@@ -153,19 +153,7 @@ function validateEmployeesArray(employees: any[], expectedLength: number) {
     expect(employee).toHaveProperty("email");
     expect(employee).toHaveProperty("phoneNumber");
   }
-}
-
-// function getDepartmentsAsync() {
-
-//   if(global.ACCESS_TOKEN == null)
-//     throw new Error("Access token is missing");
-
-//   let req = request(global.app!)
-//     .get("/v1/departments")
-//       .set("Cookie", [global.ACCESS_TOKEN]);
-
-//   return req;
-// }
+} 
 
 function countEmployeesPerDepartment(employees: EmployeeResponse[]): Record<string, number> {
   const departmentCounts: Record<string, number> = {};

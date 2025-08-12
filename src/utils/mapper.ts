@@ -26,7 +26,7 @@ export function toUserResponse(user: IUser): UserResponse {
 } 
 
 export function toEmployeeResponse(employee: IEmployee): EmployeeResponse {
-  const { _id, surname, firstName, dateOfBirth, hireDate, email, phoneNumber, photo, department } = employee;
+  const { _id, surname, firstName, dateOfBirth, hireDate, email, phoneNumber, photo, department, departmentId } = employee;
   const appEmployee: EmployeeResponse = {
     id: _id.toString(),
     surname: surname, 
@@ -36,6 +36,7 @@ export function toEmployeeResponse(employee: IEmployee): EmployeeResponse {
     email: email,
     phoneNumber: phoneNumber,
     photo: photo,
+    departmentId: departmentId?.toString() ?? '',
     department: {
       id: department?._id.toString() ?? '',
       name: department?.name ?? '',
