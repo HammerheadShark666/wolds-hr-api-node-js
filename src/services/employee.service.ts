@@ -1,5 +1,5 @@
-import { Types } from 'mongoose'; 
-import { EmployeeModel } from '../models/employee.model';
+import { Types, PipelineStage } from 'mongoose'; 
+import { EmployeeModel, IEmployee } from '../models/employee.model';
 import { EmployeeSearchResponse, EmployeeSearchRequest, EmployeeSearchPagedResponse, EmployeeRequest, EmployeeResponse } from '../interface/employee';
 import { toEmployeeResponse } from '../utils/mapper'; 
 import { validate } from '../validation/validate';
@@ -10,10 +10,8 @@ import { addEmployeeSchema } from '../validation/employee/addEmployee.schema';
 import { departmentExistsAsync } from './department.service'; 
 import { updateEmployeeSchema } from '../validation/employee/updateEmployee.schema';
 import { idSchema } from '../validation/fields/id.schema';
-import { DEPARTMENT_ERRORS, EMPLOYEE_ERRORS } from '../utils/constants';
-
-const PAGE_SIZE = 5;
-
+import { DEPARTMENT_ERRORS, EMPLOYEE_ERRORS, PAGE_SIZE } from '../utils/constants'; 
+ 
 //Service export functions
 
 export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): Promise<ServiceResult<EmployeeSearchPagedResponse>> {
@@ -45,7 +43,7 @@ export async function searchEmployeesPagedAsync(query: EmployeeSearchRequest): P
   }}; 
 } 
 
-export async function getEmployeeAsyncAsync(id: string): Promise<ServiceResult<EmployeeResponse>> {
+export async function getEmployeeAsync(id: string): Promise<ServiceResult<EmployeeResponse>> {
   
   const validationResult = await validate(idSchema, id);  
   if (!validationResult.success) {
@@ -57,13 +55,16 @@ export async function getEmployeeAsyncAsync(id: string): Promise<ServiceResult<E
     if (!(await employeeExistsAsync(id))) {  
       return {success: false, code: 404, error: [EMPLOYEE_ERRORS.NOT_FOUND]};
     }   
-  
-    var response = await EmployeeModel.findById(id);  
+    
+    const response = await EmployeeModel.aggregate<IEmployee>(
+      getEmployeeWithDepartmentPipeline(id)
+    );
+
     if(response == null){  
       return {success: false, code: 404, error: [EMPLOYEE_ERRORS.NOT_FOUND]};
     }   
 
-    return { success: true, data: toEmployeeResponse(response)};
+    return { success: true, data: toEmployeeResponse(response[0])};
   } 
   catch (err: unknown) { 
     return handleServiceError(err);
@@ -85,9 +86,14 @@ export async function addEmployeeAsync(data: EmployeeRequest): Promise<ServiceRe
       }
     } 
 
-    const employee = new EmployeeModel(data);
-    const saved = await employee.save();   
-    return { success: true, data: toEmployeeResponse(saved) };
+    const newEmployee = new EmployeeModel(data);
+    const saved = await newEmployee.save();   
+
+    const savedEmployee = await getEmployeeAsync(saved.id);   
+    if(!savedEmployee.success)
+      return {success: false, code: 404, error: [EMPLOYEE_ERRORS.NOT_FOUND]};
+
+    return { success: true, data: savedEmployee.data};   
   } 
   catch (err: unknown) {  
     return handleServiceError(err); 
@@ -103,34 +109,38 @@ export async function updateEmployeeAsync(id: string, data: EmployeeRequest): Pr
   
   try {  
  
-        if(data.departmentId != undefined ) {
-          if (!(await departmentExistsAsync(data.departmentId))) {
-            return {success: false, code: 404, error: [DEPARTMENT_ERRORS.NOT_FOUND]};
-          }
-        }  
+    if(!(await employeeExistsAsync(id))) {
+      return {success: false, code: 404, error: [EMPLOYEE_ERRORS.NOT_FOUND]};
+    }
 
-        if(!(await employeeExistsAsync(id))) {
-          return {success: false, code: 404, error: [EMPLOYEE_ERRORS.NOT_FOUND]};
-        }
-     
-        const updatedEmployee = await EmployeeModel.findByIdAndUpdate(
-          id,
-          { $set: { surname: data.surname, 
-              firstName: data.firstName,
-              dateOfBirth: data.dateOfBirth,
-              hireDate: data.hireDate,
-              email: data.email,
-              phoneNumber: data.phoneNumber,
-              departmentId: data.departmentId
-           } },
-          { new: true }
-        );
+    if(data.departmentId != undefined ) {
+      if (!(await departmentExistsAsync(data.departmentId))) {
+        return {success: false, code: 404, error: [DEPARTMENT_ERRORS.NOT_FOUND]};
+      }
+    }   
   
-        if (!updatedEmployee) {
-          return { success: false, error: [EMPLOYEE_ERRORS.NOT_UPDATED], code: 400 };
-        }
-    
-        return { success: true, data: toEmployeeResponse(updatedEmployee)}; 
+    let updated = await EmployeeModel.findByIdAndUpdate(
+      id,
+      { $set: { surname: data.surname, 
+          firstName: data.firstName,
+          dateOfBirth: data.dateOfBirth,
+          hireDate: data.hireDate,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          departmentId: data.departmentId
+        } },
+      { new: true }
+    );
+
+    if (!updated) {
+      return { success: false, error: [EMPLOYEE_ERRORS.NOT_UPDATED], code: 400 };
+    } 
+
+    const updatedEmployee = await getEmployeeAsync(updated.id);   
+    if(!updatedEmployee.success)
+      return {success: false, code: 404, error: [EMPLOYEE_ERRORS.NOT_FOUND]};
+
+    return { success: true, data: updatedEmployee.data};  
   } 
   catch (err: unknown) {  
     return handleServiceError(err); 
@@ -252,6 +262,51 @@ function buildEmployeeSearchPipeline(query: EmployeeSearchRequest): any[] {
   return pipeline;
 }
   
+export function getEmployeeWithDepartmentPipeline(
+  employeeId: string | Types.ObjectId
+): PipelineStage[] {
+  return [
+    {
+      $match: {
+        _id: typeof employeeId === "string" ? new Types.ObjectId(employeeId) : employeeId
+      }
+    },
+    {
+      $lookup: {
+        from: "departments",
+        localField: "departmentId",
+        foreignField: "_id",
+        as: "department"
+      }
+    },
+    {
+      $unwind: {
+        path: "$department",
+        preserveNullAndEmptyArrays: true
+      }
+    },
+    {
+      $project: {
+        _id: 1,
+        surname: 1,
+        firstName: 1,
+        dateOfBirth: 1,
+        hireDate: 1,
+        email: 1,
+        phoneNumber: 1,
+        photo: 1,
+        departmentId: 1,
+        employeeImportId: 1,
+        createdAt: 1,
+        department: {
+          _id: "$department._id",
+          name: "$department.name"
+        }
+      }
+    }
+  ];
+}
+   
 //Service Validation 
 
 function validatePagination(page: number, pageSize: number): [number, number]{
