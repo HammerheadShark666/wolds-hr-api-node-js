@@ -1,27 +1,27 @@
-import request from "supertest"; 
 import { EmployeeResponse } from "../../interface/employee";
+import { PAGE_SIZE } from "../../utils/constants";
 import { expectError } from "../../utils/error.helper";
+import { getDepartmentsAsync, getSearchEmployeesAsync } from "./helpers/request.helper"; 
 
 const KEYWORD = 'john';
-const PAGE_SIZE = 5;
 const ALL_EMPLOYEES_PAGE_SIZE = 120;
 let searchResultsTotal = 0;
 let totalPages = 0;
 
 describe("GET /api/v1/employees (ignore department)", () => {
   beforeAll(async () => {
-    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: '', page: 1, pageSize: PAGE_SIZE });
+    const response = await getSearchEmployeesAsync({ keyword: KEYWORD, departmentId: '', page: 1, pageSize: PAGE_SIZE });
     searchResultsTotal = response.body.totalEmployees;
     totalPages = Math.ceil(searchResultsTotal / PAGE_SIZE);
   });
 
   it("should return 400 and message when no criteria entered", async () => {
-    const response = await getSearchEmployees({ keyword: '', departmentId: '',page: 1, pageSize: PAGE_SIZE });    
+    const response = await getSearchEmployeesAsync({ keyword: '', departmentId: '',page: 1, pageSize: PAGE_SIZE });    
     expectError(response, 'Either keyword and/or department must be provided', 400);
   }); 
 
   it("should return 200 and first page of search results when first page is requested", async () => {
-    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: '',page: 1, pageSize: PAGE_SIZE });
+    const response = await getSearchEmployeesAsync({ keyword: KEYWORD, departmentId: '',page: 1, pageSize: PAGE_SIZE });
 
     const expectedCount = Math.min(PAGE_SIZE, searchResultsTotal);
 
@@ -34,7 +34,7 @@ describe("GET /api/v1/employees (ignore department)", () => {
     const lastPage = Math.max(1, totalPages);
     const lastPageCount = searchResultsTotal % PAGE_SIZE || (searchResultsTotal === 0 ? 0 : PAGE_SIZE);
 
-    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: '',page: lastPage, pageSize: PAGE_SIZE }); 
+    const response = await getSearchEmployeesAsync({ keyword: KEYWORD, departmentId: '',page: lastPage, pageSize: PAGE_SIZE }); 
 
     expect(response.status).toBe(200);
     validatePaginationMeta(response.body, lastPage, totalPages, PAGE_SIZE);
@@ -42,7 +42,7 @@ describe("GET /api/v1/employees (ignore department)", () => {
   });
 
    it("should return 200 and first page of search results when page is zero", async () => {
-    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: '',page: 0, pageSize: PAGE_SIZE });
+    const response = await getSearchEmployeesAsync({ keyword: KEYWORD, departmentId: '',page: 0, pageSize: PAGE_SIZE });
 
     const expectedCount = Math.min(PAGE_SIZE, searchResultsTotal);
 
@@ -58,14 +58,14 @@ describe("GET /api/v1/employees (include department)", () => {
   let departmentName = '';
 
   beforeAll(async () => { 
-    const response = await getDepartments();
+    const response = await getDepartmentsAsync();
     const departments = response.body; 
     departmentId = departments[0].id;
     departmentName = departments[0].name; 
   });
 
   it("should return 200 and all employees should have same department and keyword in surname", async () => {
-    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: departmentId, page: 1, pageSize: PAGE_SIZE });
+    const response = await getSearchEmployeesAsync({ keyword: KEYWORD, departmentId: departmentId, page: 1, pageSize: PAGE_SIZE });
  
     searchResultsTotal = response.body.totalEmployees;
     totalPages = Math.ceil(searchResultsTotal / PAGE_SIZE);
@@ -89,7 +89,7 @@ describe("GET /api/v1/employees (include department)", () => {
 
   it("should return 200 and  all employees should have same department, surnames should include keyword and non keyword names", async () => { 
 
-    const response = await getSearchEmployees({ keyword: '', departmentId: departmentId, page: 1, pageSize: ALL_EMPLOYEES_PAGE_SIZE });
+    const response = await getSearchEmployeesAsync({ keyword: '', departmentId: departmentId, page: 1, pageSize: ALL_EMPLOYEES_PAGE_SIZE });
     searchResultsTotal = response.body.totalEmployees;
     totalPages = Math.ceil(searchResultsTotal / ALL_EMPLOYEES_PAGE_SIZE); 
 
@@ -114,7 +114,7 @@ describe("GET /api/v1/employees (include department)", () => {
 
  it("should return 200 and  all employees should include different departments", async () => { 
 
-    const response = await getSearchEmployees({ keyword: KEYWORD, departmentId: '', page: 1, pageSize: ALL_EMPLOYEES_PAGE_SIZE });
+    const response = await getSearchEmployeesAsync({ keyword: KEYWORD, departmentId: '', page: 1, pageSize: ALL_EMPLOYEES_PAGE_SIZE });
     searchResultsTotal = response.body.totalEmployees;
     totalPages = Math.ceil(searchResultsTotal / ALL_EMPLOYEES_PAGE_SIZE); 
 
@@ -131,24 +131,7 @@ describe("GET /api/v1/employees (include department)", () => {
     expect(employees.length).toEqual(totalEmployees);
   });
 });
-
-//Api functions 
-
-function getSearchEmployees(params?: { keyword:string, departmentId: string, page: number, pageSize: number }) {
-  
-  const keyword = params?.keyword ?? '';
-  const departmentId = params?.departmentId ?? '';
-  const page = params?.page ?? 1;
-  const pageSize = params?.pageSize ?? PAGE_SIZE; 
-
-  if (!global.ACCESS_TOKEN)
-    throw new Error("Access token is missing");
-
-  return request(global.app!)
-    .get(`/v1/employees/search?keyword=${keyword}&departmentId=${departmentId}&page=${page}&pageSize=${pageSize}`)
-    .set("Cookie", [global.ACCESS_TOKEN]);
-}
-
+ 
 // Helpers
 
 function validatePaginationMeta(body: any, page: number, totalPages: number, pageSize: number) {
@@ -172,17 +155,17 @@ function validateEmployeesArray(employees: any[], expectedLength: number) {
   }
 }
 
-function getDepartments() {
+// function getDepartmentsAsync() {
 
-  if(global.ACCESS_TOKEN == null)
-    throw new Error("Access token is missing");
+//   if(global.ACCESS_TOKEN == null)
+//     throw new Error("Access token is missing");
 
-  let req = request(global.app!)
-    .get("/v1/departments")
-      .set("Cookie", [global.ACCESS_TOKEN]);
+//   let req = request(global.app!)
+//     .get("/v1/departments")
+//       .set("Cookie", [global.ACCESS_TOKEN]);
 
-  return req;
-}
+//   return req;
+// }
 
 function countEmployeesPerDepartment(employees: EmployeeResponse[]): Record<string, number> {
   const departmentCounts: Record<string, number> = {};

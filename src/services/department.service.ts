@@ -1,6 +1,7 @@
 import { AddDepartmentRequest, DepartmentResponse, UpdatedDepartmentResponse, UpdateDepartmentRequest } from '../interface/department';
 import { DepartmentModel, IDepartment } from '../models/department.model';
 import { ServiceResult } from '../types/ServiceResult';
+import { DEPARTMENT_ERRORS } from '../utils/constants';
 import { handleServiceError } from '../utils/error.helper';
 import { toDepartmentResponse } from '../utils/mapper'; 
 import { addDepartmentSchema } from '../validation/department/addDepartment.schema';
@@ -11,7 +12,7 @@ import { validate } from '../validation/validate';
 
 //Service export functions
 
-export async function getDepartmentsAsync(): Promise<ServiceResult<IDepartment[]>> {
+export async function getDepartmentsAsyncAsync(): Promise<ServiceResult<IDepartment[]>> {
   try { 
     const departments = await DepartmentModel.find().exec(); 
     return { success: true, data: departments };
@@ -31,7 +32,7 @@ export async function getDepartmentByIdAsync(id: string): Promise<ServiceResult<
  
     const department = await DepartmentModel.findById(id).exec();
     if (!department) {
-      return { success: false, error: ['Department not found'], code: 404 };
+      return { success: false, error: [DEPARTMENT_ERRORS.NOT_FOUND], code: 404 };
     } 
 
     return { success: true, data: department };
@@ -51,7 +52,7 @@ export async function addDepartmentAsync(data: AddDepartmentRequest): Promise<Se
   try {
 
     if ((await departmentNameExistsAsync(data.name))) {
-      return {success: false, code: 400, error: ['Department name exists already']};
+      return {success: false, code: 400, error: [DEPARTMENT_ERRORS.NAME_EXISTS]};
     }   
 
     const department = new DepartmentModel(data);
@@ -74,7 +75,7 @@ export async function updateDepartmentAsync(data: UpdateDepartmentRequest): Prom
  
     const existingDepartment = await DepartmentModel.findOne({ name: data.name }); 
     if (existingDepartment && existingDepartment.id !== data.id) {
-      return {success: false, code: 404, error: ['Department name exists already']};
+      return {success: false, code: 404, error: [DEPARTMENT_ERRORS.NAME_EXISTS]};
     }
  
     const updatedDepartment = await DepartmentModel.findByIdAndUpdate(
@@ -84,7 +85,7 @@ export async function updateDepartmentAsync(data: UpdateDepartmentRequest): Prom
     );
 
     if (!updatedDepartment) {
-      return { success: false, error: ['Department not found'], code: 400 };
+      return { success: false, error: [DEPARTMENT_ERRORS.NOT_FOUND], code: 400 };
     }
 
     const updatedDepartmentResponse: UpdatedDepartmentResponse = { message: "Department updated successfully", departmentId: updatedDepartment.id }; 
@@ -105,7 +106,7 @@ export async function deleteDepartmentAsync(id: string): Promise<ServiceResult<I
   try {
    
     if (!(await departmentExistsAsync(id))) { 
-      return {success: false, code: 404, error: ['Department not found']};
+      return {success: false, code: 404, error: [DEPARTMENT_ERRORS.NOT_FOUND]};
     }   
 
     await DepartmentModel.findByIdAndDelete(id);

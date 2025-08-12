@@ -6,6 +6,7 @@ import { removeTokenFromUserAsync } from "./refreshToken.service";
 import { loginSchema } from "../validation/login/login.schema";
 import { handleServiceError } from "../utils/error.helper";
 import { validate } from "../validation/validate";
+import { AUTHENTICATION_ERRORS } from "../utils/constants";
 
 //Service export functions
 
@@ -48,12 +49,12 @@ async function validateUserCredentials(username: string, password: string): Prom
 
   const user = await UserModel.findOne({ username });
   if (!user) {
-    return { success: false, error: ['Invalid login'] };
+    return { success: false, error: [AUTHENTICATION_ERRORS.INVALID_LOGIN] };
   }
 
   const isValid = await verifyPassword(password, user.password);
   if (!isValid) {
-    return { success: false, error: ['Invalid login'] };
+    return { success: false, error: [AUTHENTICATION_ERRORS.INVALID_LOGIN] };
   }
 
   return { success: true, data: user };

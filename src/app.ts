@@ -10,7 +10,8 @@ import { validateAccessToken } from './middleware/accessToken';
 import {configureCors} from './utils/configureCors';
 import { createAuthenticateRouter } from './routes/authenticate.routes';
 import { createEmployeesRouter } from './routes/employee.routes'; 
-import { createEmployeePhotoRouter } from './routes/employeePhoto.routes';
+import { createEmployeePhotoRouter } from './routes/employeePhoto.routes'; 
+import { SERVER } from './utils/constants';
 
 export async function createApp() {
 
@@ -33,12 +34,12 @@ export async function createApp() {
     v1Router.use('/employees/photo', createEmployeePhotoRouter());
     v1Router.use('/users', createUsersRouter());
   
-    app.use('/v1', v1Router);
+    app.use(SERVER.VERSION, v1Router);
     app.use(errorHandler);
 
     app.use((err: any, req: any, res: any, next: any) => {
       console.error(err);
-      res.status(500).json({ error: 'Something went wrong' });
+      res.status(500).json({ error: 'An unexpected error has occurred' });
     });
     
     // console.log('--- Listing all endpoints: ---');

@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-import cors from 'cors'; 
+import cors from 'cors';
+import { CORS } from './constants';
 
 export function configureCors() {
 
@@ -19,7 +20,7 @@ export function configureCors() {
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
-        return callback(new Error("Not allowed by CORS"));
+        return callback(new Error(CORS.NOT_ALLOWED));
       }
     },
     credentials: true,
