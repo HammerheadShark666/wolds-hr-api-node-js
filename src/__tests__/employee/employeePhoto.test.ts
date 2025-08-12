@@ -3,6 +3,7 @@ import request from 'supertest';
 import { expectError } from "../../utils/error.helper";
 import { deleteEmployeeAsync, postEmployeeAsync, postEmployeePhotoAsync } from "./helpers/request.helper";
 import { createEmployee } from "./helpers/db.helper";
+import { UUID_REGEX } from "./helpers/constants";
 
 let employeeId = ""; 
 
@@ -16,9 +17,7 @@ afterAll(async () => {
   const res = await deleteEmployeeAsync(employeeId);
   expect(res.status).toBe(200);
   expect(res.body.message).toMatch('Employee deleted');
-});
-
-const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i; 
+}); 
 
 describe('Employee Photo Upload (In-Memory)', () => {
   
@@ -35,7 +34,7 @@ describe('Employee Photo Upload (In-Memory)', () => {
     const [name, ext] = response.body.filename.split('.');
 
     expect(ext).toBe('jpg');
-    expect(uuidRegex.test(name)).toBe(true);
+    expect(UUID_REGEX.test(name)).toBe(true);
     expect(response.body.id).toBe(employeeId);
 
   });
