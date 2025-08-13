@@ -29,7 +29,7 @@ export async function createApp() {
     v1Router.use('', createLoginRouter());
     v1Router.use('', createRefreshTokenRouter());
     v1Router.use('', createAuthenticateRouter());  
-    v1Router.use(validateAccessToken);
+   // v1Router.use(validateAccessToken);
     v1Router.use('/departments', createDepartmentRouter());
     v1Router.use('/employees', createEmployeesRouter());
     v1Router.use('/employees/photo', createEmployeePhotoRouter());
