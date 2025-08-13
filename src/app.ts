@@ -21,6 +21,8 @@ export async function createApp() {
   {  
     const v1Router = express.Router();  
 
+    console.log("NODE_ENV =", process.env.NODE_ENV);
+
     app.use(configureCors());
     app.options('*', configureCors());
     app.use(cookieParser()); 
