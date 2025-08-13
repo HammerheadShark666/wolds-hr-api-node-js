@@ -33,8 +33,10 @@ export function setRefreshTokenCookie(res: Response, refreshToken: string): void
 
   res.cookie(COOKIES.REFRESH_TOKEN, refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
-    sameSite: process.env.NODE_ENV === GLOBAL.PRODUCTION ? GLOBAL.NONE : GLOBAL.LAX,
+    // secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
+    // sameSite: process.env.NODE_ENV === GLOBAL.PRODUCTION ? GLOBAL.NONE : GLOBAL.LAX,
+    secure: true,
+    sameSite : 'none',
     path: '/',
   });
 }
@@ -44,8 +46,10 @@ export function setAccessTokenCookie(res: Response, accessToken: string): void {
   console.log("NODE_ENV  (ACT) =", process.env.NODE_ENV);
   res.cookie(COOKIES.ACCESS_TOKEN, accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
-    sameSite: process.env.NODE_ENV === GLOBAL.PRODUCTION ? GLOBAL.NONE : GLOBAL.LAX,
+    secure: true,
+    sameSite : 'none'
+    // secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
+    // sameSite: process.env.NODE_ENV === GLOBAL.PRODUCTION ? GLOBAL.NONE : GLOBAL.LAX,
     path: '/',
   });
 }
