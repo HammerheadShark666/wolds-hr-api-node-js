@@ -22,14 +22,14 @@ export async function createApp() {
     const v1Router = express.Router();  
 
     app.use(configureCors());
-    //app.options('*', configureCors());
+    app.options('*', configureCors());
     app.use(cookieParser()); 
     app.use(express.json());   
 
     v1Router.use('', createLoginRouter());
     v1Router.use('', createRefreshTokenRouter());
     v1Router.use('', createAuthenticateRouter());  
-   // v1Router.use(validateAccessToken);
+    v1Router.use(validateAccessToken);
     v1Router.use('/departments', createDepartmentRouter());
     v1Router.use('/employees', createEmployeesRouter());
     v1Router.use('/employees/photo', createEmployeePhotoRouter());
