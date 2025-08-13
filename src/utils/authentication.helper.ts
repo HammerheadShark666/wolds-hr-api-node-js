@@ -28,6 +28,9 @@ export function getRefreshTokenSecret(): string {
 }
 
 export function setRefreshTokenCookie(res: Response, refreshToken: string): void {
+
+  console.log("NODE_ENV (RFT) =", process.env.NODE_ENV);
+
   res.cookie(COOKIES.REFRESH_TOKEN, refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
@@ -37,6 +40,8 @@ export function setRefreshTokenCookie(res: Response, refreshToken: string): void
 }
 
 export function setAccessTokenCookie(res: Response, accessToken: string): void {
+
+  console.log("NODE_ENV  (ACT) =", process.env.NODE_ENV);
   res.cookie(COOKIES.ACCESS_TOKEN, accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
