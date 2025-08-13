@@ -1,9 +1,8 @@
-import dotenv from 'dotenv';
 import cors from 'cors';
+import dotenv from 'dotenv';
 import { CORS } from './constants';
 
 export function configureCors() {
-
   dotenv.config();
 
   const allowedOrigins = [
@@ -11,18 +10,25 @@ export function configureCors() {
     process.env.LOCAL_FRONT_APP_END_URL,
   ];
 
-  console.log("CORS allowed origins:", allowedOrigins);
+  const normalizedOrigins = allowedOrigins.map(o =>
+    o?.toLowerCase().replace(/\/$/, '')
+  );
+
+  console.log('CORS allowed origins:', normalizedOrigins);
 
   return cors({
-    origin: function (origin, callback) { 
-      if (!origin) return callback(null, true);
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // allow curl / server-to-server
 
-      if (allowedOrigins.includes(origin)) {
+      const normalizedOrigin = origin.toLowerCase().replace(/\/$/, '');
+      if (normalizedOrigins.includes(normalizedOrigin)) {
         return callback(null, true);
-      } else {
-        return callback(new Error(CORS.NOT_ALLOWED));
       }
+      return callback(new Error(CORS.NOT_ALLOWED));
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 204
   });
 }
