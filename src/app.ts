@@ -24,15 +24,15 @@ export async function createApp() {
     app.use(configureCors());
     app.options('*', configureCors());
     app.use(cookieParser()); 
-    app.use(express.json());   
+    app.use(express.json());    
 
-    app.use("/v1", (req, res, next) => {
-      if (req.method === "OPTIONS") {
-        // Respond with 200 to allow the browser to proceed
-        return res.sendStatus(200);
-      }
-      next();
-    });
+    // app.use("/v1", (req, res, next) => {
+    //   if (req.method === "OPTIONS") {
+    //     // Respond with 200 to allow the browser to proceed
+    //     return res.sendStatus(200);
+    //   }
+    //   next();
+    // });
 
     v1Router.use('', createLoginRouter());
     v1Router.use('', createRefreshTokenRouter());

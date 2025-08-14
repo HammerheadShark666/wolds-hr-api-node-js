@@ -15,6 +15,12 @@ async function startServer() {
     
     const PORT = process.env.PORT || SERVER.DEFAULT_PORT;
     const coreApp = await createApp(); 
+
+    wrapperApp.use("/api", (req, res, next) => {
+      if (req.method === "OPTIONS") return res.sendStatus(200);
+      next();
+    });
+
     wrapperApp.use(SERVER.API_PATH, coreApp);    
 
     await connectToDatabase();
