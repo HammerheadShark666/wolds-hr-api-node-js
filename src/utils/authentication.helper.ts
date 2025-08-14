@@ -29,22 +29,18 @@ export function getRefreshTokenSecret(): string {
 
 export function setRefreshTokenCookie(res: Response, refreshToken: string): void {
   res.cookie(COOKIES.REFRESH_TOKEN, refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',    
-    //secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
-    //sameSite: process.env.NODE_ENV === GLOBAL.PRODUCTION ? GLOBAL.NONE : GLOBAL.LAX,
+    httpOnly: true,    
+    secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
+    sameSite: process.env.NODE_ENV === GLOBAL.PRODUCTION ? GLOBAL.NONE : GLOBAL.LAX,
     path: '/',
   });
 }
 
 export function setAccessTokenCookie(res: Response, accessToken: string): void {
   res.cookie(COOKIES.ACCESS_TOKEN, accessToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',    
-    //secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
-    //sameSite: process.env.NODE_ENV === GLOBAL.PRODUCTION ? GLOBAL.NONE : GLOBAL.LAX,
+    httpOnly: true,   
+    secure: process.env.NODE_ENV === GLOBAL.PRODUCTION,
+    sameSite: process.env.NODE_ENV === GLOBAL.PRODUCTION ? GLOBAL.NONE : GLOBAL.LAX,
     path: '/',
   });
 }
