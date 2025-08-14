@@ -26,7 +26,7 @@ export async function createApp() {
     app.use(cookieParser()); 
     app.use(express.json());   
 
-    app.use("/api/v1", (req, res, next) => {
+    app.use("/v1", (req, res, next) => {
       if (req.method === "OPTIONS") {
         // Respond with 200 to allow the browser to proceed
         return res.sendStatus(200);
