@@ -28,23 +28,34 @@ import { CORS } from './constants';
 //   });
 // }
 
-export function configureCors() {
-  // const allowedOrigins = [
-  //   process.env.HOSTED_FRONT_APP_END_URL,
-  //   process.env.LOCAL_FRONT_APP_END_URL
-  // ];
+// export function configureCors() {
+//   // const allowedOrigins = [
+//   //   process.env.HOSTED_FRONT_APP_END_URL,
+//   //   process.env.LOCAL_FRONT_APP_END_URL
+//   // ];
 
-  const allowedOrigins = [
-  "https://calm-wave-04d3d5f03.1.azurestaticapps.net", // your hosted frontend
-  "http://localhost:3000"                                 // local development
-];
+//   const allowedOrigins = [
+//   "https://calm-wave-04d3d5f03.1.azurestaticapps.net", // your hosted frontend
+//   "http://localhost:3000"                                 // local development
+// ];
 
-  return cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error("CORS Not Allowed"));
-    },
-    credentials: true
-  });
-}
+//   return cors({
+//     origin: (origin, callback) => {
+//       if (!origin) return callback(null, true);
+//       if (allowedOrigins.includes(origin)) return callback(null, true);
+//       return callback(new Error("CORS Not Allowed"));
+//     },
+//     credentials: true
+//   });
+// }
+
+
+app.use(cors({
+  origin: [
+    "https://calm-wave-04d3d5f03.1.azurestaticapps.net", // your hosted frontend
+  "http://localhost:3000"        
+  ],
+  methods: "GET,POST,PUT,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization",
+  credentials: true
+}));

@@ -25,11 +25,8 @@ export async function createApp() {
     app.use(configureCors());
 
     // --- OPTIONS / Preflight handler for all /api/* ---
-    app.options("/*", (req, res) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    req.headers.origin || "*" // must match frontend if credentials=true
-  );
+   app.options("/*", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET,POST,PUT,DELETE,OPTIONS"
@@ -39,7 +36,7 @@ export async function createApp() {
     "Content-Type,Authorization"
   );
   res.setHeader("Access-Control-Allow-Credentials", "true");
-  return res.sendStatus(200);
+  res.sendStatus(200);
 });
 
     // app.use(configureCors());
