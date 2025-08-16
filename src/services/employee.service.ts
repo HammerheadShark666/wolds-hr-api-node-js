@@ -260,15 +260,17 @@ function buildEmployeeSearchPipeline(query: EmployeeSearchRequest): any[] {
   );
 
   return pipeline;
-}
-  
+} 
+
 export function getEmployeeWithDepartmentPipeline(
   employeeId: string | Types.ObjectId
 ): PipelineStage[] {
   return [
     {
       $match: {
-        _id: typeof employeeId === "string" ? new Types.ObjectId(employeeId) : employeeId
+        _id: typeof employeeId === "string"
+          ? new Types.ObjectId(employeeId)
+          : employeeId
       }
     },
     {
@@ -277,12 +279,6 @@ export function getEmployeeWithDepartmentPipeline(
         localField: "departmentId",
         foreignField: "_id",
         as: "department"
-      }
-    },
-    {
-      $unwind: {
-        path: "$department",
-        preserveNullAndEmptyArrays: true
       }
     },
     {
@@ -299,13 +295,12 @@ export function getEmployeeWithDepartmentPipeline(
         employeeImportId: 1,
         createdAt: 1,
         department: {
-          _id: "$department._id",
-          name: "$department.name"
+          $arrayElemAt: ["$department", 0] // returns null if no department
         }
       }
     }
   ];
-}
+} 
    
 //Service Validation 
 
