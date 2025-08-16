@@ -7,7 +7,7 @@ import { createDepartmentRouter } from './routes/department.routes';
 import { createUsersRouter } from './routes/user.routes';
 import { errorHandler } from './middleware/errorHandler';
 import { validateAccessToken } from './middleware/accessToken';
-import {configureCors} from './utils/configureCors';
+//import {configureCors} from './utils/configureCors';
 import { createAuthenticateRouter } from './routes/authenticate.routes';
 import { createEmployeesRouter } from './routes/employee.routes'; 
 import { createEmployeePhotoRouter } from './routes/employeePhoto.routes'; 
@@ -22,22 +22,33 @@ export async function createApp() {
   {  
     const v1Router = express.Router();  
 
-    app.use(configureCors());
+   // app.use(configureCors());
+
+    app.use(cors({
+      origin: [
+        "https://calm-wave-04d3d5f03.1.azurestaticapps.net", // your hosted frontend
+      "http://localhost:3000"        
+      ],
+      methods: "GET,POST,PUT,DELETE,OPTIONS",
+      allowedHeaders: "Content-Type,Authorization",
+      credentials: true
+    }));
+
 
     // --- OPTIONS / Preflight handler for all /api/* ---
    app.options("/*", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type,Authorization"
-  );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.sendStatus(200);
-});
+    res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,DELETE,OPTIONS"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type,Authorization"
+    );
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.sendStatus(200);
+  });
 
     // app.use(configureCors());
     // app.options('/api/*', configureCors());
