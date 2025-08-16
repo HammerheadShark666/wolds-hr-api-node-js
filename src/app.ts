@@ -22,22 +22,42 @@ export async function createApp() {
   {  
     const v1Router = express.Router();  
 
-    // app.use(configureCors());
-    // app.options('/api/*', configureCors());
+    app.use(configureCors());
 
-    app.use(cors({
-      origin: "https://calm-wave-04d3d5f03.1.azurestaticapps.net",
-      credentials: true,
-    }));
-
-    // Preflight handler for all API routesfore
+    // --- OPTIONS / Preflight handler for all /api/* ---
     app.options("/api/*", (req, res) => {
-      res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
-      res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+      res.setHeader(
+        "Access-Control-Allow-Origin",
+        req.headers.origin || "*" // must match frontend if credentials=true
+      );
+      res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET,POST,PUT,DELETE,OPTIONS"
+      );
+      res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Content-Type,Authorization"
+      );
       res.setHeader("Access-Control-Allow-Credentials", "true");
       return res.sendStatus(200);
     });
+
+    // app.use(configureCors());
+    // app.options('/api/*', configureCors());
+
+    // app.use(cors({
+    //   origin: "https://calm-wave-04d3d5f03.1.azurestaticapps.net",
+    //   credentials: true,
+    // }));
+
+    // // Preflight handler for all API routesfore
+    // app.options("/api/*", (req, res) => {
+    //   res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+    //   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+    //   res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+    //   res.setHeader("Access-Control-Allow-Credentials", "true");
+    //   return res.sendStatus(200);
+    // });
 
     app.use(cookieParser()); 
     app.use(express.json());    
