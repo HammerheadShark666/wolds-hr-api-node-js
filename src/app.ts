@@ -26,6 +26,11 @@ export async function createApp() {
     app.use(cookieParser()); 
     app.use(express.json());    
 
+    app.use((req, res, next) => {
+      console.log(`[${req.method}] ${req.originalUrl}`);
+      next();
+    });
+
     // app.use("/v1", (req, res, next) => {
     //   if (req.method === "OPTIONS") {
     //     // Respond with 200 to allow the browser to proceed
