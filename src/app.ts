@@ -25,22 +25,22 @@ export async function createApp() {
     app.use(configureCors());
 
     // --- OPTIONS / Preflight handler for all /api/* ---
-    app.options("/api/*", (req, res) => {
-      res.setHeader(
-        "Access-Control-Allow-Origin",
-        req.headers.origin || "*" // must match frontend if credentials=true
-      );
-      res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET,POST,PUT,DELETE,OPTIONS"
-      );
-      res.setHeader(
-        "Access-Control-Allow-Headers",
-        "Content-Type,Authorization"
-      );
-      res.setHeader("Access-Control-Allow-Credentials", "true");
-      return res.sendStatus(200);
-    });
+    app.options("/*", (req, res) => {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    req.headers.origin || "*" // must match frontend if credentials=true
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,DELETE,OPTIONS"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type,Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  return res.sendStatus(200);
+});
 
     // app.use(configureCors());
     // app.options('/api/*', configureCors());
