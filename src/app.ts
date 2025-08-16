@@ -51,9 +51,9 @@ export async function createApp() {
       res.status(500).json({ error: 'An unexpected error has occurred' });
     });
     
-    // console.log('--- Listing all endpoints: ---');
-    // console.dir(listEndpoints(app), { depth: null });
-    // console.log('--- End of endpoint list ---'); 
+    console.log('--- Listing all endpoints: ---');
+    console.dir(listEndpoints(app), { depth: null });
+    console.log('--- End of endpoint list ---'); 
 
   } catch (err) {
     console.error('CreateApp error:', err);
