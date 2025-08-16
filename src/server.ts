@@ -13,7 +13,8 @@ async function startServer() {
 
     dotenv.config();
     
-    const PORT = process.env.PORT || SERVER.DEFAULT_PORT;
+    const PORT = parseInt(process.env.PORT || SERVER.DEFAULT_PORT.toString(), 10);
+    //const PORT = process.env.PORT || SERVER.DEFAULT_PORT;
     const coreApp = await createApp(); 
  
     wrapperApp.use(SERVER.API_PATH, coreApp);    
@@ -22,10 +23,11 @@ async function startServer() {
     console.log('Database connected'); 
 
     await insertDefaultEmployeesIfEmpty();
-
-    wrapperApp.listen(PORT, () => {
-      console.log(`Server running at http://localhost:${PORT}/api`);
+ 
+    wrapperApp.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running at http://0.0.0.0:${PORT}/api`);
     });
+ 
   } catch (err) {
     console.error('Failed to connect to database:', err);
     process.exit(1);
