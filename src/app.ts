@@ -30,9 +30,13 @@ export async function createApp() {
       credentials: true,
     }));
 
-    // Preflight handler for all API routes
+    // Preflight handler for all API routesfore
     app.options("/api/*", (req, res) => {
-      res.sendStatus(200);
+      res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type,Authorization");
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+      return res.sendStatus(200);
     });
 
     app.use(cookieParser()); 
