@@ -12,6 +12,7 @@ import { createAuthenticateRouter } from './routes/authenticate.routes';
 import { createEmployeesRouter } from './routes/employee.routes'; 
 import { createEmployeePhotoRouter } from './routes/employeePhoto.routes'; 
 import { SERVER } from './utils/constants';
+import cors from 'cors';
 
 export async function createApp() {
 
@@ -21,8 +22,19 @@ export async function createApp() {
   {  
     const v1Router = express.Router();  
 
-    app.use(configureCors());
-    app.options('/api/*', configureCors());
+    // app.use(configureCors());
+    // app.options('/api/*', configureCors());
+
+    app.use(cors({
+      origin: "https://calm-wave-04d3d5f03.1.azurestaticapps.net",
+      credentials: true,
+    }));
+
+    // Preflight handler for all API routes
+    app.options("/api/*", (req, res) => {
+      res.sendStatus(200);
+    });
+
     app.use(cookieParser()); 
     app.use(express.json());    
 
