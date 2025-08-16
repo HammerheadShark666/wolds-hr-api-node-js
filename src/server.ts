@@ -13,8 +13,7 @@ async function startServer() {
 
     dotenv.config();
     
-    const PORT = parseInt(process.env.PORT || SERVER.DEFAULT_PORT.toString(), 10);
-    //const PORT = process.env.PORT || SERVER.DEFAULT_PORT;
+    const PORT = parseInt(process.env.PORT || SERVER.DEFAULT_PORT.toString(), 10); 
     const coreApp = await createApp(); 
  
     wrapperApp.use(SERVER.API_PATH, coreApp);    
