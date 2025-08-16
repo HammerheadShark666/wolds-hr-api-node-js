@@ -22,7 +22,7 @@ export async function createApp() {
     const v1Router = express.Router();  
 
     app.use(configureCors());
-    app.options('*', configureCors());
+    app.options('/api/*', configureCors());
     app.use(cookieParser()); 
     app.use(express.json());    
 
