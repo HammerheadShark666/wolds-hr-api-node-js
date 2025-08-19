@@ -38,7 +38,8 @@ export const AZURE_STORAGE_ERRORS = {
 
 export const GENERAL_ERRORS = {
   UPLOAD_FAILED: 'Upload failed',
-  NO_FILE_TO_UPLOAD: 'No file to upload'
+  NO_FILE_TO_UPLOAD: 'No file to upload',
+  INVALID_CONTENT_TYPE: 'Invalid content type'
 } as const;
 
 export const GLOBAL = {
@@ -63,5 +64,6 @@ export const SERVER = {
 } as const;
 
 export const FILES = {
-  UPLOAD_PHOTO_FILE_NAME: 'photoFile'
+  UPLOAD_PHOTO_FILE_NAME: 'photoFile',
+  UPLOAD_IMPORT_FILE_NAME: 'importFile'
 } as const;
