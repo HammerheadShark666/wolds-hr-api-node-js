@@ -40,4 +40,12 @@ export interface UserRequest {
 export interface DeletedUserResponse {
   message: string;
   userId: string;
-}
+} 
+
+export interface UserDefaultData {
+  username: string;
+  password: string; 
+  firstName?: string;
+  surname?: string; 
+  role?: string;
+} 

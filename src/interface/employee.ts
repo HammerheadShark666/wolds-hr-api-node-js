@@ -68,3 +68,25 @@ export interface EmployeeImportResponse
   id: Types.ObjectId | null | undefined;
   date?: Date;
 }
+
+export interface EmployeeImportHistoryRequest {
+  employeeImportId: Types.ObjectId;
+  page?: number;
+  pageSize?: number;
+}
+
+export interface EmployeeImportHistoryPagedResponse {
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  totalEmployees: number;
+  employees: EmployeeResponse[];
+  error?: string;
+  success: boolean;
+}
+
+export interface EmployeeImportHistoryResponse {
+  success: boolean;
+  data?: IEmployee[];
+  error?: string;
+}

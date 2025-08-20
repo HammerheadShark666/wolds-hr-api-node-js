@@ -15,4 +15,8 @@ export interface UpdateDepartmentRequest {
 export interface UpdatedDepartmentResponse {
   message: string;
   departmentId: string;
-}
+} 
+
+export interface DepartmentDefaultData { 
+  name: string;
+} 

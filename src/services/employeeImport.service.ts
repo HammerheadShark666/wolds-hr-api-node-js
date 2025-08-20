@@ -50,7 +50,13 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
         await importedEmployeeError.save();   
       }
     }; 
+
+    console.log("a")
+
+    const result = await mongoose.connection.collection("employees").deleteOne({ employeeImport: employeeImport.id });
   
+    console.log("b")
+
     return { success: true, data: {id: employeeImport.id, date: new Date()}}; 
   } 
   catch (err: unknown) {  

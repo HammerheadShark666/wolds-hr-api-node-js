@@ -11,6 +11,7 @@ import { departmentExistsAsync } from './department.service';
 import { updateEmployeeSchema } from '../validation/employee/updateEmployee.schema';
 import { idSchema } from '../validation/fields/id.schema';
 import { DEPARTMENT_ERRORS, EMPLOYEE_ERRORS, PAGE_SIZE } from '../utils/constants'; 
+import { validatePagination } from '../utils/paging.helper';
  
 //Service export functions
 
@@ -304,19 +305,19 @@ export function getEmployeeWithDepartmentPipeline(
    
 //Service Validation 
 
-function validatePagination(page: number, pageSize: number): [number, number]{
+// function validatePagination(page: number, pageSize: number): [number, number]{
  
-  let validPage = Number(page);
-  let validPageSize = Number(pageSize);
+//   let validPage = Number(page);
+//   let validPageSize = Number(pageSize);
  
-  if (Number.isNaN(validPage) || validPage < 1) {
-    validPage = 1;
-  } 
+//   if (Number.isNaN(validPage) || validPage < 1) {
+//     validPage = 1;
+//   } 
 
-  const DEFAULT_PAGE_SIZE = PAGE_SIZE;
-  const MAX_PAGE_SIZE = 150;
-  if (Number.isNaN(validPageSize ) || validPageSize  < 1 || validPageSize > MAX_PAGE_SIZE) {
-    validPageSize  = DEFAULT_PAGE_SIZE;
-  } 
-  return  [validPage, validPageSize];
-}
+//   const DEFAULT_PAGE_SIZE = PAGE_SIZE;
+//   const MAX_PAGE_SIZE = 150;
+//   if (Number.isNaN(validPageSize ) || validPageSize  < 1 || validPageSize > MAX_PAGE_SIZE) {
+//     validPageSize  = DEFAULT_PAGE_SIZE;
+//   } 
+//   return  [validPage, validPageSize];
+// }

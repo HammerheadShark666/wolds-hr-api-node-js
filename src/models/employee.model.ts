@@ -31,4 +31,6 @@ const EmployeeSchema = new Schema<IEmployee>({
   createdAt: { type: Date, default: Date.now }
 });
 
+EmployeeSchema.index({ employeeImportId: 1 });
+
 export const EmployeeModel = model<IEmployee>('Employee', EmployeeSchema);

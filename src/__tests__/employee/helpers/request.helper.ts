@@ -53,18 +53,7 @@ export async function postEmployeePhotoAsync(filePath: string, id: string) {
         .post(`/v1/employees/photo/upload/${id}`)
           .set("Cookie", [global.ACCESS_TOKEN])
           .attach('photoFile', filePath); 
-}
-
-export async function postImportEmployeeAsync(filePath: string) {
- 
-  if(global.ACCESS_TOKEN == null)
-    throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING); 
-
-  return request(global.app!)
-        .post(`/v1/employees/import`)
-          .set("Cookie", [global.ACCESS_TOKEN])
-          .attach('importFile', filePath); 
-}
+} 
 
 export async function getSearchEmployeesAsync(params?: { keyword:string, departmentId: string, page: number, pageSize: number }) {
   

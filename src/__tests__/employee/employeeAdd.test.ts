@@ -2,7 +2,12 @@ import { EmployeeRequest, EmployeeResponse } from '../../interface/employee';
 import { expectError } from '../../utils/error.helper';
 import { expectEmployee } from './helpers/expected.helper';
 import { deleteEmployeeAsync, postEmployeeAsync } from './helpers/request.helper';
-import { EMPLOYEE_DEPARTMENT_ID, EMPLOYEE_DOB, EMPLOYEE_EMAIL, EMPLOYEE_FIRST_NAME, EMPLOYEE_HIRE_DATE, EMPLOYEE_PHONE_NUMBER, EMPLOYEE_SURNAME } from './helpers/constants';
+import { DEPARTMENT_NAME_MARKETING, EMPLOYEE_DOB, EMPLOYEE_EMAIL, EMPLOYEE_FIRST_NAME, EMPLOYEE_HIRE_DATE, EMPLOYEE_PHONE_NUMBER, EMPLOYEE_SURNAME } from './helpers/constants';
+import { getEmployeeDepartmentId } from '../../utils/department.helper';
+import { DepartmentModel } from '../../models/department.model';
+import { constants } from 'buffer';
+import { EmployeeModel } from '../../models/employee.model';
+import mongoose, { Types } from 'mongoose';
 
 let employeeId = '';
 
@@ -16,7 +21,21 @@ const EMPLOYEE_NOT_FOUND_DEPARTMENT_ID = "687783fbb6fc23ad4cdca64f";
 
 describe("POST /api/v1/employees", () => {
 
+
   it("should return 200 when added successfully", async () => {
+
+    console.log('readyState:', mongoose.connection.readyState);
+    const departmentId = await getEmployeeDepartmentId(DEPARTMENT_NAME_MARKETING);
+
+    //const department = await DepartmentModel.findById(departmentId);
+
+    //const employee = await EmployeeModel.findById(new Types.ObjectId("68a60c7ca539263c336db0e6"));
+
+    //console.log("mployee = ", employee);
+
+    //const department = await DepartmentModel.findOne({ name: DEPARTMENT_NAME_MARKETING });
+
+    //const departmentId = department?.id;
      
     const response = await postEmployeeAsync({
       surname: EMPLOYEE_SURNAME,
@@ -25,12 +44,12 @@ describe("POST /api/v1/employees", () => {
       hireDate: EMPLOYEE_HIRE_DATE,
       email: EMPLOYEE_EMAIL,
       phoneNumber: EMPLOYEE_PHONE_NUMBER,
-      departmentId: EMPLOYEE_DEPARTMENT_ID
+      departmentId:departmentId.toString()
     } satisfies EmployeeRequest);
 
     expectEmployee(response.body, { expectedSurname: EMPLOYEE_SURNAME, expectedFirstName: EMPLOYEE_FIRST_NAME, expectedDateOfBirth: EMPLOYEE_DOB, 
                                     expectedHireDate: EMPLOYEE_HIRE_DATE, expectedEmail: EMPLOYEE_EMAIL, 
-                                    expectedPhoneNumber: EMPLOYEE_PHONE_NUMBER, expectedDepartmentId: EMPLOYEE_DEPARTMENT_ID }); 
+                                    expectedPhoneNumber: EMPLOYEE_PHONE_NUMBER, expectedDepartmentId: departmentId.toString() }); 
 
     employeeId = response.body.id; 
   });
