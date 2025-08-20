@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { IEmployee } from "../models/employee.model";
 import { DepartmentResponse } from "./department";
  
@@ -60,4 +61,10 @@ export interface EmployeeResponse {
 export interface UploadEmployeePhotoResponse {
   id: string;
   filename: string;
+}
+ 
+export interface EmployeeImportResponse
+{
+  id: Types.ObjectId | null | undefined;
+  date?: Date;
 }

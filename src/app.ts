@@ -12,6 +12,7 @@ import { createAuthenticateRouter } from './routes/authenticate.routes';
 import { createEmployeesRouter } from './routes/employee.routes'; 
 import { createEmployeePhotoRouter } from './routes/employeePhoto.routes'; 
 import { SERVER } from './utils/constants';
+import { createEmployeeImportsRouter } from './routes/employeeImport.routes';
 
 export async function createApp() {
 
@@ -32,6 +33,7 @@ export async function createApp() {
     v1Router.use('/departments', createDepartmentRouter());
     v1Router.use('/employees', createEmployeesRouter());
     v1Router.use('/employees/photo', createEmployeePhotoRouter());
+    v1Router.use('/employees/import', createEmployeeImportsRouter());
     v1Router.use('/users', createUsersRouter());
   
     app.use(SERVER.VERSION, v1Router);
