@@ -5,6 +5,7 @@ import { DEPARTMENT_ERRORS } from '../utils/constants';
 import { handleServiceError } from '../utils/error.helper';
 import { toDepartmentResponse } from '../utils/mapper'; 
 import { addDepartmentSchema } from '../validation/department/addDepartment.schema';
+import { departmentNameSchema } from '../validation/department/fields/departmentName.schema';
 import { getDepartmentByIdSchema } from '../validation/department/getDepartmentById.schema'; 
 import { updateDepartmentSchema } from '../validation/department/updateDepartment.schema'; 
 import { idSchema } from '../validation/fields/id.schema';
@@ -31,6 +32,27 @@ export async function getDepartmentByIdAsync(id: string): Promise<ServiceResult<
   try {
  
     const department = await DepartmentModel.findById(id).exec();
+    if (!department) {
+      return { success: false, error: [DEPARTMENT_ERRORS.NOT_FOUND], code: 404 };
+    } 
+
+    return { success: true, data: department };
+  } 
+  catch (err: unknown) { 
+    return handleServiceError(err);
+  }
+} 
+
+export async function getDepartmentByNameAsync(name: string): Promise<ServiceResult<IDepartment>> {
+   
+  const validationResult = await validate(departmentNameSchema, name);  
+  if (!validationResult.success) { 
+    return { success: false, code: 400, error: validationResult.error }
+  }    
+
+  try {
+  
+    const department = await DepartmentModel.findOne({ name: name }).exec();
     if (!department) {
       return { success: false, error: [DEPARTMENT_ERRORS.NOT_FOUND], code: 404 };
     } 

@@ -1,36 +1,43 @@
 import path from "path";
-import request from 'supertest';
-import { expectError } from "../../utils/error.helper";  
-import { getEmployeeImportHistoryAsync } from "./helpers/request.helper";
-import { Types } from "mongoose";
+import { deleteImportedEmployees, getEmployeeImportHistoryAsync, postImportEmployeeAsync } from "./helpers/request.helper";
 import { PAGE_SIZE } from "../../utils/constants";
- 
-const ALL_EMPLOYEES_PAGE_SIZE = 120;
+  
 let importedEmpoyeesTotal = 8;
 let totalPages = 2;
+let employeeImportId: string; 
 
-// afterAll(async () => {  
+beforeAll(async () => { 
+  const filePath = path.join(__dirname, '../files', 'employee-imports.csv');
+  
+  if(global.ACCESS_TOKEN == null)
+    throw new Error("Access token is missing"); 
 
-//   console.log("global.employeeImportId = ", global.employeeImportId);
-//   //delete employees imported
-//   //delete employees exisings
-//   //delete employees error
-// }); 
+  const response = await postImportEmployeeAsync(filePath); 
+  expect(response.status).toBe(200);   
+
+  employeeImportId = response.body.id; 
+});
+
+afterAll(async () => {  
+  const res = await deleteImportedEmployees(employeeImportId);
+  expect(res.status).toBe(200);
+}); 
 
 describe('POST employee import history', () => {
   
-  // it('should get 1st page of imported employees successfully', async () => {
+  it('should get 1st page of imported employees successfully', async () => {
  
-  //   if(global.ACCESS_TOKEN == null)
-  //     throw new Error("Access token is missing"); 
+    if(global.ACCESS_TOKEN == null)
+      throw new Error("Access token is missing");   
+   
+    const response = await getEmployeeImportHistoryAsync({ employeeImportId, page: 1, pageSize: PAGE_SIZE}); 
 
-  //   const employeeImportId = new Types.ObjectId('68a5972f51011f6306e65b30');
-  
-  //   const response = await getEmployeeImportHistoryAsync({employeeImportId, page: 1, pageSize: PAGE_SIZE}); 
-  //   expect(response.status).toBe(200);    
-  //   validatePaginationMeta(response.body, 1, totalPages, PAGE_SIZE);
-  //   validateEmployeesArray(response.body.employees, 5);  
-  // });
+    console.log(response.body)
+
+    expect(response.status).toBe(200);    
+    validatePaginationMeta(response.body, 1, totalPages, PAGE_SIZE);
+    validateEmployeesArray(response.body.employees, 5);  
+  });
 
   // it('should get last page of imported employees successfully', async () => {
  
@@ -44,26 +51,8 @@ describe('POST employee import history', () => {
   //   validatePaginationMeta(response.body, 2, totalPages, PAGE_SIZE);
   //   validateEmployeesArray(response.body.employees, 3);  
   // });
-
-
-
-
-  // it('should return 404 if employee not found', async () => {
-
-  //   const filePath = path.join(__dirname, '../files', 'Employee1.jpg');
-
-  //   if(global.ACCESS_TOKEN == null)
-  //     throw new Error("Access token is missing"); 
-
-  //   const response = await request(global.app!)
-  //     .post(`/v1/employees/photo/upload/${EMPLOYEE_NOT_FOUND_ID}`)
-  //       .set("Cookie", [global.ACCESS_TOKEN])
-  //       .attach('photoFile', filePath);
-
-  //   expectError(response, 'Employee not found', 404);
-  // }); 
+ 
 });
-
 
 function validatePaginationMeta(body: any, page: number, totalPages: number, pageSize: number) {
   expect(body).toHaveProperty("totalPages", totalPages);

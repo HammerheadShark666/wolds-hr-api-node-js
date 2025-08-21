@@ -1,4 +1,3 @@
-import mongoose, { Types } from 'mongoose'; 
 import { EmployeeModel } from '../../models/employee.model';
 import { Department } from '../../types/department';
 import { EmployeeDefaultData } from '../../interface/employee';
@@ -7,13 +6,11 @@ import { DepartmentModel } from '../../models/department.model';
 export async function insertDefaultEmployees() {
   try {  
 
-    const departments = await DepartmentModel.find();
-   //await mongoose.model('Department').find().exec();
+    const departments = await DepartmentModel.find(); 
     if (departments.length === 0) { 
       return;
-    } 
+    }  
 
-    
     const employees = getEmployeeAsyncDefaultData(departments); 
     const insertedEmployees = await EmployeeModel.insertMany(employees);
 

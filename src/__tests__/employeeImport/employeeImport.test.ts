@@ -1,36 +1,32 @@
 import path from "path"; 
-import { postImportEmployeeAsync } from "./helpers/request.helper"; 
-import mongoose, { Types } from "mongoose";
-import { EmployeeModel } from "../../models/employee.model";
+import { deleteImportedEmployees, postImportEmployeeAsync } from "./helpers/request.helper";   
 import { ImportedExistingEmployeeModel } from "../../models/importedExistingEmployee..model";
 import { ImportedEmployeeErrorModel } from "../../models/importedEmployeeError.model";
+import request from 'supertest';
+import { AUTHENTICATION_ERRORS } from "../../utils/constants";
+import { Types } from "mongoose"; 
 
-afterAll(async () => {  
-
-  console.log("global.employeeImportId = ", global.employeeImportId);
-  //await deleteImportedEmployees(global.employeeImportId);
-//  await deleteImportExistingEmployees(global.employeeImportId);
-//  await deleteImportEmployeesError(employeeImportId); 
-}, 20000);
+afterAll(async () => {   
+  const res = await deleteImportedEmployees(global.employeeImportId);
+  expect(res.status).toBe(200);
+}); 
 
 describe('Import employees from file', () => {
-  
+   
   it('should import employees successfully', async () => {
-
+  
     const filePath = path.join(__dirname, '../files', 'employee-imports.csv');
 
     if(global.ACCESS_TOKEN == null)
       throw new Error("Access token is missing"); 
-
-    console.log("should import employees successfully")
-  
+ 
     const response = await postImportEmployeeAsync(filePath); 
-    expect(response.status).toBe(200);  
-    
-    console.log("response.body.id = ", response.body.id)
-
-    global.employeeImportId = response.body.id;
+    expect(response.status).toBe(200);   
+ 
+    global.employeeImportId = response.body.id; 
   });
+
+
 
   // it('should return 404 if employee not found', async () => {
 
@@ -49,33 +45,17 @@ describe('Import employees from file', () => {
 });
 
 
-async function deleteImportedEmployees(employeeImportId: Types.ObjectId) {
+// async function deleteImportedEmployees(employeeImportId: Types.ObjectId) {
+//   if(global.ACCESS_TOKEN == null)
+//     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
-
-  //  if (!mongoose.connection.readyState) {
-  //   throw new Error("Database not connected");
-  // }
-
-  console.log("Connection readyState:", mongoose.connection.readyState); 
-
-  console.log("Deleting imported employees");
-
-  console.log("employeeImportId:", employeeImportId);
-console.log("Is ObjectId?", Types.ObjectId.isValid(employeeImportId));
-
- NO CONNECTION
-
-
-  const result = await mongoose.connection.collection('employees').deleteMany({ employeeImportId: employeeImportId });
-
-  //const result = await mongoose.connection.collection("employees").deleteOne({ employeeImportId });
-
-  console.log("Deleted count:", result.deletedCount);
-
-  console.log("Deleting imported employees");
-//  const result = await EmployeeModel.deleteMany({ employeeImportId }).exec();
-//  console.log(`Deleted ${result.deletedCount} imported employees.`);
-}
+//   const req = request(global.app!)
+//     .delete(`/v1/employees/import/history/imported/${employeeImportId}`)            
+//       .set("Cookie", [global.ACCESS_TOKEN])
+//       .set("Content-Type", "application/json");
+    
+//   return req.send();
+// }
 
 async function deleteImportExistingEmployees(employeeImportId: Types.ObjectId) {
   const result = await ImportedExistingEmployeeModel.deleteMany({ employeeImportId });  

@@ -90,3 +90,13 @@ export interface EmployeeImportHistoryResponse {
   data?: IEmployee[];
   error?: string;
 }
+
+export interface DeleteEmployeeImportHistoryRequest {
+  employeeImportId: Types.ObjectId; 
+}
+
+export interface DeleteEmployeeImportHistoryResponse {
+  success: boolean;
+  count?: number;
+  error?: string;
+}

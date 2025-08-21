@@ -6,16 +6,18 @@ import { toEmployeeResponse } from "../utils/mapper";
 import { validatePagination } from "../utils/paging.helper";
 import { EmployeeModel } from "../models/employee.model";
 import { ObjectId } from "mongodb";
-
+import { handleServiceError } from "../utils/error.helper";
+import { objectIdSchema } from "../validation/fields/objectId.schema";
+import { validate } from "../validation/validate";
 
 export async function employeesImportedPagedAsync(query: EmployeeImportHistoryRequest): Promise<ServiceResult<EmployeeImportHistoryPagedResponse>> {
 
   const { employeeImportId } = query;   
   
-    // const validationResult = await validate(employeeSearchSchema, { keyword, departmentId });  
-    // if (!validationResult.success) {
-    //   return { success: false, code: 400, error: validationResult.error }
-    // }   
+    const validationResult = await validate(objectIdSchema, query.employeeImportId );  
+    if (!validationResult.success) {
+      return { success: false, code: 400, error: validationResult.error }
+    }   
   
     let page = Number.isNaN(Number(query.page)) ? 1 : Number(query.page);  
     let pageSize = Number.isNaN(Number(query.pageSize)) ? PAGE_SIZE : Number(query.pageSize);
@@ -37,6 +39,20 @@ export async function employeesImportedPagedAsync(query: EmployeeImportHistoryRe
     }}; 
 }
 
+export async function deleteEmployeeImportedAsync(id: string): Promise<ServiceResult<null>> {
+  
+  try { 
+    const response = await EmployeeModel.deleteMany({ 
+      employeeImportId: new Types.ObjectId(id)
+    });
+    console.log("response ", response)
+    return { success: true, data: null  };
+  } catch (err) { 
+    console.log(err)
+    return handleServiceError(err);
+  }
+}   
+
 async function getImportedEmployeesAsync(query: EmployeeImportHistoryRequest): Promise<EmployeeImportHistoryResponse> {
   try { 
     const pipeline = buildEmployeeSearchPipeline(query);
@@ -56,8 +72,7 @@ async function countImportedEmployeesAsync(employeeImportId: Types.ObjectId): Pr
   } catch (err) { 
     return 0;
   }
-} 
- 
+}  
 
 function buildEmployeeSearchPipeline(query: EmployeeImportHistoryRequest): any[] {
   const pipeline: any[] = [

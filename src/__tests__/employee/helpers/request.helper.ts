@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { EmployeeRequest } from '../../../interface/employee';
-import { AUTHENTICATION_ERRORS, PAGE_SIZE } from '../../../utils/constants';
+import { AUTHENTICATION_ERRORS, PAGE_SIZE } from '../../../utils/constants'; 
 
 export async function postEmployeeAsync(data?: EmployeeRequest) {
  
@@ -84,16 +84,4 @@ export async function putEmployeeAsync(id?: string, data?: EmployeeRequest) {
     return req.send(data);
   }
   return req.send();
-}
-
-export async function getDepartmentsAsync() {
-
-  if(global.ACCESS_TOKEN == null)
-    throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
-
-  let req = request(global.app!)
-    .get("/v1/departments")
-      .set("Cookie", [global.ACCESS_TOKEN]);
-
-  return req;
-}
+} 

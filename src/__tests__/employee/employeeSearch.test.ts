@@ -1,7 +1,8 @@
 import { EmployeeResponse } from "../../interface/employee";
 import { PAGE_SIZE } from "../../utils/constants";
 import { expectError } from "../../utils/error.helper";
-import { getDepartmentsAsync, getSearchEmployeesAsync } from "./helpers/request.helper"; 
+import { getDepartmentsAsync } from "../department/helpers/request.helper";
+import { getSearchEmployeesAsync } from "./helpers/request.helper"; 
 
 const KEYWORD = 'john';
 const ALL_EMPLOYEES_PAGE_SIZE = 120;

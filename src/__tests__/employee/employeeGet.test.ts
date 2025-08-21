@@ -3,7 +3,7 @@ import { createEmployee } from './helpers/db.helper';
 import { expectEmployee } from './helpers/expected.helper';
 import { deleteEmployeeAsync, getEmployeeAsync } from './helpers/request.helper';
 import { DEPARTMENT_NAME_MARKETING, EMPLOYEE_DOB, EMPLOYEE_EMAIL, EMPLOYEE_FIRST_NAME, EMPLOYEE_HIRE_DATE, EMPLOYEE_PHONE_NUMBER, EMPLOYEE_SURNAME } from './helpers/constants';
-import { getEmployeeDepartmentId } from '../../utils/department.helper';
+import { getDepartmentByNameAsync } from '../department/helpers/request.helper';
 
 let employeeId = '';
 
@@ -24,7 +24,7 @@ describe("GET /api/v1/employees", () => {
 
   it("should return 200 and employee when found successfully", async () => {
 
-      const expectedDepartmentId = await getEmployeeDepartmentId(DEPARTMENT_NAME_MARKETING);
+      const expectedDepartmentId = await getDepartmentByNameAsync(DEPARTMENT_NAME_MARKETING);
 
       const response = await getEmployeeAsync(employeeId); 
       expect(response.status).toBe(200);

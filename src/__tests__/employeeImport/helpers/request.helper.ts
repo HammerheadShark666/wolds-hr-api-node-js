@@ -13,7 +13,7 @@ export async function postImportEmployeeAsync(filePath: string) {
           .attach('importFile', filePath); 
 }
 
-export async function getEmployeeImportHistoryAsync(params?: { employeeImportId: Types.ObjectId, page: number, pageSize: number }) {
+export async function getEmployeeImportHistoryAsync(params?: { employeeImportId: string, page: number, pageSize: number }) {
    
   const employeeImportId = params?.employeeImportId ?? '';
   const page = params?.page ?? 1;
@@ -25,4 +25,17 @@ export async function getEmployeeImportHistoryAsync(params?: { employeeImportId:
   return request(global.app!)
     .get(`/v1/employees/import/history/imported?employeeImportId=${employeeImportId}&page=${page}&pageSize=${pageSize}`)
     .set("Cookie", [global.ACCESS_TOKEN]);
+}
+
+export async function deleteImportedEmployees(employeeImportId?: string) {
+
+  if(global.ACCESS_TOKEN == null)
+    throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
+
+  const req = request(global.app!)
+    .delete(`/v1/employees/import/history/imported/${employeeImportId}`)            
+      .set("Cookie", [global.ACCESS_TOKEN])
+      .set("Content-Type", "application/json");
+    
+  return req.send();
 }

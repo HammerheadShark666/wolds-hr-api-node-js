@@ -2,7 +2,7 @@ import { EmployeeImportResponse } from "../interface/employee";
 import { ServiceResult } from "../types/ServiceResult";
 import { handleServiceError } from "../utils/error.helper"; 
 import { EmployeeModel } from "../models/employee.model";
-import mongoose from "mongoose";
+import { Types } from "mongoose";
 import { ImportedEmployeeModel } from "../models/importedEmployee.model"; 
 import { EmployeeImport, ImportEmployee } from "../interface/employeeImport";
 import { ImportedExistingEmployeeModel } from "../models/importedExistingEmployee..model";
@@ -50,13 +50,7 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
         await importedEmployeeError.save();   
       }
     }; 
-
-    console.log("a")
-
-    const result = await mongoose.connection.collection("employees").deleteOne({ employeeImport: employeeImport.id });
   
-    console.log("b")
-
     return { success: true, data: {id: employeeImport.id, date: new Date()}}; 
   } 
   catch (err: unknown) {  
@@ -67,7 +61,7 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
 
 async function addEmployeeImport() {
   const importedEmployee = new ImportedEmployeeModel();
-  importedEmployee._id = new mongoose.Types.ObjectId();
+  importedEmployee._id = new Types.ObjectId();
   const saved = await importedEmployee.save();   
   return { id: saved._id, date: saved.date, employees: [], existingEmployees: [] };
 } 

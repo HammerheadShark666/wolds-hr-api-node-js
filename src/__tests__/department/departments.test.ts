@@ -1,5 +1,5 @@
-import request from 'supertest';   
-import { expectError } from '../utils/error.helper';
+import request from 'supertest';
+import { expectError } from '../../utils/error.helper';
 
 let departmentId = ''; 
 const departmentName = 'Warehouse';

@@ -1,13 +1,10 @@
-import { EmployeeRequest, EmployeeResponse } from '../../interface/employee';
+import { EmployeeRequest } from '../../interface/employee';
 import { expectError } from '../../utils/error.helper';
 import { expectEmployee } from './helpers/expected.helper';
 import { deleteEmployeeAsync, postEmployeeAsync } from './helpers/request.helper';
 import { DEPARTMENT_NAME_MARKETING, EMPLOYEE_DOB, EMPLOYEE_EMAIL, EMPLOYEE_FIRST_NAME, EMPLOYEE_HIRE_DATE, EMPLOYEE_PHONE_NUMBER, EMPLOYEE_SURNAME } from './helpers/constants';
-import { getEmployeeDepartmentId } from '../../utils/department.helper';
-import { DepartmentModel } from '../../models/department.model';
-import { constants } from 'buffer';
-import { EmployeeModel } from '../../models/employee.model';
-import mongoose, { Types } from 'mongoose';
+import { getDepartmentByNameAsync } from '../department/helpers/request.helper';
+
 
 let employeeId = '';
 
@@ -23,19 +20,8 @@ describe("POST /api/v1/employees", () => {
 
 
   it("should return 200 when added successfully", async () => {
-
-    console.log('readyState:', mongoose.connection.readyState);
-    const departmentId = await getEmployeeDepartmentId(DEPARTMENT_NAME_MARKETING);
-
-    //const department = await DepartmentModel.findById(departmentId);
-
-    //const employee = await EmployeeModel.findById(new Types.ObjectId("68a60c7ca539263c336db0e6"));
-
-    //console.log("mployee = ", employee);
-
-    //const department = await DepartmentModel.findOne({ name: DEPARTMENT_NAME_MARKETING });
-
-    //const departmentId = department?.id;
+ 
+    const departmentId = await getDepartmentByNameAsync(DEPARTMENT_NAME_MARKETING); 
      
     const response = await postEmployeeAsync({
       surname: EMPLOYEE_SURNAME,
