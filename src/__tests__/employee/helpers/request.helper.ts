@@ -24,7 +24,7 @@ export async function deleteEmployeeAsync(id: string) {
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   const req = request(global.app!)
-    .delete("/v1/employees/" + id)
+    .delete(`/v1/employees/${id}`)
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
    
@@ -37,7 +37,7 @@ export async function getEmployeeAsync(id: string) {
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   const req = request(global.app!)
-    .get("/v1/employees/" + id)
+    .get(`/v1/employees/${id}`)
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
    
@@ -76,7 +76,7 @@ export async function putEmployeeAsync(id?: string, data?: EmployeeRequest) {
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   const req = request(global.app!)
-    .put("/v1/employees/" + id)
+    .put(`/v1/employees/${id}`)
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
   

@@ -148,7 +148,7 @@ export async function updateEmployeeAsync(id: string, data: EmployeeRequest): Pr
   }
 }
 
-export async function deleteEmployeeAsyncAsync(id: string): Promise<ServiceResult<null>> {
+export async function deleteEmployeeAsyncAsync(id: string): Promise<ServiceResult<string>> {
   
   const validationResult = await validate(idSchema, id);  
   if (!validationResult.success) { 
@@ -163,7 +163,7 @@ export async function deleteEmployeeAsyncAsync(id: string): Promise<ServiceResul
   
     await EmployeeModel.findByIdAndDelete(id);  
 
-    return { success: true, data: null };
+    return { success: true, data: `Employee deleted - ${id}` };
   } 
   catch (err: unknown) { 
     return handleServiceError(err);
@@ -204,7 +204,7 @@ async function countEmployeesAsync(keyword?: string, departmentId?: string): Pro
 
     return EmployeeModel.countDocuments(filter);
   } catch (err) { 
-    return 0;
+    throw new Error("Error counting number of employees");
   }
 }
 
@@ -296,7 +296,7 @@ export function getEmployeeWithDepartmentPipeline(
         employeeImportId: 1,
         createdAt: 1,
         department: {
-          $arrayElemAt: ["$department", 0] // returns null if no department
+          $arrayElemAt: ["$department", 0]
         }
       }
     }

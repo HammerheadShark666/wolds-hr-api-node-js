@@ -14,6 +14,8 @@ beforeAll(async () => {
   expect(response.status).toBe(200);   
 
   employeeImportId = response.body.id; 
+
+  console.log(employeeImportId)
 });
 
 afterAll(async () => {

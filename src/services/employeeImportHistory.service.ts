@@ -1,10 +1,9 @@
 import mongoose, { Types } from "mongoose";
-import { EmployeeImportErrorHistoryPagedResponse, EmployeeImportErrorHistoryResponse, EmployeeImportHistoryPagedResponse, EmployeeImportHistoryRequest, EmployeeImportHistoryResponse, EmployeesImportedHistoryResponse, EmployeesImportHistoryResponse } from "../interface/employee";
 import { ServiceResult } from "../types/ServiceResult";
 import { PAGE_SIZE } from "../utils/constants";
 import { toEmployeeResponse, toEmployeesImportHistoryResponse } from "../utils/mapper";
 import { validatePagination } from "../utils/paging.helper";
-import { EmployeeModel } from "../models/employee.model";
+import { EmployeeModel, IEmployee } from "../models/employee.model";
 import { ObjectId } from "mongodb";
 import { handleServiceError } from "../utils/error.helper";
 import { objectIdSchema } from "../validation/fields/objectId.schema";
@@ -12,26 +11,21 @@ import { validate } from "../validation/validate";
 import { ImportedExistingEmployeeModel } from "../models/importedExistingEmployee..model";
 import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model";
 import { ImportedEmployeeModel } from "../models/importedEmployee.model";
-
-
-
-
-
-export async function employeesImportedHistoryAsync(): Promise<ServiceResult<EmployeesImportedHistoryResponse>> {
+import { EmployeeImportErrorHistoryPagedResponse, EmployeeImportHistoryPagedResponse, ImportedEmployeesHistoryRequest, ImportedEmployeeHistory, EmployeeImportError } from "../interface/employeeImportHistory";
+ 
+export async function importedEmployeesHistoryAsync(): Promise<ServiceResult<ImportedEmployeeHistory[]>> { 
    
   try {  
 
-    const response = await ImportedEmployeeModel.find();  
-
-    return { success: true, data: { employeeImportHistory: toEmployeesImportHistoryResponse(response)} };
+    const response = await ImportedEmployeeModel.find();
+    return { success: true, data: toEmployeesImportHistoryResponse(response) };  
   } 
   catch (err: unknown) { 
     return handleServiceError(err);
   }
-} 
+}
 
-
-export async function employeesImportedPagedAsync(query: EmployeeImportHistoryRequest): Promise<ServiceResult<EmployeeImportHistoryPagedResponse>> {
+export async function importedEmployeesPagedAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<EmployeeImportHistoryPagedResponse>> {
 
   const { id } = query;
   
@@ -45,22 +39,29 @@ export async function employeesImportedPagedAsync(query: EmployeeImportHistoryRe
     
     [page, pageSize] = validatePagination(page, pageSize); 
    
-    const [totalEmployees, employees] = await Promise.all([
+    const [totalEmployees, employeesResult] = await Promise.all([
       countImportedEmployeesAsync(id),
-      getImportedEmployeesAsync(query).then(r => r.data ?? [])
+      getImportedEmployeesAsync(query)
     ]); 
-  
-     return { success: true, data: {
+
+    if (!employeesResult.success) {
+      return {
+        success: false,
+        code: 500, // or propagate employeesResult.code if available
+        error: employeesResult.error ?? ['Failed to fetch imported employees history']
+      };
+    }
+ 
+    return { success: true, data: {
       page,
       pageSize,
       totalEmployees,
       totalPages: Math.ceil(totalEmployees / pageSize),
-      employees: employees.map(toEmployeeResponse),
-      success: true
+      employees: employeesResult.data.map(toEmployeeResponse)
     }}; 
 }
 
-export async function employeesImportedExistingPagedAsync(query: EmployeeImportHistoryRequest): Promise<ServiceResult<EmployeeImportHistoryPagedResponse>> {
+export async function importedEmployeesExistingPagedAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<EmployeeImportHistoryPagedResponse>> {
 
   const { id } = query;   
   
@@ -74,23 +75,30 @@ export async function employeesImportedExistingPagedAsync(query: EmployeeImportH
     
     [page, pageSize] = validatePagination(page, pageSize); 
    
-    const [totalEmployees, employees] = await Promise.all([
-      countImportedExistingEmployeesAsync(id),
-      getImportedExistingEmployeesAsync(query).then(r => r.data ?? [])
+    const [totalEmployees, employeesResult] = await Promise.all([
+      countImportedEmployeesExistingAsync(id),
+      getImportedEmployeesExistingAsync(query)
     ]); 
+
+    if (!employeesResult.success) {
+      return {
+        success: false,
+        code: 500, // or propagate employeesResult.code if available
+        error: employeesResult.error ?? ['Failed to fetch imported employees existing history']
+      };
+    }
   
-     return { success: true, data: {
+    return { success: true, data: {
       page,
       pageSize,
       totalEmployees,
       totalPages: Math.ceil(totalEmployees / pageSize),
-      employees: employees.map(toEmployeeResponse),
-      success: true
+      employees: employeesResult.data.map(toEmployeeResponse)
     }}; 
 } 
 
 
-export async function employeesImportedErrorPagedAsync(query: EmployeeImportHistoryRequest): Promise<ServiceResult<EmployeeImportErrorHistoryPagedResponse>> {
+export async function importedEmployeesErrorPagedAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<EmployeeImportErrorHistoryPagedResponse>> {
 
   const { id } = query;   
   
@@ -104,22 +112,29 @@ export async function employeesImportedErrorPagedAsync(query: EmployeeImportHist
     
     [page, pageSize] = validatePagination(page, pageSize); 
    
-    const [totalEmployees, employees] = await Promise.all([
-      countImportedErrorEmployeesAsync(id),
-      getImportedErrorEmployeesAsync(query).then(r => r.data ?? [])
+    const [totalEmployees, employeesResult] = await Promise.all([
+      countImportedEmployeesErrorAsync(id),
+      getImportedEmployeesErrorAsync(query)
     ]); 
+
+    if (!employeesResult.success) {
+      return {
+        success: false,
+        code: 500, // or propagate employeesResult.code if available
+        error: employeesResult.error ?? ['Failed to fetch imported employees error history']
+      };
+    } 
   
-     return { success: true, data: {
+    return { success: true, data: {
       page,
       pageSize,
       totalEmployees,
       totalPages: Math.ceil(totalEmployees / pageSize),
-      employees: employees,
-      success: true
+      employees: employeesResult.data, 
     }}; 
 } 
  
-export async function deleteEmployeeImportedHistoryAsync(id: string): Promise<ServiceResult<null>> {
+export async function deleteImportedEmployeeHistoryAsync(id: string): Promise<ServiceResult<null>> {
   
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -141,7 +156,7 @@ export async function deleteEmployeeImportedHistoryAsync(id: string): Promise<Se
   }
 }  
  
-async function getImportedEmployeesAsync(query: EmployeeImportHistoryRequest): Promise<EmployeesImportHistoryResponse> {
+async function getImportedEmployeesAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<IEmployee[]>> {
   try { 
     const pipeline = buildEmployeeSearchPipeline(query);
     const response = await EmployeeModel.aggregate(pipeline);
@@ -149,12 +164,12 @@ async function getImportedEmployeesAsync(query: EmployeeImportHistoryRequest): P
   } catch (err) { 
     return {
       success: false,
-      error: 'Failed to imported employees.',
+      error: ['Failed to imported employees.'],
     };
   }
 }  
 
-async function getImportedExistingEmployeesAsync(query: EmployeeImportHistoryRequest): Promise<EmployeesImportHistoryResponse> {
+async function getImportedEmployeesExistingAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<IEmployee[]>> {
   try { 
     const pipeline = buildEmployeeSearchPipeline(query);
     const response = await ImportedExistingEmployeeModel.aggregate(pipeline);
@@ -162,12 +177,12 @@ async function getImportedExistingEmployeesAsync(query: EmployeeImportHistoryReq
   } catch (err) { 
     return {
       success: false,
-      error: 'Failed to imported existing employees.',
+      error: ['Failed to imported existing employees.'],
     };
   }
 }  
 
-async function getImportedErrorEmployeesAsync(query: EmployeeImportHistoryRequest): Promise<EmployeeImportErrorHistoryResponse> {
+async function getImportedEmployeesErrorAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<EmployeeImportError[]>> {
   try { 
     const pipeline = buildImportedEmployeeErrorSearchPipeline(query);
     const response = await ImportedEmployeeErrorModel.aggregate(pipeline);
@@ -176,7 +191,7 @@ async function getImportedErrorEmployeesAsync(query: EmployeeImportHistoryReques
   } catch (err) { 
     return {
       success: false,
-      error: 'Failed to find imported error employees.',
+      error: ['Failed to find imported error employees.'],
     };
   }
 }   
@@ -185,27 +200,27 @@ async function countImportedEmployeesAsync(employeeImportId: Types.ObjectId): Pr
   try {    
     return EmployeeModel.countDocuments({employeeImportId: employeeImportId});
   } catch (err) { 
-    return 0;
+    throw new Error("Error counting number of imported employees");
   }
 }  
 
-async function countImportedExistingEmployeesAsync(employeeImportId: Types.ObjectId): Promise<number> {
+async function countImportedEmployeesExistingAsync(employeeImportId: Types.ObjectId): Promise<number> {
   try {    
     return ImportedExistingEmployeeModel.countDocuments({employeeImportId: employeeImportId});
   } catch (err) { 
-    return 0;
+    throw new Error("Error counting number of imported existing employees");
   }
 } 
 
-async function countImportedErrorEmployeesAsync(employeeImportId: Types.ObjectId): Promise<number> {
+async function countImportedEmployeesErrorAsync(employeeImportId: Types.ObjectId): Promise<number> {
   try {    
     return ImportedEmployeeErrorModel.countDocuments({employeeImportId: employeeImportId});
   } catch (err) { 
-    return 0;
+    throw new Error("Error counting number of imported error employees");
   }
 } 
 
-function buildEmployeeSearchPipeline(query: EmployeeImportHistoryRequest): any[] {
+function buildEmployeeSearchPipeline(query: ImportedEmployeesHistoryRequest): any[] {
   const pipeline: any[] = [
     {
       $lookup: {
@@ -239,23 +254,9 @@ function buildEmployeeSearchPipeline(query: EmployeeImportHistoryRequest): any[]
   return pipeline;
 } 
 
-function buildImportedEmployeeErrorSearchPipeline(query: EmployeeImportHistoryRequest): any[] {
-  const pipeline: any[] = [
-    // {
-    //   $lookup: {
-    //     from: 'departments',
-    //     localField: 'departmentId',
-    //     foreignField: '_id',
-    //     as: 'department',
-    //   },
-    // },
-    // {
-    //   $unwind: {
-    //     path: '$department',
-    //     preserveNullAndEmptyArrays: true,
-    //   },
-    // },
-  ];
+function buildImportedEmployeeErrorSearchPipeline(query: ImportedEmployeesHistoryRequest): any[] {
+  
+  const pipeline: any[] = [];
 
   if (query.id) {
     pipeline.push({
@@ -265,7 +266,7 @@ function buildImportedEmployeeErrorSearchPipeline(query: EmployeeImportHistoryRe
  
   const { page, pageSize } = parsePagination(query);
   pipeline.push(
-   // { $sort: { surname: 1, firstName: 1 } },
+    { $sort: { employee: 1 } },
     { $skip: (page - 1) * pageSize },
     { $limit: pageSize }
   );
@@ -273,7 +274,7 @@ function buildImportedEmployeeErrorSearchPipeline(query: EmployeeImportHistoryRe
   return pipeline;
 } 
 
-function parsePagination(query: EmployeeImportHistoryRequest, defaults = { page: 1, pageSize: PAGE_SIZE }) {
+function parsePagination(query: ImportedEmployeesHistoryRequest, defaults = { page: 1, pageSize: PAGE_SIZE }) {
   const page = typeof query.page === 'number' ? query.page : parseInt(query.page ?? '', PAGE_SIZE) || defaults.page;
   const pageSize = typeof query.pageSize === 'number' ? query.pageSize : parseInt(query.pageSize ?? '', 10) || defaults.pageSize;    
   return { page, pageSize };

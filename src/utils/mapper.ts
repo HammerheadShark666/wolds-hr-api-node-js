@@ -2,10 +2,10 @@ import { UserResponse } from "../interface/user";
 import { DepartmentResponse } from "../interface/department";
 import { IDepartment } from "../models/department.model"; 
 import { IUser } from "../models/user.model";
-import { EmployeeImportHistoryResponse, EmployeeResponse } from "../interface/employee";
+import { EmployeeResponse } from "../interface/employee";
 import { IEmployee } from "../models/employee.model";
-import { ImportEmployee } from "../interface/employeeImport";
 import { IImportedEmployee } from "../models/importedEmployee.model";
+import { ImportedEmployeeHistory } from "../interface/employeeImportHistory";
 
 export function toDepartmentResponse(department: IDepartment): DepartmentResponse {
   const { id, name } = department;
@@ -46,23 +46,9 @@ export function toEmployeeResponse(employee: IEmployee): EmployeeResponse {
   }; 
  
   return appEmployee;
-}
+} 
 
-
-// export function toEmployeeImportHistoryResponse(importEmployee: IImportedEmployee[]): EmployeeImportHistoryResponse {
-
-
-
-
-//   const { _id, date } = importEmployee;
-//   const employeeImportHistoryResponse: EmployeeImportHistoryResponse = {
-//     id: _id,
-//     date: date
-//   }; 
-//   return employeeImportHistoryResponse;
-// } 
-
-export function toEmployeesImportHistoryResponse(importEmployees: IImportedEmployee[]): EmployeeImportHistoryResponse[] {
+export function toEmployeesImportHistoryResponse(importEmployees: IImportedEmployee[]): ImportedEmployeeHistory[] {
   return importEmployees.map(({ _id, date }) => ({
     id: _id,
     date

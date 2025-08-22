@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import asyncHandler from 'express-async-handler';
-import { EmployeeImportHistoryRequest } from '../interface/employee';
-import { deleteEmployeeImportedHistoryAsync, employeesImportedErrorPagedAsync, employeesImportedExistingPagedAsync, employeesImportedHistoryAsync, employeesImportedPagedAsync } from '../services/employeeImportHistory.service';
+import { deleteImportedEmployeeHistoryAsync, importedEmployeesErrorPagedAsync, importedEmployeesExistingPagedAsync, importedEmployeesHistoryAsync, importedEmployeesPagedAsync } from '../services/employeeImportHistory.service';
+import { ImportedEmployeesHistoryRequest } from '../interface/employeeImportHistory';
 
 export function createEmployeeImportHistoryRouter() {
   
@@ -11,7 +11,8 @@ export function createEmployeeImportHistoryRouter() {
     '', 
     asyncHandler(async (req: Request, res: Response) => { 
    
-      const response = await employeesImportedHistoryAsync();  
+      const response = await importedEmployeesHistoryAsync();   
+      
       if (!response.success) { 
         res.status(400).json({ error: response.error });
         return;
@@ -22,9 +23,10 @@ export function createEmployeeImportHistoryRouter() {
 
   router.get(
     '/imported', 
-    asyncHandler(async (req: Request<{}, {}, {}, EmployeeImportHistoryRequest>, res: Response) => {
+    asyncHandler(async (req: Request<{}, {}, {}, ImportedEmployeesHistoryRequest>, res: Response) => {
    
-      const response = await employeesImportedPagedAsync(req.query);  
+      const response = await importedEmployeesPagedAsync(req.query);   
+
       if (!response.success) { 
         res.status(400).json({ error: response.error });
         return;
@@ -35,9 +37,9 @@ export function createEmployeeImportHistoryRouter() {
 
   router.get(
     '/existing', 
-    asyncHandler(async (req: Request<{}, {}, {}, EmployeeImportHistoryRequest>, res: Response) => {
+    asyncHandler(async (req: Request<{}, {}, {}, ImportedEmployeesHistoryRequest>, res: Response) => {
    
-      const response = await employeesImportedExistingPagedAsync(req.query);  
+      const response = await importedEmployeesExistingPagedAsync(req.query);  
       if (!response.success) { 
         res.status(400).json({ error: response.error });
         return;
@@ -48,9 +50,9 @@ export function createEmployeeImportHistoryRouter() {
 
    router.get(
     '/error', 
-    asyncHandler(async (req: Request<{}, {}, {}, EmployeeImportHistoryRequest>, res: Response) => {
+    asyncHandler(async (req: Request<{}, {}, {}, ImportedEmployeesHistoryRequest>, res: Response) => {
    
-      const response = await employeesImportedErrorPagedAsync(req.query);  
+      const response = await importedEmployeesErrorPagedAsync(req.query);  
       if (!response.success) { 
         res.status(400).json({ error: response.error });
         return;
@@ -63,7 +65,7 @@ export function createEmployeeImportHistoryRouter() {
     '/:id', 
     asyncHandler(async (req: Request, res: Response) => { 
 
-      const response = await deleteEmployeeImportedHistoryAsync(req.params.id);  
+      const response = await deleteImportedEmployeeHistoryAsync(req.params.id);  
       if (!response.success) { 
         res.status(400).json({ error: response.error });
         return;

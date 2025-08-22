@@ -7,14 +7,14 @@ import { EmployeeImport, ImportEmployee } from "../interface/employeeImport";
 import { ImportedExistingEmployeeModel } from "../models/importedExistingEmployee..model";
 import { getEndOfDayDate, getStartOfDayDate } from "../utils/date.helper";
 import { parseImportEmployeeCsvBuffer } from "../utils/employeeParser.helper";
-import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model";
-import { EmployeeImportHistoryResponse } from "../interface/employee";
+import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model"; 
+import { ImportedEmployeeHistory } from "../interface/employeeImportHistory";
    
-export async function importEmployees(fileBuffer: Buffer, mimeType: string): Promise<ServiceResult<EmployeeImportHistoryResponse>> {
+export async function importEmployees(fileBuffer: Buffer, mimeType: string): Promise<ServiceResult<ImportedEmployeeHistory>> {
  
   try {
 
-    const employeeImport: EmployeeImport = await addEmployeeImport();
+    const employeeImport: EmployeeImport = await addImportedEmployee();
     if(!employeeImport)
       throw new Error("Employee import not created")
 
@@ -26,17 +26,15 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
  
         employee.employeeImportId = employeeImport.id;
 
-       // if(employee.surname == 'Pruitt')
-       //   throw new Error('Error with imported employee');
+        if(employee.surname == 'Pruitt')
+          throw new Error('Error with imported employee');
 
         const employeeExists = await employeeExistsAsync(employee.surname, employee.firstName, employee.dateOfBirth);
-        if(employeeExists) {    
-          console.log("employeeExists - ", true)
+        if(employeeExists) {
           const importedExistingEmployee = new ImportedExistingEmployeeModel(employee);
           await importedExistingEmployee.save();        
         }
         else { 
-          console.log("employeeExists - ", false)
           const employeeToImport = new EmployeeModel(employee);
           await employeeToImport.save();    
         } 
@@ -61,7 +59,7 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
   } 
 }
 
-async function addEmployeeImport() {
+async function addImportedEmployee() {
   const importedEmployee = new ImportedEmployeeModel();
   importedEmployee._id = new Types.ObjectId();
   const saved = await importedEmployee.save();   

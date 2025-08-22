@@ -19,7 +19,7 @@ export async function getDepartmentByNameAsync(name: string) {
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   const req = await request(global.app!)
-    .get("/v1/departments/name/" + name)
+    .get(`/v1/departments/name/${name}`)
     .set("Cookie", [global.ACCESS_TOKEN]); 
 
   return req.body.id;
