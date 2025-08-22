@@ -11,7 +11,7 @@ declare global {
       userId: string;
       username: string;
       password: string;
-      employeeImportId: string;
+      importEmployeesId: string;
     }
   }
  
@@ -22,7 +22,7 @@ declare global {
   var userId: string | undefined;
   var username: string | undefined;
   var password: string | undefined;
-  var employeeImportId: string | undefined;
+  var importEmployeesId: string | undefined;
 }
 
 export {};

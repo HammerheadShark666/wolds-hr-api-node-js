@@ -1,10 +1,10 @@
 import path from "path"; 
-import {  deleteImportedEmployeesAsync, postImportEmployeeAsync } from "./helpers/request.helper";   
+import { deleteImportedEmployeesAsync, postImportEmployeeAsync } from "./helpers/request.helper";   
 
-let employeeImportId: string = ""
+let importEmployeesId: string = ""
 
 afterAll(async () => {
-  const res = await deleteImportedEmployeesAsync(employeeImportId);
+  const res = await deleteImportedEmployeesAsync(importEmployeesId);
   expect(res.status).toBe(200);   
 }); 
 
@@ -20,7 +20,7 @@ describe('Import employees from file', () => {
     const response = await postImportEmployeeAsync(filePath); 
     expect(response.status).toBe(200);   
  
-    employeeImportId = response.body.id; 
+    importEmployeesId = response.body.id; 
   });
 
 

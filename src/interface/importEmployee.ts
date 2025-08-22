@@ -1,7 +1,7 @@
 import { ObjectId, Schema, Types } from "mongoose";
 import { IEmployee } from "../models/employee.model";
 
-export interface EmployeeImport {
+export interface ImportedEmployees {
   id: Types.ObjectId;
   date: Date;
   employees: IEmployee[];
@@ -17,7 +17,7 @@ export interface ImportEmployee {
   phoneNumber?: string;
   photo?: string;
   departmentId?: Types.ObjectId | null;
-  employeeImportId: Types.ObjectId | null | undefined;
+  importEmployeesId: Types.ObjectId | null | undefined;
   createdAt?: Date;
 }
 
@@ -31,6 +31,6 @@ export interface EmployeeImported {
   phoneNumber?: string;
   photo?: string;
   departmentId?: Types.ObjectId | null;
-  employeeImportId: Types.ObjectId;
+  importEmployeesId: Types.ObjectId;
   createdAt?: Date;
 }

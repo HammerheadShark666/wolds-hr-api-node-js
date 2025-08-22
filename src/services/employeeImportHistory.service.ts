@@ -11,7 +11,7 @@ import { validate } from "../validation/validate";
 import { ImportedExistingEmployeeModel } from "../models/importedExistingEmployee..model";
 import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model";
 import { ImportedEmployeeModel } from "../models/importedEmployee.model";
-import { EmployeeImportErrorHistoryPagedResponse, EmployeeImportHistoryPagedResponse, ImportedEmployeesHistoryRequest, ImportedEmployeeHistory, EmployeeImportError } from "../interface/employeeImportHistory";
+import { ImportedEmployeesHistoryRequest, ImportedEmployeeHistory, ImportedEmployeesErrorHistoryPagedResponse, ImportedEmployeeError, ImportedEmployeesHistoryPagedResponse } from "../interface/employeeImportHistory";
  
 export async function importedEmployeesHistoryAsync(): Promise<ServiceResult<ImportedEmployeeHistory[]>> { 
    
@@ -25,7 +25,7 @@ export async function importedEmployeesHistoryAsync(): Promise<ServiceResult<Imp
   }
 }
 
-export async function importedEmployeesPagedAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<EmployeeImportHistoryPagedResponse>> {
+export async function importedEmployeesPagedAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<ImportedEmployeesHistoryPagedResponse>> {
 
   const { id } = query;
   
@@ -61,7 +61,7 @@ export async function importedEmployeesPagedAsync(query: ImportedEmployeesHistor
     }}; 
 }
 
-export async function importedEmployeesExistingPagedAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<EmployeeImportHistoryPagedResponse>> {
+export async function importedEmployeesExistingPagedAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<ImportedEmployeesHistoryPagedResponse>> {
 
   const { id } = query;   
   
@@ -98,7 +98,7 @@ export async function importedEmployeesExistingPagedAsync(query: ImportedEmploye
 } 
 
 
-export async function importedEmployeesErrorPagedAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<EmployeeImportErrorHistoryPagedResponse>> {
+export async function importedEmployeesErrorPagedAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<ImportedEmployeesErrorHistoryPagedResponse>> {
 
   const { id } = query;   
   
@@ -141,9 +141,9 @@ export async function deleteImportedEmployeeHistoryAsync(id: string): Promise<Se
 
   try { 
     await ImportedEmployeeModel.deleteOne({ _id: new Types.ObjectId(id) }); 
-    await EmployeeModel.deleteMany({ employeeImportId: new Types.ObjectId(id) }); 
-    await ImportedExistingEmployeeModel.deleteMany({ employeeImportId: new Types.ObjectId(id) }); 
-    await ImportedEmployeeErrorModel.deleteMany({ employeeImportId: new Types.ObjectId(id) }); 
+    await EmployeeModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
+    await ImportedExistingEmployeeModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
+    await ImportedEmployeeErrorModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
 
     await session.commitTransaction();
     return { success: true, data: null  };
@@ -182,7 +182,7 @@ async function getImportedEmployeesExistingAsync(query: ImportedEmployeesHistory
   }
 }  
 
-async function getImportedEmployeesErrorAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<EmployeeImportError[]>> {
+async function getImportedEmployeesErrorAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<ImportedEmployeeError[]>> {
   try { 
     const pipeline = buildImportedEmployeeErrorSearchPipeline(query);
     const response = await ImportedEmployeeErrorModel.aggregate(pipeline);
@@ -196,25 +196,25 @@ async function getImportedEmployeesErrorAsync(query: ImportedEmployeesHistoryReq
   }
 }   
 
-async function countImportedEmployeesAsync(employeeImportId: Types.ObjectId): Promise<number> {
+async function countImportedEmployeesAsync(importEmployeesId: Types.ObjectId): Promise<number> {
   try {    
-    return EmployeeModel.countDocuments({employeeImportId: employeeImportId});
+    return EmployeeModel.countDocuments({importEmployeesId: importEmployeesId});
   } catch (err) { 
     throw new Error("Error counting number of imported employees");
   }
 }  
 
-async function countImportedEmployeesExistingAsync(employeeImportId: Types.ObjectId): Promise<number> {
+async function countImportedEmployeesExistingAsync(importEmployeesId: Types.ObjectId): Promise<number> {
   try {    
-    return ImportedExistingEmployeeModel.countDocuments({employeeImportId: employeeImportId});
+    return ImportedExistingEmployeeModel.countDocuments({importEmployeesId: importEmployeesId});
   } catch (err) { 
     throw new Error("Error counting number of imported existing employees");
   }
 } 
 
-async function countImportedEmployeesErrorAsync(employeeImportId: Types.ObjectId): Promise<number> {
+async function countImportedEmployeesErrorAsync(importEmployeesId: Types.ObjectId): Promise<number> {
   try {    
-    return ImportedEmployeeErrorModel.countDocuments({employeeImportId: employeeImportId});
+    return ImportedEmployeeErrorModel.countDocuments({importEmployeesId: importEmployeesId});
   } catch (err) { 
     throw new Error("Error counting number of imported error employees");
   }
@@ -240,7 +240,7 @@ function buildEmployeeSearchPipeline(query: ImportedEmployeesHistoryRequest): an
 
   if (query.id) {
     pipeline.push({
-      $match: { employeeImportId: new ObjectId(query.id) }
+      $match: { importEmployeesId: new ObjectId(query.id) }
     });
   } 
  
@@ -260,7 +260,7 @@ function buildImportedEmployeeErrorSearchPipeline(query: ImportedEmployeesHistor
 
   if (query.id) {
     pipeline.push({
-      $match: { employeeImportId: new ObjectId(query.id) }
+      $match: { importEmployeesId: new ObjectId(query.id) }
     });
   } 
  

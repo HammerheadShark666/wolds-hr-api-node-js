@@ -12,9 +12,9 @@ export async function postImportEmployeeAsync(filePath: string) {
           .attach('importFile', filePath); 
 }
 
-export async function getEmployeeImportHistoryAsync(params?: { employeeImportId: string, page: number, pageSize: number }) {
+export async function getImportedEmployeesHistoryAsync(params?: { importEmployeesId: string, page: number, pageSize: number }) {
    
-  const employeeImportId = params?.employeeImportId ?? '';
+  const importEmployeesId = params?.importEmployeesId ?? '';
   const page = params?.page ?? 1;
   const pageSize = params?.pageSize ?? PAGE_SIZE; 
 
@@ -22,13 +22,13 @@ export async function getEmployeeImportHistoryAsync(params?: { employeeImportId:
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   return request(global.app!)
-    .get(`/v1/employees/import/history/imported?id=${employeeImportId}&page=${page}&pageSize=${pageSize}`)
+    .get(`/v1/employees/import/history/imported?id=${importEmployeesId}&page=${page}&pageSize=${pageSize}`)
     .set("Cookie", [global.ACCESS_TOKEN]);
 }
 
-export async function getExistingEmployeeImportHistoryAsync(params?: { employeeImportId: string, page: number, pageSize: number }) {
+export async function getImportedEmployeesExistingHistoryAsync(params?: { importEmployeesId: string, page: number, pageSize: number }) {
    
-  const employeeImportId = params?.employeeImportId ?? '';
+  const importEmployeesId = params?.importEmployeesId ?? '';
   const page = params?.page ?? 1;
   const pageSize = params?.pageSize ?? PAGE_SIZE; 
 
@@ -36,13 +36,13 @@ export async function getExistingEmployeeImportHistoryAsync(params?: { employeeI
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   return request(global.app!)
-    .get(`/v1/employees/import/history/existing?id=${employeeImportId}&page=${page}&pageSize=${pageSize}`)
+    .get(`/v1/employees/import/history/existing?id=${importEmployeesId}&page=${page}&pageSize=${pageSize}`)
     .set("Cookie", [global.ACCESS_TOKEN]);
 }
 
-export async function getErrorEmployeeImportHistoryAsync(params?: { employeeImportId: string, page: number, pageSize: number }) {
+export async function getImportedEmployeesErrorHistoryAsync(params?: { importEmployeesId: string, page: number, pageSize: number }) {
    
-  const employeeImportId = params?.employeeImportId ?? '';
+  const importEmployeesId = params?.importEmployeesId ?? '';
   const page = params?.page ?? 1;
   const pageSize = params?.pageSize ?? PAGE_SIZE; 
 
@@ -50,17 +50,17 @@ export async function getErrorEmployeeImportHistoryAsync(params?: { employeeImpo
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   return request(global.app!)
-    .get(`/v1/employees/import/history/error?id=${employeeImportId}&page=${page}&pageSize=${pageSize}`)
+    .get(`/v1/employees/import/history/error?id=${importEmployeesId}&page=${page}&pageSize=${pageSize}`)
     .set("Cookie", [global.ACCESS_TOKEN]);
 }
 
-export async function deleteImportedEmployeesAsync(employeeImportId?: string) {
+export async function deleteImportedEmployeesAsync(importEmployeesId?: string) {
 
   if(global.ACCESS_TOKEN == null)
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   const req = request(global.app!)
-    .delete(`/v1/employees/import/history/${employeeImportId}`)            
+    .delete(`/v1/employees/import/history/${importEmployeesId}`)            
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
     

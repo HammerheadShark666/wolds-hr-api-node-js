@@ -293,7 +293,7 @@ export function getEmployeeWithDepartmentPipeline(
         phoneNumber: 1,
         photo: 1,
         departmentId: 1,
-        employeeImportId: 1,
+        importEmployeesId: 1,
         createdAt: 1,
         department: {
           $arrayElemAt: ["$department", 0]

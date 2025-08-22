@@ -1,8 +1,8 @@
 import path from "path";
-import { deleteImportedEmployeesAsync, getEmployeeImportHistoryAsync, getErrorEmployeeImportHistoryAsync, getExistingEmployeeImportHistoryAsync, postImportEmployeeAsync } from "./helpers/request.helper";
 import { PAGE_SIZE } from "../../utils/constants";
+import { deleteImportedEmployeesAsync, getImportedEmployeesErrorHistoryAsync, getImportedEmployeesExistingHistoryAsync, getImportedEmployeesHistoryAsync, postImportEmployeeAsync } from "./helpers/request.helper";
    
-let employeeImportId: string = ""
+let importEmployeesId: string = ""
 
 beforeAll(async () => { 
   const filePath = path.join(__dirname, '../files', 'employee-imports.csv');
@@ -13,13 +13,13 @@ beforeAll(async () => {
   const response = await postImportEmployeeAsync(filePath); 
   expect(response.status).toBe(200);   
 
-  employeeImportId = response.body.id; 
+  importEmployeesId = response.body.id; 
 
-  console.log(employeeImportId)
+  console.log(importEmployeesId)
 });
 
 afterAll(async () => {
-  let res = await deleteImportedEmployeesAsync(employeeImportId);
+  let res = await deleteImportedEmployeesAsync(importEmployeesId);
   expect(res.status).toBe(200);  
 }); 
 
@@ -30,7 +30,7 @@ describe('POST employee import history', () => {
     if(global.ACCESS_TOKEN == null)
       throw new Error("Access token is missing");   
    
-    const response = await getEmployeeImportHistoryAsync({ employeeImportId, page: 1, pageSize: PAGE_SIZE}); 
+    const response = await getImportedEmployeesHistoryAsync({ importEmployeesId, page: 1, pageSize: PAGE_SIZE}); 
  
     let expectedEmployeesTotal = 8;
     let expectedEmployeesInPage = 5;
@@ -46,7 +46,7 @@ describe('POST employee import history', () => {
     if(global.ACCESS_TOKEN == null)
       throw new Error("Access token is missing");  
   
-    const response = await getEmployeeImportHistoryAsync({employeeImportId, page: 2, pageSize: PAGE_SIZE}); 
+    const response = await getImportedEmployeesHistoryAsync({importEmployeesId, page: 2, pageSize: PAGE_SIZE}); 
 
     let expectedEmployeesTotal = 8;
     let expectedEmployeesInPage = 3;
@@ -62,7 +62,7 @@ describe('POST employee import history', () => {
     if(global.ACCESS_TOKEN == null)
       throw new Error("Access token is missing");   
    
-    const response = await getExistingEmployeeImportHistoryAsync({ employeeImportId, page: 1, pageSize: PAGE_SIZE}); 
+    const response = await getImportedEmployeesExistingHistoryAsync({ importEmployeesId, page: 1, pageSize: PAGE_SIZE}); 
  
     let expectedEmployeesTotal = 2;
     let expectedEmployeesInPage = 2;
@@ -78,7 +78,7 @@ describe('POST employee import history', () => {
     if(global.ACCESS_TOKEN == null)
       throw new Error("Access token is missing");   
    
-    const response = await getErrorEmployeeImportHistoryAsync({ employeeImportId, page: 1, pageSize: PAGE_SIZE}); 
+    const response = await getImportedEmployeesErrorHistoryAsync({ importEmployeesId, page: 1, pageSize: PAGE_SIZE}); 
  
     let expectedEmployeesTotal = 1;
     let expectedEmployeesInPage = 1;
@@ -128,7 +128,6 @@ function validateEmployeesErrorArray(errors: any[], expectedLength: number) {
     expect(fields[3]).toBe('2011-01-15');                        
     expect(fields[4]).toBe('687783fbb6fc23ad4cdca63d'); 
     expect(fields[5]).toBe('moranjason@gmail.com');           
-    expect(fields[6]).toBe('07814016865');     
-
+    expect(fields[6]).toBe('07814016865');
   }
 } 

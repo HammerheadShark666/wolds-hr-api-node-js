@@ -18,7 +18,7 @@ export interface ImportedEmployeesHistoryRequest {
   pageSize?: number;
 }
 
-export interface EmployeeImportHistoryPagedResponse {
+export interface ImportedEmployeesHistoryPagedResponse {
   page: number;
   pageSize: number;
   totalPages: number;
@@ -26,23 +26,23 @@ export interface EmployeeImportHistoryPagedResponse {
   employees: EmployeeResponse[];
 }
  
-export interface EmployeeImportErrorHistoryPagedResponse {
+export interface ImportedEmployeesErrorHistoryPagedResponse {
   page: number;
   pageSize: number;
   totalPages: number;
   totalEmployees: number;
-  employees?: EmployeeImportError[];
+  employees?: ImportedEmployeeError[];
 } 
-export interface EmployeeImportError {
+export interface ImportedEmployeeError {
   employee: string;
   error: string;
 }
 
-export interface DeleteEmployeeImportHistoryRequest {
-  employeeImportId: Types.ObjectId; 
+export interface DeleteImportedEmployeesHistoryRequest {
+  importEmployeesId: Types.ObjectId; 
 }
 
-export interface DeleteEmployeeImportHistoryResponse {
+export interface DeleteImportedEmployeesHistoryResponse {
   success: boolean;
   count?: number;
   error?: string;

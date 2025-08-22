@@ -7,7 +7,7 @@ export interface IImportedExistingEmployee extends Document {
   dateOfBirth: Date | null; 
   email?: string;
   phoneNumber?: string;  
-  employeeImportId: Types.ObjectId;
+  importEmployeesId: Types.ObjectId;
   createdAt: Date;
 }
 
@@ -17,7 +17,7 @@ const ImportedExistingEmployeeSchema = new Schema<IImportedExistingEmployee>({
   dateOfBirth: { type: Date, default: null }, 
   email: { type: String, required: false, default: null, maxlength: 250, match: /.+@.+\..+/ },
   phoneNumber: { type: String, maxlength: 25, default: null },  
-  employeeImportId: { type: Schema.Types.ObjectId, ref: 'EmployeeImport', required: false, default: null },
+  importEmployeesId: { type: Schema.Types.ObjectId, ref: 'ImportEmployee', required: false, default: null },
   createdAt: { type: Date, default: Date.now }
 });
 
