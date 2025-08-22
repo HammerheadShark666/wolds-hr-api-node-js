@@ -20,9 +20,7 @@ export async function getDepartmentByNameAsync(name: string) {
 
   const req = await request(global.app!)
     .get("/v1/departments/name/" + name)
-    .set("Cookie", [global.ACCESS_TOKEN]);
-
-  console.log("req - ", req.body)
+    .set("Cookie", [global.ACCESS_TOKEN]); 
 
   return req.body.id;
 }

@@ -1,6 +1,5 @@
 import request from 'supertest';
-import { AUTHENTICATION_ERRORS, PAGE_SIZE } from '../../../utils/constants';
-import { Types } from 'mongoose';
+import { AUTHENTICATION_ERRORS, PAGE_SIZE } from '../../../utils/constants'; 
 
 export async function postImportEmployeeAsync(filePath: string) {
  
@@ -23,19 +22,86 @@ export async function getEmployeeImportHistoryAsync(params?: { employeeImportId:
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   return request(global.app!)
-    .get(`/v1/employees/import/history/imported?employeeImportId=${employeeImportId}&page=${page}&pageSize=${pageSize}`)
+    .get(`/v1/employees/import/history/imported?id=${employeeImportId}&page=${page}&pageSize=${pageSize}`)
     .set("Cookie", [global.ACCESS_TOKEN]);
 }
 
-export async function deleteImportedEmployees(employeeImportId?: string) {
+export async function getExistingEmployeeImportHistoryAsync(params?: { employeeImportId: string, page: number, pageSize: number }) {
+   
+  const employeeImportId = params?.employeeImportId ?? '';
+  const page = params?.page ?? 1;
+  const pageSize = params?.pageSize ?? PAGE_SIZE; 
+
+  if (!global.ACCESS_TOKEN)
+    throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
+
+  return request(global.app!)
+    .get(`/v1/employees/import/history/existing?id=${employeeImportId}&page=${page}&pageSize=${pageSize}`)
+    .set("Cookie", [global.ACCESS_TOKEN]);
+}
+
+export async function getErrorEmployeeImportHistoryAsync(params?: { employeeImportId: string, page: number, pageSize: number }) {
+   
+  const employeeImportId = params?.employeeImportId ?? '';
+  const page = params?.page ?? 1;
+  const pageSize = params?.pageSize ?? PAGE_SIZE; 
+
+  if (!global.ACCESS_TOKEN)
+    throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
+
+  return request(global.app!)
+    .get(`/v1/employees/import/history/error?id=${employeeImportId}&page=${page}&pageSize=${pageSize}`)
+    .set("Cookie", [global.ACCESS_TOKEN]);
+}
+
+export async function deleteImportedEmployeesAsync(employeeImportId?: string) {
 
   if(global.ACCESS_TOKEN == null)
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   const req = request(global.app!)
-    .delete(`/v1/employees/import/history/imported/${employeeImportId}`)            
+    .delete(`/v1/employees/import/history/${employeeImportId}`)            
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
     
   return req.send();
 }
+
+// export async function deleteImportedExistingEmployeesAsync(employeeImportId?: string) {
+
+//   if(global.ACCESS_TOKEN == null)
+//     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
+
+//   const req = request(global.app!)
+//     .delete(`/v1/employees/import/history/imported/existing/${employeeImportId}`)            
+//       .set("Cookie", [global.ACCESS_TOKEN])
+//       .set("Content-Type", "application/json");
+    
+//   return req.send();
+// }
+
+// export async function deleteImportedEmployeesErrorAsync(employeeImportId?: string) {
+
+//   if(global.ACCESS_TOKEN == null)
+//     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
+
+//   const req = request(global.app!)
+//     .delete(`/v1/employees/import/history/imported/error/${employeeImportId}`)            
+//       .set("Cookie", [global.ACCESS_TOKEN])
+//       .set("Content-Type", "application/json");
+    
+//   return req.send();
+// }
+
+// export async function deleteImportedEmployeesHistoryAsync(employeeImportId?: string) {
+
+//   if(global.ACCESS_TOKEN == null)
+//     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
+
+//   const req = request(global.app!)
+//     .delete(`/v1/employees/import/history/${employeeImportId}`)            
+//       .set("Cookie", [global.ACCESS_TOKEN])
+//       .set("Content-Type", "application/json");
+    
+//   return req.send();
+// }

@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { IEmployee } from "../models/employee.model";
 import { DepartmentResponse } from "./department";
+import { IImportedEmployee } from "../models/importedEmployee.model";
  
 export interface EmployeeSearchRequest {
   keyword?: string;
@@ -63,14 +64,14 @@ export interface UploadEmployeePhotoResponse {
   filename: string;
 }
  
-export interface EmployeeImportResponse
+export interface EmployeeImportHistoryResponse
 {
   id: Types.ObjectId | null | undefined;
   date?: Date;
 }
 
 export interface EmployeeImportHistoryRequest {
-  employeeImportId: Types.ObjectId;
+  id: Types.ObjectId;
   page?: number;
   pageSize?: number;
 }
@@ -85,9 +86,34 @@ export interface EmployeeImportHistoryPagedResponse {
   success: boolean;
 }
 
-export interface EmployeeImportHistoryResponse {
+export interface EmployeesImportHistoryResponse {
   success: boolean;
   data?: IEmployee[];
+  error?: string;
+}
+
+export interface EmployeesImportedHistoryResponse { 
+  employeeImportHistory?: EmployeeImportHistoryResponse[]; 
+}
+
+export interface EmployeeImportErrorHistoryResponse {
+  success: boolean;
+  data?: EmployeeImportError[];
+  error?: string;
+}
+
+export interface EmployeeImportError {
+  employee: string;
+  error: string;
+}
+
+export interface EmployeeImportErrorHistoryPagedResponse {
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  totalEmployees: number;
+  success: boolean;
+  employees?: EmployeeImportError[];
   error?: string;
 }
 

@@ -48,10 +48,7 @@ describe("PUT /api/v1/employees", () => {
             phoneNumber: UPDATE_EMPLOYEE_PHONE_NUMBER, 
             departmentId: updateDepartmentId.toString()
           } satisfies EmployeeRequest);
-
-
-          console.log(response.body)
-
+ 
     expectEmployee(response.body, { expectedSurname: UPDATE_EMPLOYEE_SURNAME, expectedFirstName: UPDATE_EMPLOYEE_FIRST_NAME, expectedDateOfBirth: UPDATE_EMPLOYEE_DOB, 
                                     expectedHireDate: UPDATE_EMPLOYEE_HIRE_DATE, expectedEmail: UPDATE_EMPLOYEE_EMAIL, expectedPhoneNumber: UPDATE_EMPLOYEE_PHONE_NUMBER, expectedDepartmentId: updateDepartmentId.toString() });
  

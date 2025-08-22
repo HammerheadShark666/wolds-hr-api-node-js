@@ -1,4 +1,3 @@
-import { EmployeeImportResponse } from "../interface/employee";
 import { ServiceResult } from "../types/ServiceResult";
 import { handleServiceError } from "../utils/error.helper"; 
 import { EmployeeModel } from "../models/employee.model";
@@ -9,8 +8,9 @@ import { ImportedExistingEmployeeModel } from "../models/importedExistingEmploye
 import { getEndOfDayDate, getStartOfDayDate } from "../utils/date.helper";
 import { parseImportEmployeeCsvBuffer } from "../utils/employeeParser.helper";
 import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model";
+import { EmployeeImportHistoryResponse } from "../interface/employee";
    
-export async function importEmployees(fileBuffer: Buffer, mimeType: string): Promise<ServiceResult<EmployeeImportResponse>> {
+export async function importEmployees(fileBuffer: Buffer, mimeType: string): Promise<ServiceResult<EmployeeImportHistoryResponse>> {
  
   try {
 
@@ -26,15 +26,17 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
  
         employee.employeeImportId = employeeImport.id;
 
-        if(employee.surname == 'Pruitt')
-          throw new Error('Error with imported employee');
+       // if(employee.surname == 'Pruitt')
+       //   throw new Error('Error with imported employee');
 
         const employeeExists = await employeeExistsAsync(employee.surname, employee.firstName, employee.dateOfBirth);
         if(employeeExists) {    
+          console.log("employeeExists - ", true)
           const importedExistingEmployee = new ImportedExistingEmployeeModel(employee);
           await importedExistingEmployee.save();        
         }
         else { 
+          console.log("employeeExists - ", false)
           const employeeToImport = new EmployeeModel(employee);
           await employeeToImport.save();    
         } 
