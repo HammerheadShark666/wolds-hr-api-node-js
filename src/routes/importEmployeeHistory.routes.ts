@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import asyncHandler from 'express-async-handler';
-import { deleteImportedEmployeeHistoryAsync, importedEmployeesErrorPagedAsync, importedEmployeesExistingPagedAsync, importedEmployeesHistoryAsync, importedEmployeesPagedAsync } from '../services/employeeImportHistory.service';
-import { ImportedEmployeesHistoryRequest } from '../interface/employeeImportHistory';
+import asyncHandler from 'express-async-handler'; 
+import { ImportedEmployeesHistoryRequest } from '../interface/importEmployeeHistory';
+import { deleteImportedEmployeeHistoryAsync, importedEmployeesErrorPagedAsync, importedEmployeesExistingPagedAsync, importedEmployeesHistoryAsync, importedEmployeesPagedAsync } from '../services/importEmployeeHistory.service';
 
 export function createImportEmployeesHistoryRouter() {
   

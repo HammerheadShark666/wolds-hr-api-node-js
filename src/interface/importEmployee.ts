@@ -2,11 +2,17 @@ import { ObjectId, Schema, Types } from "mongoose";
 import { IEmployee } from "../models/employee.model";
 
 export interface ImportedEmployees {
-  id: Types.ObjectId;
-  date: Date;
-  employees: IEmployee[];
-  existingEmployees: IEmployee[];
+  id: Types.ObjectId | null;
+  importedEmployeesCount: number;
+  importEmployeesExistingCount: number;
+  importEmployeesErrorsCount: number;
 }
+
+export interface ImportedEmployee
+{
+  id: Types.ObjectId | null ;
+  date?: Date;
+} 
 
 export interface ImportEmployee { 
   surname: string;

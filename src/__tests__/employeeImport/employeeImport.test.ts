@@ -18,9 +18,21 @@ describe('Import employees from file', () => {
       throw new Error("Access token is missing"); 
  
     const response = await postImportEmployeeAsync(filePath); 
+ 
     expect(response.status).toBe(200);   
  
     importEmployeesId = response.body.id; 
+    expect(response.body).toHaveProperty('id');
+    expect(response.body).toHaveProperty('importedEmployeesCount');   
+    expect(response.body).toHaveProperty('importEmployeesExistingCount');
+    expect(response.body).toHaveProperty('importEmployeesErrorsCount');
+    expect(typeof response.body.id).toBe('string'); 
+    expect(typeof response.body.importedEmployeesCount).toBe('number');
+    expect(typeof response.body.importEmployeesExistingCount).toBe('number');
+    expect(typeof response.body.importEmployeesErrorsCount).toBe('number'); 
+    expect(response.body.importedEmployeesCount).toEqual(8);
+    expect(response.body.importEmployeesExistingCount).toEqual(2);
+    expect(response.body.importEmployeesErrorsCount).toEqual(1); 
   });
 
 

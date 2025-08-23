@@ -7,14 +7,17 @@ import { ImportedExistingEmployeeModel } from "../models/importedExistingEmploye
 import { getEndOfDayDate, getStartOfDayDate } from "../utils/date.helper";
 import { parseImportEmployeeCsvBuffer } from "../utils/employeeParser.helper";
 import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model";  
-import { ImportedEmployees, ImportEmployee } from "../interface/importEmployee";
-import { ImportedEmployeeHistory } from "../interface/employeeImportHistory";
+import { ImportedEmployee, ImportedEmployees, ImportEmployee } from "../interface/importEmployee"; 
    
-export async function importEmployees(fileBuffer: Buffer, mimeType: string): Promise<ServiceResult<ImportedEmployeeHistory>> {
+export async function importEmployees(fileBuffer: Buffer, mimeType: string): Promise<ServiceResult<ImportedEmployees>> {
  
+  let importedEmployeesCount: number = 0;
+  let importEmployeesExistingCount: number= 0;
+  let importEmployeesErrorsCount: number= 0;
+
   try {
 
-    const importedEmployees: ImportedEmployees = await addImportedEmployees();
+    const importedEmployees: ImportedEmployee = await addImportedEmployees();
     if(!importedEmployees)
       throw new Error("Employee import not created")
 
@@ -32,11 +35,13 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
         const employeeExists = await employeeExistsAsync(employee.surname, employee.firstName, employee.dateOfBirth);
         if(employeeExists) {
           const importedExistingEmployee = new ImportedExistingEmployeeModel(employee);
-          await importedExistingEmployee.save();        
+          await importedExistingEmployee.save(); 
+          importEmployeesExistingCount++;       
         }
         else { 
           const employeeToImport = new EmployeeModel(employee);
           await employeeToImport.save();    
+          importedEmployeesCount++;
         } 
       } 
       catch (err: unknown) {
@@ -47,11 +52,12 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
 
         console.log(err) 
         const importedEmployeeError = new ImportedEmployeeErrorModel({employee: employeeToCsvLine(employee), importEmployeesId: importedEmployees.id, error: errorMessage});
-        await importedEmployeeError.save();   
+        await importedEmployeeError.save();
+        importEmployeesErrorsCount++;
       }
     }; 
-  
-    return { success: true, data: {id: importedEmployees.id, date: new Date()}}; 
+ 
+    return { success: true, data: { id: importedEmployees.id, importedEmployeesCount: importedEmployeesCount, importEmployeesExistingCount: importEmployeesExistingCount, importEmployeesErrorsCount: importEmployeesErrorsCount }}
   } 
   catch (err: unknown) {  
     console.log(err)
