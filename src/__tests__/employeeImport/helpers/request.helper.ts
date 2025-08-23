@@ -1,13 +1,15 @@
 import request from 'supertest';
 import { AUTHENTICATION_ERRORS, PAGE_SIZE } from '../../../utils/constants'; 
 
+const baseUrl = '/v1/employees/import';
+
 export async function postImportEmployeeAsync(filePath: string) {
  
   if(global.ACCESS_TOKEN == null)
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING); 
 
   return request(global.app!)
-        .post(`/v1/employees/import`) 
+        .post(`${baseUrl}`) 
           .set("Cookie", [global.ACCESS_TOKEN])
           .attach('importFile', filePath); 
 }
@@ -22,7 +24,7 @@ export async function getImportedEmployeesHistoryAsync(params?: { importEmployee
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   return request(global.app!)
-    .get(`/v1/employees/import/history/imported?id=${importEmployeesId}&page=${page}&pageSize=${pageSize}`)
+    .get(`${baseUrl}/history/imported?id=${importEmployeesId}&page=${page}&pageSize=${pageSize}`)
     .set("Cookie", [global.ACCESS_TOKEN]);
 }
 
@@ -36,7 +38,7 @@ export async function getImportedEmployeesExistingHistoryAsync(params?: { import
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   return request(global.app!)
-    .get(`/v1/employees/import/history/existing?id=${importEmployeesId}&page=${page}&pageSize=${pageSize}`)
+    .get(`${baseUrl}/history/existing?id=${importEmployeesId}&page=${page}&pageSize=${pageSize}`)
     .set("Cookie", [global.ACCESS_TOKEN]);
 }
 
@@ -50,7 +52,7 @@ export async function getImportedEmployeesErrorHistoryAsync(params?: { importEmp
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   return request(global.app!)
-    .get(`/v1/employees/import/history/error?id=${importEmployeesId}&page=${page}&pageSize=${pageSize}`)
+    .get(`${baseUrl}/history/error?id=${importEmployeesId}&page=${page}&pageSize=${pageSize}`)
     .set("Cookie", [global.ACCESS_TOKEN]);
 }
 
@@ -60,7 +62,7 @@ export async function deleteImportedEmployeesAsync(importEmployeesId?: string) {
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   const req = request(global.app!)
-    .delete(`/v1/employees/import/history/${importEmployeesId}`)            
+    .delete(`${baseUrl}/history/${importEmployeesId}`)            
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
     

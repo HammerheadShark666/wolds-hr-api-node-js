@@ -2,13 +2,15 @@ import request from 'supertest';
 import { EmployeeRequest } from '../../../interface/employee';
 import { AUTHENTICATION_ERRORS, PAGE_SIZE } from '../../../utils/constants'; 
 
+const baseUrl = '/v1/employees';
+
 export async function postEmployeeAsync(data?: EmployeeRequest) {
  
   if(global.ACCESS_TOKEN == null)
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   const req = request(global.app!)
-    .post("/v1/employees")
+    .post(`${baseUrl}`)
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
   
@@ -24,7 +26,7 @@ export async function deleteEmployeeAsync(id: string) {
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   const req = request(global.app!)
-    .delete(`/v1/employees/${id}`)
+    .delete(`${baseUrl}/${id}`)
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
    
@@ -37,7 +39,7 @@ export async function getEmployeeAsync(id: string) {
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   const req = request(global.app!)
-    .get(`/v1/employees/${id}`)
+    .get(`${baseUrl}/${id}`)
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
    
@@ -50,7 +52,7 @@ export async function postEmployeePhotoAsync(filePath: string, id: string) {
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING); 
 
   return request(global.app!)
-        .post(`/v1/employees/photo/upload/${id}`)
+        .post(`${baseUrl}/photo/upload/${id}`)
           .set("Cookie", [global.ACCESS_TOKEN])
           .attach('photoFile', filePath); 
 } 
@@ -66,7 +68,7 @@ export async function getSearchEmployeesAsync(params?: { keyword:string, departm
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   return request(global.app!)
-    .get(`/v1/employees/search?keyword=${keyword}&departmentId=${departmentId}&page=${page}&pageSize=${pageSize}`)
+    .get(`${baseUrl}/search?keyword=${keyword}&departmentId=${departmentId}&page=${page}&pageSize=${pageSize}`)
     .set("Cookie", [global.ACCESS_TOKEN]);
 }
 
@@ -76,7 +78,7 @@ export async function putEmployeeAsync(id?: string, data?: EmployeeRequest) {
     throw new Error(AUTHENTICATION_ERRORS.ACCESS_TOKEN_MISSING);
 
   const req = request(global.app!)
-    .put(`/v1/employees/${id}`)
+    .put(`${baseUrl}/${id}`)
       .set("Cookie", [global.ACCESS_TOKEN])
       .set("Content-Type", "application/json");
   
