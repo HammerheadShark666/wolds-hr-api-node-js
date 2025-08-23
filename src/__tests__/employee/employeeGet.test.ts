@@ -2,7 +2,8 @@ import { expectError } from '../../utils/error.helper';
 import { createEmployee } from './helpers/db.helper';
 import { expectEmployee } from './helpers/expected.helper';
 import { deleteEmployeeAsync, getEmployeeAsync } from './helpers/request.helper';
-import { EMPLOYEE_DEPARTMENT_ID, EMPLOYEE_DOB, EMPLOYEE_EMAIL, EMPLOYEE_FIRST_NAME, EMPLOYEE_HIRE_DATE, EMPLOYEE_PHONE_NUMBER, EMPLOYEE_SURNAME } from './helpers/constants';
+import { DEPARTMENT_NAME_MARKETING, EMPLOYEE_DOB, EMPLOYEE_EMAIL, EMPLOYEE_FIRST_NAME, EMPLOYEE_HIRE_DATE, EMPLOYEE_PHONE_NUMBER, EMPLOYEE_SURNAME } from './helpers/constants';
+import { getDepartmentByNameAsync } from '../department/helpers/request.helper';
 
 let employeeId = '';
 
@@ -22,12 +23,15 @@ afterAll(async () => {
 describe("GET /api/v1/employees", () => {
 
   it("should return 200 and employee when found successfully", async () => {
+
+      const expectedDepartmentId = await getDepartmentByNameAsync(DEPARTMENT_NAME_MARKETING);
+
       const response = await getEmployeeAsync(employeeId); 
       expect(response.status).toBe(200);
 
       expectEmployee(response.body, { expectedSurname: EMPLOYEE_SURNAME, expectedFirstName: EMPLOYEE_FIRST_NAME, expectedDateOfBirth: EMPLOYEE_DOB, 
                                       expectedHireDate: EMPLOYEE_HIRE_DATE, expectedEmail: EMPLOYEE_EMAIL, expectedPhoneNumber: EMPLOYEE_PHONE_NUMBER, 
-                                      expectedDepartmentId: EMPLOYEE_DEPARTMENT_ID });
+                                      expectedDepartmentId: expectedDepartmentId.toString() });
   });
 
   it("should return 400 when invalid id passed", async () => {

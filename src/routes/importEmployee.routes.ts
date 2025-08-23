@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express'; 
 import { FILES, GENERAL_ERRORS } from '../utils/constants';
 import multer from 'multer';
-import { importEmployees } from '../services/employeeImport.service';
+import { importEmployees } from '../services/importEmployee.service';
 
-export function createEmployeeImportsRouter() {
+export function createImportEmployeesRouter() {
   
   const upload = multer({ storage: multer.memoryStorage() });
   const router = Router();

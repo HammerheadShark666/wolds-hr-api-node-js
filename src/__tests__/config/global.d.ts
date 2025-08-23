@@ -1,4 +1,5 @@
 import { Express } from 'express';
+import { IDepartment } from '../../models/department.model';
 
 declare global {
   namespace NodeJS {
@@ -10,6 +11,7 @@ declare global {
       userId: string;
       username: string;
       password: string;
+      importEmployeesId: string;
     }
   }
  
@@ -20,6 +22,7 @@ declare global {
   var userId: string | undefined;
   var username: string | undefined;
   var password: string | undefined;
+  var importEmployeesId: string | undefined;
 }
 
 export {};

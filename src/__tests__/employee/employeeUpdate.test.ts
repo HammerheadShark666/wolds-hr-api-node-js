@@ -1,9 +1,10 @@
 import { expectError } from '../../utils/error.helper';
 import { EmployeeRequest } from '../../interface/employee';  
 import { expectEmployee } from './helpers/expected.helper';
-import { deleteEmployeeAsync, postEmployeeAsync, putEmployeeAsync } from './helpers/request.helper';
+import { deleteEmployeeAsync, putEmployeeAsync } from './helpers/request.helper';
 import { createEmployee } from './helpers/db.helper';
-import { EMPLOYEE_FIRST_NAME, EMPLOYEE_SURNAME } from './helpers/constants';
+import { DEPARTMENT_NAME_QA, EMPLOYEE_FIRST_NAME, EMPLOYEE_SURNAME } from './helpers/constants'; 
+import { getDepartmentByNameAsync } from '../department/helpers/request.helper';
 
 let employeeId = '';
  
@@ -13,7 +14,6 @@ const UPDATE_EMPLOYEE_DOB = new Date("05-23-2000");
 const UPDATE_EMPLOYEE_HIRE_DATE = new Date("03-11-2021");
 const UPDATE_EMPLOYEE_EMAIL = "test@hotmail.com";
 const UPDATE_EMPLOYEE_PHONE_NUMBER = "0177563423";
-const UPDATE_EMPLOYEE_DEPARTMENT_ID = "687783fbb6fc23ad4cdca63b"; 
 const EMPLOYEE_SURNAME_OVERSIZED = "OversizedSurnameOversizedSurnameOversizedSurname";
 const EMPLOYEE_FIRST_NAME_OVERSIZED = "OversizedFirstNameOversizedFirstNameOversizedFirstName";
 const EMPLOYEE_INVALID_EMAIL = "testhotmail";
@@ -28,7 +28,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {  
-  const res = await deleteEmployeeAsync(employeeId);
+  const res = await deleteEmployeeAsync(employeeId); 
   expect(res.status).toBe(200);
   expect(res.body.message).toMatch('Employee deleted');
 });
@@ -37,6 +37,8 @@ describe("PUT /api/v1/employees", () => {
 
   it("should return 200 when updated successfully", async () => {
      
+    const updateDepartmentId = await getDepartmentByNameAsync(DEPARTMENT_NAME_QA);
+
     const response = await putEmployeeAsync(employeeId,{
             surname: UPDATE_EMPLOYEE_SURNAME, 
             firstName: UPDATE_EMPLOYEE_FIRST_NAME, 
@@ -44,11 +46,11 @@ describe("PUT /api/v1/employees", () => {
             hireDate: UPDATE_EMPLOYEE_HIRE_DATE, 
             email: UPDATE_EMPLOYEE_EMAIL, 
             phoneNumber: UPDATE_EMPLOYEE_PHONE_NUMBER, 
-            departmentId: UPDATE_EMPLOYEE_DEPARTMENT_ID
+            departmentId: updateDepartmentId.toString()
           } satisfies EmployeeRequest);
-
+ 
     expectEmployee(response.body, { expectedSurname: UPDATE_EMPLOYEE_SURNAME, expectedFirstName: UPDATE_EMPLOYEE_FIRST_NAME, expectedDateOfBirth: UPDATE_EMPLOYEE_DOB, 
-                                    expectedHireDate: UPDATE_EMPLOYEE_HIRE_DATE, expectedEmail: UPDATE_EMPLOYEE_EMAIL, expectedPhoneNumber: UPDATE_EMPLOYEE_PHONE_NUMBER, expectedDepartmentId: UPDATE_EMPLOYEE_DEPARTMENT_ID });
+                                    expectedHireDate: UPDATE_EMPLOYEE_HIRE_DATE, expectedEmail: UPDATE_EMPLOYEE_EMAIL, expectedPhoneNumber: UPDATE_EMPLOYEE_PHONE_NUMBER, expectedDepartmentId: updateDepartmentId.toString() });
  
     employeeId = response.body.id;
   });

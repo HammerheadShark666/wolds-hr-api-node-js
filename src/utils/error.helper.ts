@@ -10,7 +10,7 @@ export function handleServiceError(err: unknown): { success: false; error: strin
   }
 
   if (err instanceof Error) {
-    return { success: false, error: ['Unexpected error: ' + err.message], code: 500 };
+    return { success: false, error: [`Unexpected error: ${err.message} `], code: 500 };
   }
  
   return { success: false, error: ['Unexpected error: Unknown error'], code: 500 };

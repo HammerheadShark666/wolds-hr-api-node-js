@@ -1,31 +1,29 @@
-import path from "path";
-import request from 'supertest';
-import { expectError } from "../../utils/error.helper";
-import { deleteEmployeeAsync, postEmployeeAsync, postEmployeePhotoAsync, postImportEmployeeAsync } from "./helpers/request.helper";
-import { createEmployee } from "./helpers/db.helper";
-import { UUID_REGEX } from "./helpers/constants";
+import path from "path"; 
+import { deleteImportedEmployeesAsync, postImportEmployeeAsync } from "./helpers/request.helper";   
 
-let employeeId = ""; 
+let importEmployeesId: string = ""
 
-const EMPLOYEE_NOT_FOUND_ID = "689afebce7fb4bb9ac7607ea"; 
-
- 
+afterAll(async () => {
+  const res = await deleteImportedEmployeesAsync(importEmployeesId);
+  expect(res.status).toBe(200);   
+}); 
 
 describe('Import employees from file', () => {
-  
+   
   it('should import employees successfully', async () => {
-
+  
     const filePath = path.join(__dirname, '../files', 'employee-imports.csv');
 
     if(global.ACCESS_TOKEN == null)
       throw new Error("Access token is missing"); 
-  
+ 
     const response = await postImportEmployeeAsync(filePath); 
-    expect(response.status).toBe(200);    
-     
-     
-
+    expect(response.status).toBe(200);   
+ 
+    importEmployeesId = response.body.id; 
   });
+
+
 
   // it('should return 404 if employee not found', async () => {
 

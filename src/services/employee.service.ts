@@ -11,6 +11,7 @@ import { departmentExistsAsync } from './department.service';
 import { updateEmployeeSchema } from '../validation/employee/updateEmployee.schema';
 import { idSchema } from '../validation/fields/id.schema';
 import { DEPARTMENT_ERRORS, EMPLOYEE_ERRORS, PAGE_SIZE } from '../utils/constants'; 
+import { validatePagination } from '../utils/paging.helper';
  
 //Service export functions
 
@@ -147,7 +148,7 @@ export async function updateEmployeeAsync(id: string, data: EmployeeRequest): Pr
   }
 }
 
-export async function deleteEmployeeAsyncAsync(id: string): Promise<ServiceResult<null>> {
+export async function deleteEmployeeAsyncAsync(id: string): Promise<ServiceResult<string>> {
   
   const validationResult = await validate(idSchema, id);  
   if (!validationResult.success) { 
@@ -162,7 +163,7 @@ export async function deleteEmployeeAsyncAsync(id: string): Promise<ServiceResul
   
     await EmployeeModel.findByIdAndDelete(id);  
 
-    return { success: true, data: null };
+    return { success: true, data: `Employee deleted - ${id}` };
   } 
   catch (err: unknown) { 
     return handleServiceError(err);
@@ -203,7 +204,7 @@ async function countEmployeesAsync(keyword?: string, departmentId?: string): Pro
 
     return EmployeeModel.countDocuments(filter);
   } catch (err) { 
-    return 0;
+    throw new Error("Error counting number of employees");
   }
 }
 
@@ -292,31 +293,12 @@ export function getEmployeeWithDepartmentPipeline(
         phoneNumber: 1,
         photo: 1,
         departmentId: 1,
-        employeeImportId: 1,
+        importEmployeesId: 1,
         createdAt: 1,
         department: {
-          $arrayElemAt: ["$department", 0] // returns null if no department
+          $arrayElemAt: ["$department", 0]
         }
       }
     }
   ];
-} 
-   
-//Service Validation 
-
-function validatePagination(page: number, pageSize: number): [number, number]{
- 
-  let validPage = Number(page);
-  let validPageSize = Number(pageSize);
- 
-  if (Number.isNaN(validPage) || validPage < 1) {
-    validPage = 1;
-  } 
-
-  const DEFAULT_PAGE_SIZE = PAGE_SIZE;
-  const MAX_PAGE_SIZE = 150;
-  if (Number.isNaN(validPageSize ) || validPageSize  < 1 || validPageSize > MAX_PAGE_SIZE) {
-    validPageSize  = DEFAULT_PAGE_SIZE;
-  } 
-  return  [validPage, validPageSize];
 }

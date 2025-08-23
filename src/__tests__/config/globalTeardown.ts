@@ -20,7 +20,7 @@ export default async function globalTeardown() {
     .send();
 
   if (response.status !== 200) {
-    throw new Error('Failed to delete user in globalTeardown: ' + response.text);
+    throw new Error(`Failed to delete user in globalTeardown: ${response.text}`);
   }
 
   await mongoose.disconnect(); 

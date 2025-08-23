@@ -4,6 +4,8 @@ import { IDepartment } from "../models/department.model";
 import { IUser } from "../models/user.model";
 import { EmployeeResponse } from "../interface/employee";
 import { IEmployee } from "../models/employee.model";
+import { IImportedEmployee } from "../models/importedEmployee.model";
+import { ImportedEmployeeHistory } from "../interface/employeeImportHistory";
 
 export function toDepartmentResponse(department: IDepartment): DepartmentResponse {
   const { id, name } = department;
@@ -44,4 +46,11 @@ export function toEmployeeResponse(employee: IEmployee): EmployeeResponse {
   }; 
  
   return appEmployee;
+} 
+
+export function toEmployeesImportHistoryResponse(importEmployees: IImportedEmployee[]): ImportedEmployeeHistory[] {
+  return importEmployees.map(({ _id, date }) => ({
+    id: _id,
+    date
+  }));
 }

@@ -10,7 +10,7 @@ export interface IEmployee extends Document {
   phoneNumber: string;
   photo: string;
   departmentId: Types.ObjectId;
-  employeeImportId: Types.ObjectId;
+  importEmployeesId: Types.ObjectId;
   createdAt: Date;
   department?: {
     _id: Types.ObjectId;
@@ -27,8 +27,10 @@ const EmployeeSchema = new Schema<IEmployee>({
   phoneNumber: { type: String, maxlength: 25, default: null }, 
   photo:  { type: String, required: false, maxlength: 100, default: null }, 
   departmentId: { type: Schema.Types.ObjectId, ref: 'Department', required: false, default: null },
-  employeeImportId: { type: Schema.Types.ObjectId, ref: 'EmployeeImport', required: false, default: null },
+  importEmployeesId: { type: Schema.Types.ObjectId, ref: 'ImportEmployee', required: false, default: null },
   createdAt: { type: Date, default: Date.now }
 });
+
+EmployeeSchema.index({ importEmployeesId: 1 });
 
 export const EmployeeModel = model<IEmployee>('Employee', EmployeeSchema);

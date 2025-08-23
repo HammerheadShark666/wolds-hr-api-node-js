@@ -1,24 +1,23 @@
 import { Types } from "mongoose";
-import { ImportEmployee } from "../interface/employeeImport";
+import { ImportEmployee } from "../interface/importEmployee";
 
 export async function parseImportEmployeeCsvBuffer(
   fileBuffer: Buffer,
-  employeeImportId: Types.ObjectId | null
+  importEmployeesId: Types.ObjectId | null
 ): Promise<ImportEmployee[]> {
   const lines = fileBuffer.toString("utf-8").split(/\r?\n/);
 
   const employees: ImportEmployee[] = [];
 
   for (const line of lines) {
-    const employee = parseEmployeeFromCsv(line, employeeImportId);
+    const employee = parseEmployeeFromCsv(line, importEmployeesId);
     if (employee) employees.push(employee);
   }
 
   return employees;
-}
- 
+} 
 
-export function parseEmployeeFromCsv(line: string, employeeImportId: Types.ObjectId | null): ImportEmployee | null { 
+export function parseEmployeeFromCsv(line: string, importEmployeesId: Types.ObjectId | null): ImportEmployee | null { 
   
   line = line.trim();
   if (!line) return null;
@@ -49,7 +48,7 @@ export function parseEmployeeFromCsv(line: string, employeeImportId: Types.Objec
     departmentId: Types.ObjectId.isValid(departmentId) 
       ? new Types.ObjectId(departmentId)
       : undefined,
-    employeeImportId: employeeImportId || undefined,
+    importEmployeesId: importEmployeesId || undefined,
     createdAt: new Date(),
   };
 }

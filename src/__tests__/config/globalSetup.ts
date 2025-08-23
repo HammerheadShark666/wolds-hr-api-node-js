@@ -7,6 +7,7 @@ import 'tslib';
 export default async function globalSetup() {
  
   dotenv.config();
+  
   global.app = await createApp();
   await connectToDatabase();
 
