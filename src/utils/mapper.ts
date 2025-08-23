@@ -5,7 +5,7 @@ import { IUser } from "../models/user.model";
 import { EmployeeResponse } from "../interface/employee";
 import { IEmployee } from "../models/employee.model";
 import { IImportedEmployee } from "../models/importedEmployee.model";
-import { ImportedEmployeeHistory } from "../interface/employeeImportHistory";
+import { ImportedEmployeeHistory } from "../interface/importEmployeeHistory";
 
 export function toDepartmentResponse(department: IDepartment): DepartmentResponse {
   const { id, name } = department;

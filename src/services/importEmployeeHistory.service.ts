@@ -11,7 +11,7 @@ import { validate } from "../validation/validate";
 import { ImportedExistingEmployeeModel } from "../models/importedExistingEmployee..model";
 import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model";
 import { ImportedEmployeeModel } from "../models/importedEmployee.model";
-import { ImportedEmployeesHistoryRequest, ImportedEmployeeHistory, ImportedEmployeesErrorHistoryPagedResponse, ImportedEmployeeError, ImportedEmployeesHistoryPagedResponse } from "../interface/employeeImportHistory";
+import { ImportedEmployeesHistoryRequest, ImportedEmployeeHistory, ImportedEmployeesErrorHistoryPagedResponse, ImportedEmployeeError, ImportedEmployeesHistoryPagedResponse } from "../interface/importEmployeeHistory";
  
 export async function importedEmployeesHistoryAsync(): Promise<ServiceResult<ImportedEmployeeHistory[]>> { 
    
