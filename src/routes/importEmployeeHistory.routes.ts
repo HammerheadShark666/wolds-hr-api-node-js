@@ -9,8 +9,7 @@ export function createImportEmployeesHistoryRouter() {
 
   router.get(
     '', 
-    asyncHandler(async (req: Request, res: Response) => { 
-   
+    asyncHandler(async (req: Request, res: Response) => {  
       const response = await importedEmployeesHistoryAsync();   
       
       if (!response.success) { 

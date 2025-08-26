@@ -17,7 +17,8 @@ export async function importedEmployeesHistoryAsync(): Promise<ServiceResult<Imp
    
   try {  
 
-    const response = await ImportedEmployeeModel.find();
+    const response = await ImportedEmployeeModel.find().sort({ date: -1 });
+    console.log(response)
     return { success: true, data: toEmployeesImportHistoryResponse(response) };  
   } 
   catch (err: unknown) { 

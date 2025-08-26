@@ -57,7 +57,7 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
       }
     }; 
  
-    return { success: true, data: { id: importedEmployees.id, importedEmployeesCount: importedEmployeesCount, importEmployeesExistingCount: importEmployeesExistingCount, importEmployeesErrorsCount: importEmployeesErrorsCount }}
+    return { success: true, data: { id: importedEmployees.id, date: importedEmployees.date, importedEmployeesCount: importedEmployeesCount, importEmployeesExistingCount: importEmployeesExistingCount, importEmployeesErrorsCount: importEmployeesErrorsCount }}
   } 
   catch (err: unknown) {  
     console.log(err)
@@ -69,7 +69,7 @@ async function addImportedEmployees() {
   const importedEmployee = new ImportedEmployeeModel();
   importedEmployee._id = new Types.ObjectId();
   const saved = await importedEmployee.save();   
-  return { id: saved._id, date: saved.date, employees: [], existingEmployees: [] };
+  return { id: saved._id, date: saved.date };
 } 
 
 async function employeeExistsAsync(surname: string, firstName: string, dateOfBirth: Date | null) : Promise<boolean> {

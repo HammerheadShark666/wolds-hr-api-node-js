@@ -34,8 +34,8 @@ export async function createApp() {
     v1Router.use('/departments', createDepartmentRouter());
     v1Router.use('/employees', createEmployeesRouter());
     v1Router.use('/employees/photo', createEmployeePhotoRouter());
-    v1Router.use('/employees/import', createImportEmployeesRouter());
-    v1Router.use('/employees/import/history', createImportEmployeesHistoryRouter());
+    v1Router.use('/import/employees', createImportEmployeesRouter());
+    v1Router.use('/import/employees/history', createImportEmployeesHistoryRouter());
     v1Router.use('/users', createUsersRouter());
   
     app.use(SERVER.VERSION, v1Router);
