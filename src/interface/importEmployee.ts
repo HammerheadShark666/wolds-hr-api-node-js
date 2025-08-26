@@ -3,6 +3,7 @@ import { IEmployee } from "../models/employee.model";
 
 export interface ImportedEmployees {
   id: Types.ObjectId | null;
+  date: Date;
   importedEmployeesCount: number;
   importEmployeesExistingCount: number;
   importEmployeesErrorsCount: number;
@@ -10,8 +11,8 @@ export interface ImportedEmployees {
 
 export interface ImportedEmployee
 {
-  id: Types.ObjectId | null ;
-  date?: Date;
+  id: Types.ObjectId;
+  date: Date;
 } 
 
 export interface ImportEmployee { 
