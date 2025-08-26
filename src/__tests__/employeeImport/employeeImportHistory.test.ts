@@ -13,9 +13,7 @@ beforeAll(async () => {
   const response = await postImportEmployeeAsync(filePath); 
   expect(response.status).toBe(200);   
 
-  importEmployeesId = response.body.id; 
-
-  console.log(importEmployeesId)
+  importEmployeesId = response.body.id;
 });
 
 afterAll(async () => {
