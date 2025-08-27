@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { AUTHENTICATION_ERRORS, PAGE_SIZE } from '../../../utils/constants'; 
 
-const baseUrl = '/v1/employees/import';
+const baseUrl = '/v1/import/employees';
 
 export async function postImportEmployeeAsync(filePath: string) {
  

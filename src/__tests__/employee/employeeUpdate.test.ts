@@ -9,9 +9,11 @@ import { getDepartmentByNameAsync } from '../department/helpers/request.helper';
 let employeeId = '';
  
 const UPDATE_EMPLOYEE_SURNAME = "Harrison";
-const UPDATE_EMPLOYEE_FIRST_NAME = "James"
-const UPDATE_EMPLOYEE_DOB = new Date("05-23-2000");
-const UPDATE_EMPLOYEE_HIRE_DATE = new Date("03-11-2021");
+const UPDATE_EMPLOYEE_FIRST_NAME = "James";
+// const UPDATE_EMPLOYEE_DOB = new Date("2000-05-23");
+// const UPDATE_EMPLOYEE_HIRE_DATE = new Date("2021-11-03");
+const UPDATE_EMPLOYEE_DOB = "2000-05-23";
+const UPDATE_EMPLOYEE_HIRE_DATE = "2021-11-03";
 const UPDATE_EMPLOYEE_EMAIL = "test@hotmail.com";
 const UPDATE_EMPLOYEE_PHONE_NUMBER = "0177563423";
 const EMPLOYEE_SURNAME_OVERSIZED = "OversizedSurnameOversizedSurnameOversizedSurname";
@@ -58,6 +60,10 @@ describe("PUT /api/v1/employees", () => {
   it("should return 404 when employee id not found", async () => {
     const updateEmployeeRequest: EmployeeRequest = { surname: UPDATE_EMPLOYEE_SURNAME, firstName: UPDATE_EMPLOYEE_FIRST_NAME }
     const response = await putEmployeeAsync(EMPLOYEE_NOT_FOUND_ID, updateEmployeeRequest);
+
+
+    console.log('Response body:', response.body);
+
     expectError(response, 'Employee not found', 404);
   });
 

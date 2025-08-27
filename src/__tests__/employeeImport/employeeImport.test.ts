@@ -1,5 +1,7 @@
 import path from "path"; 
 import { deleteImportedEmployeesAsync, postImportEmployeeAsync } from "./helpers/request.helper";   
+import { objectIdSchema } from "../../validation/fields/objectId.schema";
+import { todaysDateSchema } from "../../validation/fields/todaysDate.schema";
 
 let importEmployeesId: string = ""
 
@@ -20,6 +22,8 @@ describe('Import employees from file', () => {
     const response = await postImportEmployeeAsync(filePath); 
  
     expect(response.status).toBe(200);   
+
+    console.log('Import response body:', response.body);
  
     importEmployeesId = response.body.id; 
     expect(response.body).toHaveProperty('id');
@@ -27,12 +31,20 @@ describe('Import employees from file', () => {
     expect(response.body).toHaveProperty('importEmployeesExistingCount');
     expect(response.body).toHaveProperty('importEmployeesErrorsCount');
     expect(typeof response.body.id).toBe('string'); 
+    expect(typeof response.body.date).toBe('string');
     expect(typeof response.body.importedEmployeesCount).toBe('number');
     expect(typeof response.body.importEmployeesExistingCount).toBe('number');
     expect(typeof response.body.importEmployeesErrorsCount).toBe('number'); 
-    expect(response.body.importedEmployeesCount).toEqual(8);
+
+    const idResult = objectIdSchema.safeParse(response.body.id);
+    expect(idResult.success).toBe(true);
+
+    const dateResult = todaysDateSchema.safeParse(response.body.date);
+    expect(dateResult.success).toBe(true);
+
+    expect(response.body.importedEmployeesCount).toEqual(10);
     expect(response.body.importEmployeesExistingCount).toEqual(2);
-    expect(response.body.importEmployeesErrorsCount).toEqual(1); 
+    expect(response.body.importEmployeesErrorsCount).toEqual(7); 
   });
 
 

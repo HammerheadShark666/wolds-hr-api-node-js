@@ -27,13 +27,13 @@ import { Types } from "mongoose";
 
 export const objectIdSchema = z.preprocess(
   (val) => {
-    if (val == null) return null;           // null or undefined
+    if (val == null) return null;           
     if (typeof val === "string" && val.trim() === "") return null; // empty string
     return val;
   },
   z.union([
     z.string().regex(/^[a-fA-F0-9]{24}$/, { message: "Invalid department Id" }),
-    z.instanceof(Types.ObjectId), // allow Mongoose ObjectId
-    z.null(),                     // allow null
+    z.instanceof(Types.ObjectId),
+    z.null(),                     
   ])
 );

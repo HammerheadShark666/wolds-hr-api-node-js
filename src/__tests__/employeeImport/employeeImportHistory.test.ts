@@ -30,7 +30,7 @@ describe('POST employee import history', () => {
    
     const response = await getImportedEmployeesHistoryAsync({ importEmployeesId, page: 1, pageSize: PAGE_SIZE}); 
  
-    let expectedEmployeesTotal = 8;
+    let expectedEmployeesTotal = 10;
     let expectedEmployeesInPage = 5;
     let expectedTotalPages = 2;
 
@@ -46,8 +46,8 @@ describe('POST employee import history', () => {
   
     const response = await getImportedEmployeesHistoryAsync({importEmployeesId, page: 2, pageSize: PAGE_SIZE}); 
 
-    let expectedEmployeesTotal = 8;
-    let expectedEmployeesInPage = 3;
+    let expectedEmployeesTotal = 10;
+    let expectedEmployeesInPage = 5;
     let expectedTotalPages = 2;
 
     expect(response.status).toBe(200);    
@@ -78,9 +78,9 @@ describe('POST employee import history', () => {
    
     const response = await getImportedEmployeesErrorHistoryAsync({ importEmployeesId, page: 1, pageSize: PAGE_SIZE}); 
  
-    let expectedEmployeesTotal = 1;
-    let expectedEmployeesInPage = 1;
-    let expectedTotalPages = 1;  
+    let expectedEmployeesTotal = 7;
+    let expectedEmployeesInPage = 5;
+    let expectedTotalPages = 2;  
  
     expect(response.status).toBe(200);    
     validatePaginationMeta(response.body, 1, expectedTotalPages, PAGE_SIZE, expectedEmployeesTotal);
@@ -114,17 +114,17 @@ function validateEmployeesErrorArray(errors: any[], expectedLength: number) {
   expect(Array.isArray(errors)).toBe(true);
   expect(errors.length).toBe(expectedLength);
  
-  if (errors.length > 0) {
-    const employee = errors[0].employee;
-    
-    const fields = employee.split(',');
+  if (errors.length > 0) { 
+
+    const error = errors.find(item => item.employee.includes("Pruitt"));    
+    const fields = error.employee.split(',');
 
     expect(fields).toHaveLength(7);
     expect(fields[0]).toBe('Pruitt');                           
     expect(fields[1]).toBe('Matthew');                          
     expect(fields[2]).toBe('1974-12-08');                      
     expect(fields[3]).toBe('2011-01-15');                        
-    expect(fields[4]).toBe('687783fbb6fc23ad4cdca63d'); 
+    expect(fields[4]).toBe('68a5e82bee6dd9293bf8aad6'); 
     expect(fields[5]).toBe('moranjason@gmail.com');           
     expect(fields[6]).toBe('07814016865');
   }

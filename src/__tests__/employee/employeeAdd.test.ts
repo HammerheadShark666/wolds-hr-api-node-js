@@ -5,7 +5,6 @@ import { deleteEmployeeAsync, postEmployeeAsync } from './helpers/request.helper
 import { DEPARTMENT_NAME_MARKETING, EMPLOYEE_DOB, EMPLOYEE_EMAIL, EMPLOYEE_FIRST_NAME, EMPLOYEE_HIRE_DATE, EMPLOYEE_PHONE_NUMBER, EMPLOYEE_SURNAME } from './helpers/constants';
 import { getDepartmentByNameAsync } from '../department/helpers/request.helper';
 
-
 let employeeId = '';
 
 const EMPLOYEE_SURNAME_OVERSIZED = "OversizedSurnameOversizedSurnameOversizedSurname";
@@ -32,7 +31,7 @@ describe("POST /api/v1/employees", () => {
       phoneNumber: EMPLOYEE_PHONE_NUMBER,
       departmentId:departmentId.toString()
     } satisfies EmployeeRequest);
-
+  
     expectEmployee(response.body, { expectedSurname: EMPLOYEE_SURNAME, expectedFirstName: EMPLOYEE_FIRST_NAME, expectedDateOfBirth: EMPLOYEE_DOB, 
                                     expectedHireDate: EMPLOYEE_HIRE_DATE, expectedEmail: EMPLOYEE_EMAIL, 
                                     expectedPhoneNumber: EMPLOYEE_PHONE_NUMBER, expectedDepartmentId: departmentId.toString() }); 
@@ -75,6 +74,7 @@ describe("POST /api/v1/employees", () => {
   it("should return 400 when department id is not a valid id", async () => {
     const addEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, departmentId: EMPLOYEE_INVALID_DEPARTMENT_ID}
     const response = await postEmployeeAsync(addEmployeeRequest); 
+ 
     expectError(response, 'Invalid department Id', 400); 
   });
 

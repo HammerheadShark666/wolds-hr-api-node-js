@@ -1,5 +1,3 @@
-import { Types } from "mongoose"; 
-import { DepartmentModel } from "../../models/department.model"; 
 import { phoneNumberSchema } from "../fields/phoneNumber.schema";
 import { dateOfBirthSchema } from "../fields/dateOfBirth.schema";
 import { hireDateSchema } from "../fields/hireDate.schema";

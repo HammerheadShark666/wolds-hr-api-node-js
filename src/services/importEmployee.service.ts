@@ -39,99 +39,46 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
         employee.importEmployeesId = importedEmployees.id;
 
 
-          const validationResult = await validate(importEmployeeSchema, employee);  
-          if (!validationResult.success) {
-           // return { success: false, code: 400, error: validationResult.error }
-
-           console.log('Validation error:', validationResult.error);
-
-           //check department exists if department id is provided
-
-           if(employee.departmentId) {
-
+        const validationResult = await validate(importEmployeeSchema, employee);  
+        if (!validationResult.success) {
+          
+          if(employee.departmentId) {
             const department = await DepartmentModel.findById(employee.departmentId);
             if(!department) {
               validationResult.error.push('Department does not exist in database');
             }
-           }
-
-            const importedEmployeeError = new ImportedEmployeeErrorModel({employee: employeeToCsvLine(employee), importEmployeesId: importedEmployees.id, error: validationResult.error});
-            await importedEmployeeError.save();
-            importEmployeesErrorsCount++;
- 
-          }   
-          else {
-
-            if(employee.departmentId) {
-
-              const department = DepartmentModel.findById(employee.departmentId);
-              if(!department) {
-                const importedEmployeeError = new ImportedEmployeeErrorModel({employee: employeeToCsvLine(employee), importEmployeesId: importedEmployees.id, error: ['Department does not exist in database']});
-                await importedEmployeeError.save();
-                importEmployeesErrorsCount++;
-                continue;
-              }
-            }
-              
-
-             //check department exists if department id is provided
-
-            if(employee.surname == 'Pruitt')
-              throw new Error('Error with imported employee');
-
-            const employeeExists = await employeeExistsAsync(employee.surname, employee.firstName, employee.dateOfBirth ? new Date(employee.dateOfBirth) : null);
-            if(employeeExists) {
-              const importedExistingEmployee = new ImportedExistingEmployeeModel(employee);
-              await importedExistingEmployee.save(); 
-              importEmployeesExistingCount++;       
-            }
-            else { 
-              const employeeToImport = new EmployeeModel(employee);
-              await employeeToImport.save();    
-              importedEmployeesCount++;
-            } 
           }
-          
 
+          const importedEmployeeError = new ImportedEmployeeErrorModel({employee: employeeToCsvLine(employee), importEmployeesId: importedEmployees.id, error: validationResult.error});
+          await importedEmployeeError.save();
+          importEmployeesErrorsCount++;
+        } else {
 
-        // let dateOfBirth: Date | null = null 
+          if(employee.departmentId) {
+            const department = DepartmentModel.findById(employee.departmentId);
+            if(!department) {
+              const importedEmployeeError = new ImportedEmployeeErrorModel({employee: employeeToCsvLine(employee), importEmployeesId: importedEmployees.id, error: ['Department does not exist in database']});
+              await importedEmployeeError.save();
+              importEmployeesErrorsCount++;
+              continue;
+            }
+          } 
 
-        // if(!isValidDate(employee.dateOfBirth))
-        //   throw new Error('Invalid date of birth');
-        // else
-        //   dateOfBirth = new Date(employee.dateOfBirth!);
+          if(employee.surname == 'Pruitt')
+            throw new Error('Error with imported employee');
 
-        // let hireDate: Date | null = null 
-
-        // if(!isValidDate(employee.hireDate))
-        //   throw new Error('Invalid hire date');
-        // else
-        //   hireDate = new Date(employee.hireDate!);
-
-
-        //check input valid
-
-        //  valid dob 
-        // valid hire date
-        // valid department id
-        // valid email
-        // valid phone number
-
-
-        // if(employee.surname == 'Pruitt')
-        //   throw new Error('Error with imported employee');
-
-        // const employeeExists = await employeeExistsAsync(employee.surname, employee.firstName, dateOfBirth);
-        // if(employeeExists) {
-        //   const importedExistingEmployee = new ImportedExistingEmployeeModel(employee);
-        //   await importedExistingEmployee.save(); 
-        //   importEmployeesExistingCount++;       
-        // }
-        // else { 
-        //   const employeeToImport = new EmployeeModel(employee);
-        //   await employeeToImport.save();    
-        //   importedEmployeesCount++;
-        // } 
+          const employeeExists = await employeeExistsAsync(employee.surname, employee.firstName, employee.dateOfBirth ? new Date(employee.dateOfBirth) : null);
+          if(employeeExists) {
+            const importedExistingEmployee = new ImportedExistingEmployeeModel(employee);
+            await importedExistingEmployee.save(); 
+            importEmployeesExistingCount++;       
+          }
+          else { 
+            const employeeToImport = new EmployeeModel(employee);
+            await employeeToImport.save();    
+            importedEmployeesCount++;
+          } 
+        } 
       } 
       catch (err: unknown) {
         let errorMessage = 'Unknown error';
@@ -180,8 +127,8 @@ function employeeToCsvLine(employee: ImportEmployee): string {
   const fields = [
     employee.surname ?? "",
     employee.firstName ?? "",
-    employee.dateOfBirth, //? employee.dateOfBirth, //.toISOString().split("T")[0] : "",
-    employee.hireDate,  // ? employee.hireDate.toISOString().split("T")[0] : "",
+    employee.dateOfBirth,
+    employee.hireDate,
     employee.departmentId ? employee.departmentId.toString() : "",
     employee.email ?? "",
     employee.phoneNumber ?? ""     

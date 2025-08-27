@@ -3,8 +3,10 @@ import { EmployeeResponse } from "../../../interface/employee";
 export type ExpectEmployeeOptions = {
   expectedSurname?: string;
   expectedFirstName?: string;
-  expectedDateOfBirth?: Date;
-  expectedHireDate?: Date;
+  expectedDateOfBirth?: string;
+  expectedHireDate?: string;
+//  expectedDateOfBirth?: Date;
+//   expectedHireDate?: Date;
   expectedEmail?: string;
   expectedPhoneNumber?: string;
   expectedDepartmentId?: string;
