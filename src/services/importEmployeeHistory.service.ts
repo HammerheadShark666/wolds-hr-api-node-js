@@ -47,7 +47,7 @@ export async function importedEmployeesPagedAsync(query: ImportedEmployeesHistor
     if (!employeesResult.success) {
       return {
         success: false,
-        code: 500, // or propagate employeesResult.code if available
+        code: 500,
         error: employeesResult.error ?? ['Failed to fetch imported employees history']
       };
     }
@@ -83,7 +83,7 @@ export async function importedEmployeesExistingPagedAsync(query: ImportedEmploye
     if (!employeesResult.success) {
       return {
         success: false,
-        code: 500, // or propagate employeesResult.code if available
+        code: 500,
         error: employeesResult.error ?? ['Failed to fetch imported employees existing history']
       };
     }
@@ -119,7 +119,7 @@ export async function importedEmployeesErrorPagedAsync(query: ImportedEmployeesH
     if (!employeesResult.success) {
       return {
         success: false,
-        code: 500, // or propagate employeesResult.code if available
+        code: 500,
         error: employeesResult.error ?? ['Failed to fetch imported employees error history']
       };
     } 

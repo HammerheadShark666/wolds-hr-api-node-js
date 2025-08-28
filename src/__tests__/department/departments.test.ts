@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { expectError } from '../../utils/error.helper';
+import { deleteDepartment, getDepartmentById, getDepartmentsAsync, putDepartment, postDepartment } from './helpers/request.helper';
 
 let departmentId = ''; 
 const departmentName = 'Warehouse';
@@ -79,70 +80,7 @@ describe("DELETE /api/v1/departments/:id", () => {
     expectError(res, 'Department not found', 404);
   });
 }); 
-
-//Api functions 
-
-function postDepartment(data?: object) {
-
-  if(global.ACCESS_TOKEN == null)
-    throw new Error("Access token is missing");
-
-  const req = request(global.app!)
-    .post("/v1/departments")
-      .set("Cookie", [global.ACCESS_TOKEN])
-      .set("Content-Type", "application/json");
-  
-  if (data !== undefined) {
-    return req.send(data);
-  }
-  return req.send();
-}
  
-function getDepartmentsAsync() {
-
-  if(global.ACCESS_TOKEN == null)
-    throw new Error("Access token is missing");
-
-  let req = request(global.app!)
-    .get("/v1/departments")
-      .set("Cookie", [global.ACCESS_TOKEN]);
-
-  return req;
-}
-
-function putDepartment(departmentId: string, data: string) {
-
-  if(global.ACCESS_TOKEN == null)
-    throw new Error("Access token is missing");
-
-  return request(global.app!)
-    .put(`/v1/departments/${departmentId}`)
-      .set("Cookie", [global.ACCESS_TOKEN])
-      .set('Content-Type', 'application/json')
-      .send({ name: data });
-}
-
-function deleteDepartment(id: string) {
-
-   if(global.ACCESS_TOKEN == null)
-    throw new Error("Access token is missing");
-
-  return request(global.app!)
-    .delete(`/v1/departments/${id}`)
-      .set("Cookie", [global.ACCESS_TOKEN]);
-}
-
-function getDepartmentById(departmentId: string) {
-
-   if(global.ACCESS_TOKEN == null)
-    throw new Error("Access token is missing");
-
-  return request(global.app!)
-    .get(`/v1/departments/${departmentId}`)
-      .set("Cookie", [global.ACCESS_TOKEN]) 
-      .set('Content-Type', 'application/json');
-}   
-
 //Helpers
 
 type Department = {

@@ -18,10 +18,8 @@ export interface ImportedEmployee
 export interface ImportEmployee { 
   surname: string;
   firstName: string;
-  dateOfBirth: string | null;
-  //dateOfBirth: Date | null;
-  hireDate: string | null;
-  //hireDate?: Date | null;
+  dateOfBirth: string | null; 
+  hireDate: string | null; 
   email?: string;
   phoneNumber?: string;
   photo?: string;

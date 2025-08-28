@@ -9,9 +9,7 @@ import { getDepartmentByNameAsync } from '../department/helpers/request.helper';
 let employeeId = '';
  
 const UPDATE_EMPLOYEE_SURNAME = "Harrison";
-const UPDATE_EMPLOYEE_FIRST_NAME = "James";
-// const UPDATE_EMPLOYEE_DOB = new Date("2000-05-23");
-// const UPDATE_EMPLOYEE_HIRE_DATE = new Date("2021-11-03");
+const UPDATE_EMPLOYEE_FIRST_NAME = "James"; 
 const UPDATE_EMPLOYEE_DOB = "2000-05-23";
 const UPDATE_EMPLOYEE_HIRE_DATE = "2021-11-03";
 const UPDATE_EMPLOYEE_EMAIL = "test@hotmail.com";

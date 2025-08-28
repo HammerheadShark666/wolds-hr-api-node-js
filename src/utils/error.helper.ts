@@ -1,3 +1,6 @@
+import e from "express";
+import { runInThisContext } from "vm";
+
 export function handleServiceError(err: unknown): { success: false; error: string[]; code?: number } {
 
   if (typeof err === 'object' && err !== null && 'name' in err) {
@@ -23,3 +26,11 @@ export function expectError(response: any, expectedMessage: string, statusCode: 
   expect(response.body.error).toBeInstanceOf(Array);
   expect(response.body.error).toContain(expectedMessage);
 }
+
+export function getError(error: any): string {
+  let errorMessage = 'Unknown error';
+  if (error instanceof Error) {
+    errorMessage = error.message;
+  }
+  return errorMessage;
+} 

@@ -21,10 +21,8 @@ describe('Import employees from file', () => {
  
     const response = await postImportEmployeeAsync(filePath); 
  
-    expect(response.status).toBe(200);   
+    expect(response.status).toBe(200);    
 
-    console.log('Import response body:', response.body);
- 
     importEmployeesId = response.body.id; 
     expect(response.body).toHaveProperty('id');
     expect(response.body).toHaveProperty('importedEmployeesCount');   
@@ -46,21 +44,17 @@ describe('Import employees from file', () => {
     expect(response.body.importEmployeesExistingCount).toEqual(2);
     expect(response.body.importEmployeesErrorsCount).toEqual(7); 
   });
+    
+  it('should fail to import as file invalid data', async () => {
+  
+    const filePath = path.join(__dirname, '../files', 'employee-imports-invalid.csv');
 
-
-
-  // it('should return 404 if employee not found', async () => {
-
-  //   const filePath = path.join(__dirname, '../files', 'Employee1.jpg');
-
-  //   if(global.ACCESS_TOKEN == null)
-  //     throw new Error("Access token is missing"); 
-
-  //   const response = await request(global.app!)
-  //     .post(`/v1/employees/photo/upload/${EMPLOYEE_NOT_FOUND_ID}`)
-  //       .set("Cookie", [global.ACCESS_TOKEN])
-  //       .attach('photoFile', filePath);
-
-  //   expectError(response, 'Employee not found', 404);
-  // }); 
+    if(global.ACCESS_TOKEN == null)
+      throw new Error("Access token is missing"); 
+ 
+    const response = await postImportEmployeeAsync(filePath); 
+ 
+    expect(response.status).toBe(500);    
+ 
+  });
 });

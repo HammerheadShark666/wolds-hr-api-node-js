@@ -67,3 +67,14 @@ export const FILES = {
   UPLOAD_PHOTO_FILE_NAME: 'photoFile',
   UPLOAD_IMPORT_FILE_NAME: 'importFile'
 } as const;
+
+export const EXPECTED_HEADERS: string[] = [
+  "Id",
+  "Surname",
+  "FirstName",
+  "DateOfBirth",
+  "HireDate",
+  "Department",
+  "Email",
+  "PhoneNumber"
+] as const;

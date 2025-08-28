@@ -5,8 +5,6 @@ export type ExpectEmployeeOptions = {
   expectedFirstName?: string;
   expectedDateOfBirth?: string;
   expectedHireDate?: string;
-//  expectedDateOfBirth?: Date;
-//   expectedHireDate?: Date;
   expectedEmail?: string;
   expectedPhoneNumber?: string;
   expectedDepartmentId?: string;

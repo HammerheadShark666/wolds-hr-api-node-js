@@ -1,5 +1,5 @@
 import { ServiceResult } from "../types/ServiceResult";
-import { handleServiceError } from "../utils/error.helper"; 
+import { getError, handleServiceError } from "../utils/error.helper"; 
 import { EmployeeModel } from "../models/employee.model";
 import { Types } from "mongoose";
 import { ImportedEmployeeModel } from "../models/importedEmployee.model";  
@@ -10,14 +10,9 @@ import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.mode
 import { ImportedEmployee, ImportedEmployees, ImportEmployee } from "../interface/importEmployee"; 
 import { validate } from "../validation/validate";
 import { importEmployeeSchema } from "../validation/importEmployee/importEmployee.schema";
-import { DepartmentModel } from "../models/department.model";
+import { DepartmentModel } from "../models/department.model"; 
+import { EXPECTED_HEADERS } from "../utils/constants"; 
 
-function isValidDate(dateString: string | null) {
-  if(!dateString) return true;
-  const date = new Date(dateString);
-  return !isNaN(date.getTime());
-}
-   
 export async function importEmployees(fileBuffer: Buffer, mimeType: string): Promise<ServiceResult<ImportedEmployees>> {
  
   let importedEmployeesCount: number = 0;
@@ -25,6 +20,8 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
   let importEmployeesErrorsCount: number= 0;
 
   try {
+
+    validateCSVBuffer(fileBuffer);
 
     const importedEmployees: ImportedEmployee = await addImportedEmployees();
     if(!importedEmployees)
@@ -38,58 +35,23 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
  
         employee.importEmployeesId = importedEmployees.id;
 
-
         const validationResult = await validate(importEmployeeSchema, employee);  
-        if (!validationResult.success) {
-          
-          if(employee.departmentId) {
-            const department = await DepartmentModel.findById(employee.departmentId);
-            if(!department) {
-              validationResult.error.push('Department does not exist in database');
-            }
-          }
-
-          const importedEmployeeError = new ImportedEmployeeErrorModel({employee: employeeToCsvLine(employee), importEmployeesId: importedEmployees.id, error: validationResult.error});
-          await importedEmployeeError.save();
-          importEmployeesErrorsCount++;
-        } else {
-
-          if(employee.departmentId) {
-            const department = DepartmentModel.findById(employee.departmentId);
-            if(!department) {
-              const importedEmployeeError = new ImportedEmployeeErrorModel({employee: employeeToCsvLine(employee), importEmployeesId: importedEmployees.id, error: ['Department does not exist in database']});
-              await importedEmployeeError.save();
-              importEmployeesErrorsCount++;
-              continue;
-            }
-          } 
-
-          if(employee.surname == 'Pruitt')
-            throw new Error('Error with imported employee');
-
+        if (!validationResult.success) { 
+          importEmployeesErrorsCount = await saveImportedEmployeeErrorAsync(employee, importedEmployees.id, importEmployeesErrorsCount, validationResult.error);
+        } else { 
+ 
           const employeeExists = await employeeExistsAsync(employee.surname, employee.firstName, employee.dateOfBirth ? new Date(employee.dateOfBirth) : null);
-          if(employeeExists) {
-            const importedExistingEmployee = new ImportedExistingEmployeeModel(employee);
-            await importedExistingEmployee.save(); 
-            importEmployeesExistingCount++;       
+          if(employeeExists) { 
+            importEmployeesExistingCount = await saveImportedEmployeeExistingAsync(employee, importEmployeesExistingCount); 
           }
-          else { 
-            const employeeToImport = new EmployeeModel(employee);
-            await employeeToImport.save();    
-            importedEmployeesCount++;
+          else {  
+            importedEmployeesCount = await saveImportedEmployeesAsync(employee, importedEmployeesCount);   
           } 
         } 
       } 
       catch (err: unknown) {
-        let errorMessage = 'Unknown error';
-        if (err instanceof Error) {
-          errorMessage = err.message;
-        }
-
-        console.log(err) 
-        const importedEmployeeError = new ImportedEmployeeErrorModel({employee: employeeToCsvLine(employee), importEmployeesId: importedEmployees.id, error: errorMessage});
-        await importedEmployeeError.save();
-        importEmployeesErrorsCount++;
+        console.log(err);  
+        importEmployeesErrorsCount = await saveImportedEmployeeErrorAsync(employee, importedEmployees.id, importEmployeesErrorsCount, [getError(err)]);             
       }
     }; 
  
@@ -136,3 +98,61 @@ function employeeToCsvLine(employee: ImportEmployee): string {
 
   return fields.join(",");
 } 
+
+async function saveImportedEmployeesAsync(employee: ImportEmployee, importedEmployeesCount: number): Promise<number> {
+  const employeeToImport = new EmployeeModel(employee);
+  await employeeToImport.save();    
+  importedEmployeesCount++;
+  return importedEmployeesCount;
+}
+
+async function saveImportedEmployeeExistingAsync(employee: ImportEmployee, importEmployeesExistingCount: number): Promise<number> {
+  const importedExistingEmployee = new ImportedExistingEmployeeModel(employee);
+  await importedExistingEmployee.save(); 
+  importEmployeesExistingCount++;
+  return importEmployeesExistingCount;     
+}
+ 
+async function saveImportedEmployeeErrorAsync(employee: ImportEmployee, importedEmployeeId: Types.ObjectId, importEmployeesErrorsCount: number, error: string | string[]): Promise<number> {
+  const importedEmployeeError = new ImportedEmployeeErrorModel({employee: employeeToCsvLine(employee), importEmployeesId: importedEmployeeId, error: error});
+  await importedEmployeeError.save();
+  importEmployeesErrorsCount++;
+  return importEmployeesErrorsCount;
+}
+
+async function departmentExistsAsync(id: Types.ObjectId): Promise<boolean> {
+  if(id) {
+    const department = await DepartmentModel.findById(id);
+    if(!department) {
+       return false;       
+    }
+  }
+  return true;
+}
+  
+function validateCSVBuffer(fileBuffer: Buffer): void {
+  const content = fileBuffer.toString("utf-8");
+  const lines = content.split(/\r?\n/).filter(Boolean); 
+
+  if (lines.length === 0) {
+    throw new Error("CSV file is empty");
+  }
+
+  // First line = header
+  const headerLine = lines[0];
+  const headers: string[] = headerLine.split(",").filter(Boolean);
+
+  if (headers.length !== EXPECTED_HEADERS.length) {
+    throw new Error(
+      `Invalid number of columns in header. Expected ${EXPECTED_HEADERS.length}, but got ${headers.length}`
+    );
+  }
+
+  for (let i = 0; i < EXPECTED_HEADERS.length; i++) {
+    if (headers[i].trim() !== EXPECTED_HEADERS[i]) {
+      throw new Error(
+        `Invalid header at column ${i + 1}. Expected "${EXPECTED_HEADERS[i]}" but got "${headers[i]}"`
+      );
+    }
+  }
+}

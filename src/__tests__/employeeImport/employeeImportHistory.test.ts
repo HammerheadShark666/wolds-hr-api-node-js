@@ -115,17 +115,18 @@ function validateEmployeesErrorArray(errors: any[], expectedLength: number) {
   expect(errors.length).toBe(expectedLength);
  
   if (errors.length > 0) { 
-
-    const error = errors.find(item => item.employee.includes("Pruitt"));    
+ 
+    const error = errors.find(item => item.employee.includes("Carter"));    
     const fields = error.employee.split(',');
 
     expect(fields).toHaveLength(7);
-    expect(fields[0]).toBe('Pruitt');                           
-    expect(fields[1]).toBe('Matthew');                          
-    expect(fields[2]).toBe('1974-12-08');                      
-    expect(fields[3]).toBe('2011-01-15');                        
-    expect(fields[4]).toBe('68a5e82bee6dd9293bf8aad6'); 
-    expect(fields[5]).toBe('moranjason@gmail.com');           
-    expect(fields[6]).toBe('07814016865');
+    expect(fields[0]).toBe('Carter');                           
+    expect(fields[1]).toBe('JackJackJackJackJackJackJackJackJackJackJackJackJackJackJackJackJack');  
+    expect(fields[2]).toBe('');                      
+    expect(fields[3]).toBe('');                                   
+    expect(fields[4]).toBe(''); 
+    expect(fields[5]).toBe('');           
+    expect(fields[6]).toBe(''); 
+    expect(error.error[0]).toBe('First name must be at most 25 characters long');     
   }
 } 

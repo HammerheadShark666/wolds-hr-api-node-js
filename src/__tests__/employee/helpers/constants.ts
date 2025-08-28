@@ -1,7 +1,5 @@
 export const EMPLOYEE_SURNAME = "Jones";
 export const EMPLOYEE_FIRST_NAME = "Mandy";
-// export const EMPLOYEE_DOB = new Date("2000-05-23");
-// export const EMPLOYEE_HIRE_DATE = new Date("2021-03-11");
 export const EMPLOYEE_DOB = "2000-05-23";
 export const EMPLOYEE_HIRE_DATE = "2021-03-11";
 export const EMPLOYEE_EMAIL = "test@hotmail.com";

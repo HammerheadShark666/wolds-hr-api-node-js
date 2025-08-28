@@ -41,8 +41,8 @@ export function parseEmployeeFromCsv(line: string, importEmployeesId: Types.Obje
   return { 
     surname: surname || "",
     firstName: firstName || "",
-    dateOfBirth: dateOfBirth, // ? new Date(dateOfBirth) : null,
-    hireDate: hireDate, //hireDate ? new Date(hireDate) : undefined,
+    dateOfBirth: dateOfBirth,
+    hireDate: hireDate,
     email: email || "",
     phoneNumber: phoneNumber || "",
     departmentId: Types.ObjectId.isValid(departmentId) 

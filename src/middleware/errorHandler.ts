@@ -12,7 +12,7 @@ export function errorHandler(
 
   // Handle Zod validation errors
   if (err instanceof ZodError) {
-    const formatted = err.issues.map((e) => e.message); // <-- use .issues
+    const formatted = err.issues.map((e) => e.message); 
     return res.status(400).json({ errors: formatted });
   }
 
