@@ -3,8 +3,8 @@ import { EmployeeRequest } from '../../interface/employee';
 import { expectEmployee } from './helpers/expected.helper';
 import { deleteEmployeeAsync, putEmployeeAsync } from './helpers/request.helper';
 import { createEmployee } from './helpers/db.helper';
-import { DEPARTMENT_NAME_QA, EMPLOYEE_FIRST_NAME, EMPLOYEE_SURNAME } from './helpers/constants'; 
 import { getDepartmentByNameAsync } from '../department/helpers/request.helper';
+import { EMPLOYEE_TEST, EMPLOYEE_TEST_DATA } from './helpers/constants';
 
 let employeeId = '';
  
@@ -37,7 +37,7 @@ describe("PUT /api/v1/employees", () => {
 
   it("should return 200 when updated successfully", async () => {
      
-    const updateDepartmentId = await getDepartmentByNameAsync(DEPARTMENT_NAME_QA);
+    const updateDepartmentId = await getDepartmentByNameAsync(EMPLOYEE_TEST.DEPARTMENT_NAME_QA);
 
     const response = await putEmployeeAsync(employeeId,{
             surname: UPDATE_EMPLOYEE_SURNAME, 
@@ -81,31 +81,31 @@ describe("PUT /api/v1/employees", () => {
   });
 
   it("should return 400 when email invalid", async () => {
-    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, email: EMPLOYEE_INVALID_EMAIL }
+    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_TEST_DATA.VALID.surname, firstName: EMPLOYEE_TEST_DATA.VALID.firstName, email: EMPLOYEE_TEST_DATA.INVALID.INVALID_EMAIL}
     const response = await putEmployeeAsync(employeeId, updateEmployeeRequest); 
     expectError(response, 'Invalid email format', 400);
   });
 
   it("should return 400 when email too long", async () => {
-    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, email: EMPLOYEE_INVALID_EMAIL_OVERSIZED }
+    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_TEST_DATA.VALID.surname, firstName: EMPLOYEE_TEST_DATA.VALID.firstName, email: EMPLOYEE_TEST_DATA.INVALID.OVERSIZED_EMAIL }
     const response = await putEmployeeAsync(employeeId, updateEmployeeRequest); 
     expectError(response, 'Invalid email format', 400);
   });
 
   it("should return 400 when phone number too long", async () => {
-    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, phoneNumber: EMPLOYEE_INVALID_PHONE_NUMBER}
+    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_TEST_DATA.VALID.surname, firstName: EMPLOYEE_TEST_DATA.VALID.firstName, phoneNumber: EMPLOYEE_INVALID_PHONE_NUMBER}
     const response = await putEmployeeAsync(employeeId, updateEmployeeRequest); 
     expectError(response, 'Phone number must be less than or equal to 25 characters', 400); 
   });
 
   it("should return 400 when department id is not a valid id", async () => {
-    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, departmentId: EMPLOYEE_INVALID_DEPARTMENT_ID}
+    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_TEST_DATA.VALID.surname, firstName: EMPLOYEE_TEST_DATA.VALID.firstName, departmentId: EMPLOYEE_INVALID_DEPARTMENT_ID}
     const response = await putEmployeeAsync(employeeId, updateEmployeeRequest); 
     expectError(response, 'Invalid department Id', 400); 
   });
 
   it("should return 400 when department id not found", async () => {
-    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_SURNAME, firstName: EMPLOYEE_FIRST_NAME, departmentId: EMPLOYEE_NOT_FOUND_DEPARTMENT_ID}
+    const updateEmployeeRequest: EmployeeRequest = { surname: EMPLOYEE_TEST_DATA.VALID.surname, firstName: EMPLOYEE_TEST_DATA.VALID.firstName, departmentId: EMPLOYEE_NOT_FOUND_DEPARTMENT_ID}
     const response = await putEmployeeAsync(employeeId, updateEmployeeRequest); 
     expectError(response, 'Department not found', 404); 
   });  

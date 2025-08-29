@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "jest --coverage --verbose --runInBand --silent=false --detectOpenHandles",
-    "debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand"
+    "debug": "node --inspect-brk ./node_modules/.bin/jest --runInBand",
+    "serve": "npm run build && npm run start"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.28.0",

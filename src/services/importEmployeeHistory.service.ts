@@ -10,14 +10,14 @@ import { objectIdSchema } from "../validation/fields/objectId.schema";
 import { validate } from "../validation/validate";
 import { ImportedExistingEmployeeModel } from "../models/importedExistingEmployee..model";
 import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model";
-import { ImportedEmployeeModel } from "../models/importedEmployee.model";
+import { ImportedEmployeeHistoryModel } from "../models/importedEmployeeHistory.model";
 import { ImportedEmployeesHistoryRequest, ImportedEmployeeHistory, ImportedEmployeesErrorHistoryPagedResponse, ImportedEmployeeError, ImportedEmployeesHistoryPagedResponse } from "../interface/importEmployeeHistory";
  
 export async function importedEmployeesHistoryAsync(): Promise<ServiceResult<ImportedEmployeeHistory[]>> { 
    
   try {  
 
-    const response = await ImportedEmployeeModel.find().sort({ date: -1 }); 
+    const response = await ImportedEmployeeHistoryModel.find().sort({ date: -1 }); 
     return { success: true, data: toEmployeesImportHistoryResponse(response) };  
   } 
   catch (err: unknown) { 
@@ -139,7 +139,7 @@ export async function deleteImportedEmployeeHistoryAsync(id: string): Promise<Se
   session.startTransaction();
 
   try { 
-    await ImportedEmployeeModel.deleteOne({ _id: new Types.ObjectId(id) }); 
+    await ImportedEmployeeHistoryModel.deleteOne({ _id: new Types.ObjectId(id) }); 
     await EmployeeModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
     await ImportedExistingEmployeeModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
     await ImportedEmployeeErrorModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 

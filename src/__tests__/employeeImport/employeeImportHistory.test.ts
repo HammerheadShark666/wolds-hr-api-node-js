@@ -78,7 +78,7 @@ describe('POST employee import history', () => {
    
     const response = await getImportedEmployeesErrorHistoryAsync({ importEmployeesId, page: 1, pageSize: PAGE_SIZE}); 
  
-    let expectedEmployeesTotal = 7;
+    let expectedEmployeesTotal = 8;
     let expectedEmployeesInPage = 5;
     let expectedTotalPages = 2;  
  

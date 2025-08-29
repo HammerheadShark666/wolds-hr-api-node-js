@@ -9,7 +9,7 @@ export interface ImportedEmployees {
   importEmployeesErrorsCount: number;
 }
 
-export interface ImportedEmployee
+export interface ImportedEmployeeHistory
 {
   id: Types.ObjectId;
   date: Date;
