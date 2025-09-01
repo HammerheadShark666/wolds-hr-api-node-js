@@ -1,6 +1,6 @@
 import { Schema, model, Document, Types } from 'mongoose';
 
-export interface IImportedExistingEmployee extends Document {
+export interface IImportedEmployeeExisting extends Document {
   _id: Types.ObjectId; 
   surname: string;
   firstName: string;
@@ -11,7 +11,7 @@ export interface IImportedExistingEmployee extends Document {
   createdAt: Date;
 }
 
-const ImportedExistingEmployeeSchema = new Schema<IImportedExistingEmployee>({  
+const ImportedEmployeeExistingSchema = new Schema<IImportedEmployeeExisting>({  
   surname: { type: String, required: true, maxlength: 25 },  
   firstName: { type: String, required: true, maxlength: 25 }, 
   dateOfBirth: { type: Date, default: null }, 
@@ -21,4 +21,4 @@ const ImportedExistingEmployeeSchema = new Schema<IImportedExistingEmployee>({
   createdAt: { type: Date, default: Date.now }
 });
 
-export const ImportedExistingEmployeeModel = model<IImportedExistingEmployee>('ImportedExistingEmployee', ImportedExistingEmployeeSchema);
+export const ImportedEmployeeExistingModel = model<IImportedEmployeeExisting>('ImportedEmployeeExisting', ImportedEmployeeExistingSchema);

@@ -1,13 +1,9 @@
-import { DepartmentResponse } from "../../interface/department";
+import request from "supertest";
+import { DepartmentRequest, DepartmentResponse } from "../../interface/department";
 import { expectError } from "../../utils/error.helper";
-import {
-  deleteDepartment,
-  getDepartmentById,
-  getDepartmentsAsync,
-  putDepartment,
-  postDepartment,
-} from "./helpers/request.helper";
+import { withAuth } from "../utils/request.helper";
 
+// --- Test Data ---
 const TEST_DEPARTMENT = {
   name: "Warehouse",
   updatedName: "R&D",
@@ -15,90 +11,15 @@ const TEST_DEPARTMENT = {
 };
 
 const testContext: { departmentId?: string } = {};
-
-beforeAll(async () => {
-  const response = await postDepartment({ name: TEST_DEPARTMENT.name });
-  expectDepartment(response.body, { expectedName: TEST_DEPARTMENT.name });
-  testContext.departmentId = response.body.id;
-});
-
-afterAll(async () => {
-  if (testContext.departmentId) {
-    await deleteDepartment(testContext.departmentId);
-  }
-});
-
-describe("GET /api/v1/departments", () => {
-  it("should return 200 and list departments", async () => {
-    const res = await getDepartmentsAsync();
-    expect(res.status).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-
-    if (res.body.length > 0) {
-      expectDepartment(res.body[0]);
-    }
-  });
-});
-
-describe("POST /api/v1/departments", () => {
-  it("should return 400 when name is missing", async () => {
-    const res = await postDepartment({ name: "" });
-    expectError(res, "Department name must be at least 2 characters", 400);
-  });
-
-  it("should return 400 when department already exists", async () => {
-    const res = await postDepartment({ name: TEST_DEPARTMENT.name });
-    expectError(res, "Department name exists already", 400);
-  });
-});
-
-describe("GET /api/v1/departments/:id", () => {
-  it("should return 200 and department", async () => {
-    const res = await getDepartmentById(testContext.departmentId!);
-    expect(res.status).toBe(200);
-    expectDepartment(res.body, { expectedName: TEST_DEPARTMENT.name });
-  });
-
-  it("should return 404 for invalid ID", async () => {
-    const res = await getDepartmentById(TEST_DEPARTMENT.invalidId);
-    expectError(res, "Department not found", 404);
-  });
-});
-
-describe("PUT /api/v1/departments", () => {
-  it("should return 200 and success message", async () => {
-    const res = await putDepartment(testContext.departmentId!, TEST_DEPARTMENT.updatedName);
-    expect(res.status).toBe(200);
-    expect(res.body).toMatchObject({
-      departmentId: testContext.departmentId,
-      message: "Department updated successfully",
-    });
-  });
-
-  it("should return 400 for invalid department", async () => {
-    const res = await putDepartment(TEST_DEPARTMENT.invalidId, TEST_DEPARTMENT.name);
-    expectError(res, "Department not found", 400);
-  });
-});
-
-describe("DELETE /api/v1/departments/:id", () => {
-  it("should return 200 and message when deleted", async () => {
-    const res = await deleteDepartment(testContext.departmentId!);
-    expect(res.status).toBe(200);
-    expect(res.body.message).toMatch("Department deleted");
-    testContext.departmentId = undefined; // prevent afterAll double-delete
-  });
-
-  it("should return 404 when department not found", async () => {
-    const res = await deleteDepartment(TEST_DEPARTMENT.invalidId);
-    expectError(res, "Department not found", 404);
-  });
-});
+const BASE_URL = "/v1/departments";
 
 // --- Helpers ---
 type ExpectDepartmentOptions = { expectedName?: string };
 
-function expectDepartment(department: DepartmentResponse, options: ExpectDepartmentOptions = {}) {
+function expectDepartment(
+  department: DepartmentResponse,
+  options: ExpectDepartmentOptions = {}
+) {
   expect(department).toBeDefined();
   expect(department).toEqual(
     expect.objectContaining({
@@ -107,7 +28,102 @@ function expectDepartment(department: DepartmentResponse, options: ExpectDepartm
     })
   );
 
-  if (options.expectedName !== undefined) {
+  if (options.expectedName) {
     expect(department.name).toBe(options.expectedName);
   }
 }
+
+async function departmentRequest(method: "get"|"post"|"put"|"delete", path: string, data?: DepartmentRequest | string) {  
+  let req =  request(global.app!)[method](`${BASE_URL}${path}`);
+  if ((method === "post" || method === "put") && data) req = req.set("Content-Type", "application/json").send(data);
+  return await withAuth(req);
+}
+
+// --- Setup & Teardown ---
+beforeAll(async () => {
+  const response = await departmentRequest("post", '', { name: TEST_DEPARTMENT.name });
+  expect(response.status).toBe(201);
+  expectDepartment(response.body, { expectedName: TEST_DEPARTMENT.name });
+  testContext.departmentId = response.body.id;
+});
+
+afterAll(async () => {
+  if (testContext.departmentId) { 
+    await departmentRequest("delete", `/${testContext.departmentId}`);
+  }
+});
+
+// --- Tests ---
+describe("Departments API", () => {
+
+  describe("GET /api/v1/departments", () => {
+    it("should list departments", async () => { 
+      const response =   await departmentRequest("get", ``, ``);
+     
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBe(true);
+
+      if (response.body.length > 0) {
+        expectDepartment(response.body[0]);
+      }
+    });
+  });
+
+  describe("POST /api/v1/departments", () => {
+    it("should return 400 when name is missing", async () => {
+      const response = await departmentRequest("post", '', { name: '' });
+      expectError(response, "Department name must be at least 2 characters", 400);
+    });
+
+    it("should return 400 when department already exists", async () => {
+      const response = await departmentRequest("post", '', { name: TEST_DEPARTMENT.name });
+      expectError(response, "Department name exists already", 400);
+    });
+  });
+
+  describe("GET /api/v1/departments/:id", () => {
+    it("should return department by ID", async () => {
+      const response = await departmentRequest("get", `/${testContext.departmentId!}`);
+      expect(response.status).toBe(200);
+      expectDepartment(response.body, { expectedName: TEST_DEPARTMENT.name });
+    });
+
+    it("should return 404 for invalid ID", async () => {
+      const response = await departmentRequest("get", `/${TEST_DEPARTMENT.invalidId}`);
+      expectError(response, "Department not found", 404);
+    });
+  });
+
+  describe("PUT /api/v1/departments", () => {
+
+    it("should update department", async () => {
+      const response = await departmentRequest("put", `/${testContext.departmentId!}`, { name: TEST_DEPARTMENT.updatedName }); 
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({
+        departmentId: testContext.departmentId,
+        message: "Department updated successfully",
+      });
+    });
+
+    it("should return 400 for invalid department", async () => {
+      const response = await departmentRequest("put", `/${TEST_DEPARTMENT.invalidId}`, { name: TEST_DEPARTMENT.name });
+      expectError(response, "Department not found", 400);
+    });
+  });
+
+  describe("DELETE /api/v1/departments/:id", () => {
+    it("should delete department", async () => {
+      const response = await departmentRequest("delete", `/${testContext.departmentId!}`);
+      expect(response.status).toBe(200);
+      expect(response.body.message).toMatch("Department deleted");
+
+      // Prevent afterAll double-delete
+      testContext.departmentId = undefined;
+    });
+
+    it("should return 404 when department not found", async () => { 
+      const response = await departmentRequest("delete", `/${TEST_DEPARTMENT.invalidId}`);
+      expectError(response, "Department not found", 404);
+    });
+  });
+});

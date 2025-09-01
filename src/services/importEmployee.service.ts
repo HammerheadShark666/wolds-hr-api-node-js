@@ -3,17 +3,17 @@ import { getError, handleServiceError } from "../utils/error.helper";
 import { EmployeeModel } from "../models/employee.model";
 import { Types } from "mongoose";
 import { ImportedEmployeeHistoryModel } from "../models/importedEmployeeHistory.model";  
-import { ImportedExistingEmployeeModel } from "../models/importedExistingEmployee..model";
+import { ImportedEmployeeExistingModel } from "../models/importedEmployeeExisting.model";
 import { getEndOfDayDate, getStartOfDayDate } from "../utils/date.helper";
 import { parseImportEmployeeCsvBuffer } from "../utils/employeeParser.helper";
 import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model";  
-import { ImportedEmployeeHistory, ImportedEmployees, ImportEmployee } from "../interface/importEmployee"; 
+import { ImportedEmployeeHistory, ImportedEmployeeResponse, ImportEmployee } from "../interface/importEmployee"; 
 import { validate } from "../validation/validate";
 import { importEmployeeSchema } from "../validation/importEmployee/importEmployee.schema";
 import { DepartmentModel } from "../models/department.model"; 
 import { EXPECTED_HEADERS } from "../utils/constants"; 
 
-export async function importEmployees(fileBuffer: Buffer, mimeType: string): Promise<ServiceResult<ImportedEmployees>> {
+export async function importEmployees(fileBuffer: Buffer, mimeType: string): Promise<ServiceResult<ImportedEmployeeResponse>> {
  
   let importedEmployeesCount: number = 0;
   let importEmployeesExistingCount: number= 0;
@@ -25,9 +25,7 @@ export async function importEmployees(fileBuffer: Buffer, mimeType: string): Pro
 
     const importedEmployeeHistory: ImportedEmployeeHistory = await createImportedEmployeeHistory();
     if(!importedEmployeeHistory)
-      throw new Error("Employee import not created");
-
-   // const employees = await parseImportEmployeeCsvBuffer(fileBuffer, importedEmployees.id);
+      throw new Error("Employee import not created"); 
 
     const { validEmployees, invalidEmployees } = parseImportEmployeeCsvBuffer(fileBuffer, importedEmployeeHistory.id);
   
@@ -113,19 +111,12 @@ async function saveImportedEmployeesAsync(employee: ImportEmployee, importedEmpl
 }
 
 async function saveImportedEmployeeExistingAsync(employee: ImportEmployee, importEmployeesExistingCount: number): Promise<number> {
-  const importedExistingEmployee = new ImportedExistingEmployeeModel(employee);
-  await importedExistingEmployee.save(); 
+  const importedEmployeeExisting = new ImportedEmployeeExistingModel(employee);
+  await importedEmployeeExisting.save(); 
   importEmployeesExistingCount++;
   return importEmployeesExistingCount;     
 }
- 
-// async function saveImportedEmployeeErrorAsync(employee: ImportEmployee, importedEmployeeId: Types.ObjectId, importEmployeesErrorsCount: number, error: string | string[]): Promise<number> {
-//   const importedEmployeeError = new ImportedEmployeeErrorModel({employee: employeeToCsvLine(employee), importEmployeesId: importedEmployeeId, error: error});
-//   await importedEmployeeError.save();
-//   importEmployeesErrorsCount++;
-//   return importEmployeesErrorsCount;
-// }
-
+  
 async function saveImportedEmployeeErrorAsync(employee: string, importedEmployeeId: Types.ObjectId, importEmployeesErrorsCount: number, error: string | string[]): Promise<number> {
   const importedEmployeeError = new ImportedEmployeeErrorModel({employee: employee, importEmployeesId: importedEmployeeId, error: error});
   await importedEmployeeError.save();

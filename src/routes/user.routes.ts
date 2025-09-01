@@ -8,7 +8,7 @@ export function createUsersRouter() {
   const router = Router();
 
   router.post(
-    '/add',
+    '',
     asyncHandler(async (req: Request, res: Response) => {
       const addUserRequest: AddUserRequest = {username: req.body.username, 
                                               password: req.body.password, 
@@ -28,7 +28,7 @@ export function createUsersRouter() {
   );
  
   router.get(
-    '/id/:id',
+    '/:id',
     asyncHandler(async (req: Request, res: Response) => {
 
       const response = await getUserByIdAsync(req.params.id.toString());
@@ -76,6 +76,8 @@ export function createUsersRouter() {
   router.delete(
     '/:id',
     asyncHandler(async (req: Request, res: Response) => {
+
+      console.log("Received request to delete user with ID:", req.params.id);
       
       const response = await deleteUserAsync(req.params.id);
       if (!response.success) { 

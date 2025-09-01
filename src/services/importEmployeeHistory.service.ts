@@ -8,7 +8,7 @@ import { ObjectId } from "mongodb";
 import { handleServiceError } from "../utils/error.helper";
 import { objectIdSchema } from "../validation/fields/objectId.schema";
 import { validate } from "../validation/validate";
-import { ImportedExistingEmployeeModel } from "../models/importedExistingEmployee..model";
+import { ImportedEmployeeExistingModel } from "../models/importedEmployeeExisting.model";
 import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model";
 import { ImportedEmployeeHistoryModel } from "../models/importedEmployeeHistory.model";
 import { ImportedEmployeesHistoryRequest, ImportedEmployeeHistory, ImportedEmployeesErrorHistoryPagedResponse, ImportedEmployeeError, ImportedEmployeesHistoryPagedResponse } from "../interface/importEmployeeHistory";
@@ -141,7 +141,7 @@ export async function deleteImportedEmployeeHistoryAsync(id: string): Promise<Se
   try { 
     await ImportedEmployeeHistoryModel.deleteOne({ _id: new Types.ObjectId(id) }); 
     await EmployeeModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
-    await ImportedExistingEmployeeModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
+    await ImportedEmployeeExistingModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
     await ImportedEmployeeErrorModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
 
     await session.commitTransaction();
@@ -171,7 +171,7 @@ async function getImportedEmployeesAsync(query: ImportedEmployeesHistoryRequest)
 async function getImportedEmployeesExistingAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<IEmployee[]>> {
   try { 
     const pipeline = buildEmployeeSearchPipeline(query);
-    const response = await ImportedExistingEmployeeModel.aggregate(pipeline);
+    const response = await ImportedEmployeeExistingModel.aggregate(pipeline);
     return { success: true, data: response };
   } catch (err) { 
     return {
@@ -205,7 +205,7 @@ async function countImportedEmployeesAsync(importEmployeesId: Types.ObjectId): P
 
 async function countImportedEmployeesExistingAsync(importEmployeesId: Types.ObjectId): Promise<number> {
   try {    
-    return ImportedExistingEmployeeModel.countDocuments({importEmployeesId: importEmployeesId});
+    return ImportedEmployeeExistingModel.countDocuments({importEmployeesId: importEmployeesId});
   } catch (err) { 
     throw new Error("Error counting number of imported existing employees");
   }

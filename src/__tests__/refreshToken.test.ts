@@ -1,42 +1,53 @@
-import request from 'supertest';
+import request from "supertest";
 
 const LONG_INVALID_TOKEN = "x".repeat(500);
 const FAKE_INVALID_TOKEN = "invalid_token_123";
 
+let validRefreshToken = "";
+
 describe("POST /api/v1/refresh-token", () => {
+  beforeAll(async () => {
+    // Login once to grab a real refresh token
+    const loginRes = await request(global.app!)
+      .post("/v1/login")
+      .set("Content-Type", "application/json")
+      .send({ username: "john@hotmail.com", password: "Password#1" });
 
-  it("should return 200 and token when refresh token is valid", async () => {
-    const refreshToken = global.REFRESH_TOKEN;
-    if (!refreshToken) throw new Error("Missing global.REFRESH_TOKEN");
+    const setCookieHeader = loginRes.headers["set-cookie"];
+    const refreshCookie = Array.isArray(setCookieHeader)
+      ? setCookieHeader.find(c => c.startsWith("refresh_token="))
+      : setCookieHeader;
 
-    const response = await postRefreshToken(refreshToken);
-    expect(response.status).toBe(200);
-    expect(response.body).toBeDefined();
-    expect(response.body).toHaveProperty("message", "Token refreshed");
+    if (!refreshCookie) throw new Error("No refresh token cookie returned");
+    validRefreshToken = refreshCookie;
   });
 
-  it("should return 401 when no refresh token is provided", async () => {
-    const response = await postRefreshToken("");
-    expect(response.status).toBe(401);
+  it("should return 200 and a new token when refresh token is valid", async () => {
+    const res = await postRefreshToken(validRefreshToken); 
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("message", "Token refreshed"); 
   });
 
-  it("should return 401 when refresh token is too long", async () => {
-    const response = await postRefreshToken(LONG_INVALID_TOKEN);
-    expect(response.status).toBe(401);
-  });
+  const invalidCases = [
+    { name: "no refresh token", cookie: "" },
+    { name: "refresh token is too long", cookie: `refresh_token=${LONG_INVALID_TOKEN}` },
+    { name: "refresh token is invalid", cookie: `refresh_token=${FAKE_INVALID_TOKEN}` },
+  ];
 
-  it("should return 401 when refresh token is invalid", async () => {
-    const response = await postRefreshToken(FAKE_INVALID_TOKEN);
-    expect(response.status).toBe(401);
+  invalidCases.forEach(({ name, cookie }) => {
+    it(`should return 401 when ${name}`, async () => {
+      const res = await postRefreshToken(cookie);
+      expect(res.status).toBe(401);
+      expect(res.body).toHaveProperty("error"); // or "message", depending on your API
+    });
   });
 });
- 
-//Api functions
 
-function postRefreshToken(cookieValue: string) {
+// --- API helper ---
+function postRefreshToken(cookie: string) {
   return request(global.app!)
     .post("/v1/refresh-token")
     .set("Content-Type", "application/json")
-    .set("Cookie", [cookieValue])
+    .set("Cookie", [cookie])
     .send();
 }

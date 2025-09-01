@@ -58,7 +58,7 @@ async function addNewUser() {
     throw new Error("Access token is missing");
  
   const addedUserResponse = await request(global.app!)
-    .post("/v1/users/add")
+    .post("/v1/users")
       .set("Content-Type", "application/json")
       .set("Cookie", [global.ACCESS_TOKEN])
       .send({ username: global.username, password: global.password, confirmPassword: global.password, surname: 'Doe', firstName: 'John', role: 'clerk' }); 
