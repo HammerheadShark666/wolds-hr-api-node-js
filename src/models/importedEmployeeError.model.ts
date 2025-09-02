@@ -4,12 +4,12 @@ export interface IImportedEmployeeError extends Document {
   _id: Types.ObjectId; 
   importEmployeesId: Types.ObjectId;
   employee: string;
-  error: string;
+  error: string[];
 }
 
 const ImportedEmployeeErrorSchema = new Schema< IImportedEmployeeError>({  
   employee: { type: String, required: true, maxlength: 500 },
-  error: { type: String, required: true, maxlength: 500 },
+  error: { type: [String], required: true, maxlength: 500 },
   importEmployeesId: { type: Schema.Types.ObjectId, ref: 'ImportEmployee', required: false, default: null },
 });
 

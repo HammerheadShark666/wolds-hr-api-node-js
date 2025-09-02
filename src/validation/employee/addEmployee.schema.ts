@@ -10,9 +10,9 @@ import { departmentIdSchema } from '../fields/departmentId.schema';
 export const addEmployeeSchema = z.object({
   surname: surnameSchema,
   firstName: firstNameSchema,
-  dateOfBirth: dateOfBirthSchema,
-  hireDate: hireDateSchema,
-  email: emailSchema,
-  phoneNumber: phoneNumberSchema,
-  departmentId: departmentIdSchema
+  dateOfBirth: dateOfBirthSchema.optional(),
+  hireDate: hireDateSchema.optional(),
+  email: emailSchema.optional(),
+  phoneNumber: phoneNumberSchema.optional(),
+  departmentId: departmentIdSchema.optional(),
 });

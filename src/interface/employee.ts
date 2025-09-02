@@ -36,9 +36,9 @@ export interface EmployeeDefaultData {
 
 export interface EmployeeRequest {  
   surname: string;
-  firstName: string;
-  dateOfBirth?: Date;
-  hireDate?: Date;
+  firstName: string; 
+  dateOfBirth?: string;
+  hireDate?: string;
   email?: string;
   phoneNumber?: string; 
   departmentId?: string;

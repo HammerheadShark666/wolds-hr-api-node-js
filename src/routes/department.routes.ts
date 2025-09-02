@@ -45,8 +45,8 @@ export function createDepartmentRouter() {
   );
 
   router.post(
-    '/',
-    asyncHandler(async (req: Request, res: Response) => {
+    '',
+    asyncHandler(async (req: Request, res: Response) => {  
       const response = await addDepartmentAsync(req.body);
       if (!response.success) {
         res.status(response.code ?? 400).json({ error: response.error });

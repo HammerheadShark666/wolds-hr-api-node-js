@@ -8,17 +8,16 @@ import { ObjectId } from "mongodb";
 import { handleServiceError } from "../utils/error.helper";
 import { objectIdSchema } from "../validation/fields/objectId.schema";
 import { validate } from "../validation/validate";
-import { ImportedExistingEmployeeModel } from "../models/importedExistingEmployee..model";
+import { ImportedEmployeeExistingModel } from "../models/importedEmployeeExisting.model";
 import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model";
-import { ImportedEmployeeModel } from "../models/importedEmployee.model";
+import { ImportedEmployeeHistoryModel } from "../models/importedEmployeeHistory.model";
 import { ImportedEmployeesHistoryRequest, ImportedEmployeeHistory, ImportedEmployeesErrorHistoryPagedResponse, ImportedEmployeeError, ImportedEmployeesHistoryPagedResponse } from "../interface/importEmployeeHistory";
  
 export async function importedEmployeesHistoryAsync(): Promise<ServiceResult<ImportedEmployeeHistory[]>> { 
    
   try {  
 
-    const response = await ImportedEmployeeModel.find().sort({ date: -1 });
-    console.log(response)
+    const response = await ImportedEmployeeHistoryModel.find().sort({ date: -1 }); 
     return { success: true, data: toEmployeesImportHistoryResponse(response) };  
   } 
   catch (err: unknown) { 
@@ -48,7 +47,7 @@ export async function importedEmployeesPagedAsync(query: ImportedEmployeesHistor
     if (!employeesResult.success) {
       return {
         success: false,
-        code: 500, // or propagate employeesResult.code if available
+        code: 500,
         error: employeesResult.error ?? ['Failed to fetch imported employees history']
       };
     }
@@ -84,7 +83,7 @@ export async function importedEmployeesExistingPagedAsync(query: ImportedEmploye
     if (!employeesResult.success) {
       return {
         success: false,
-        code: 500, // or propagate employeesResult.code if available
+        code: 500,
         error: employeesResult.error ?? ['Failed to fetch imported employees existing history']
       };
     }
@@ -120,7 +119,7 @@ export async function importedEmployeesErrorPagedAsync(query: ImportedEmployeesH
     if (!employeesResult.success) {
       return {
         success: false,
-        code: 500, // or propagate employeesResult.code if available
+        code: 500,
         error: employeesResult.error ?? ['Failed to fetch imported employees error history']
       };
     } 
@@ -140,9 +139,9 @@ export async function deleteImportedEmployeeHistoryAsync(id: string): Promise<Se
   session.startTransaction();
 
   try { 
-    await ImportedEmployeeModel.deleteOne({ _id: new Types.ObjectId(id) }); 
+    await ImportedEmployeeHistoryModel.deleteOne({ _id: new Types.ObjectId(id) }); 
     await EmployeeModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
-    await ImportedExistingEmployeeModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
+    await ImportedEmployeeExistingModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
     await ImportedEmployeeErrorModel.deleteMany({ importEmployeesId: new Types.ObjectId(id) }); 
 
     await session.commitTransaction();
@@ -172,7 +171,7 @@ async function getImportedEmployeesAsync(query: ImportedEmployeesHistoryRequest)
 async function getImportedEmployeesExistingAsync(query: ImportedEmployeesHistoryRequest): Promise<ServiceResult<IEmployee[]>> {
   try { 
     const pipeline = buildEmployeeSearchPipeline(query);
-    const response = await ImportedExistingEmployeeModel.aggregate(pipeline);
+    const response = await ImportedEmployeeExistingModel.aggregate(pipeline);
     return { success: true, data: response };
   } catch (err) { 
     return {
@@ -206,7 +205,7 @@ async function countImportedEmployeesAsync(importEmployeesId: Types.ObjectId): P
 
 async function countImportedEmployeesExistingAsync(importEmployeesId: Types.ObjectId): Promise<number> {
   try {    
-    return ImportedExistingEmployeeModel.countDocuments({importEmployeesId: importEmployeesId});
+    return ImportedEmployeeExistingModel.countDocuments({importEmployeesId: importEmployeesId});
   } catch (err) { 
     throw new Error("Error counting number of imported existing employees");
   }

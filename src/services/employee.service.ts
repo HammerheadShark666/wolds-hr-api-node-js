@@ -102,7 +102,7 @@ export async function addEmployeeAsync(data: EmployeeRequest): Promise<ServiceRe
 } 
 
 export async function updateEmployeeAsync(id: string, data: EmployeeRequest): Promise<ServiceResult<EmployeeResponse>> {
-
+ 
   const validationResult = await validate(updateEmployeeSchema, data);  
   if (!validationResult.success) {
     return { success: false, code: 400, error: validationResult.error }

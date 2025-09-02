@@ -1,10 +1,15 @@
-import { z } from "zod";
-import mongoose from "mongoose";  
+import { z } from "zod"; 
+import { Types } from "mongoose";
 
-export const objectIdSchema = z
-  .union([z.string(), z.null(), z.undefined()])
-  .refine((val) => {
-    if (val == null) return true; 
-    if (typeof val !== "string") return false; 
-    return /^[a-fA-F0-9]{24}$/.test(val);
-  }, { message: "Invalid department Id" });
+export const objectIdSchema = z.preprocess(
+  (val) => {
+    if (val == null) return null;           
+    if (typeof val === "string" && val.trim() === "") return null;
+    return val;
+  },
+  z.union([
+    z.string().regex(/^[a-fA-F0-9]{24}$/, { message: "Invalid Id" }),
+    z.instanceof(Types.ObjectId),
+    z.null(),                     
+  ])
+);

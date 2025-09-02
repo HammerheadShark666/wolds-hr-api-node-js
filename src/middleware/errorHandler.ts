@@ -10,20 +10,20 @@ export function errorHandler(
 ) {
   console.error('Error:', err);
 
-  // Handle Zod validation errors
+  // Zod validation errors
   if (err instanceof ZodError) {
-    const formatted = err.issues.map((e) => e.message); // <-- use .issues
+    const formatted = err.issues.map((e) => e.message); 
     return res.status(400).json({ errors: formatted });
   }
 
-  // Handle Mongoose validation errors
+  // Mongoose validation errors
   if (err instanceof mongoose.Error.ValidationError) {
     const errors = Object.values(err.errors).map((e: any) => e.message);
     return res.status(400).json({ errors });
   }
 
-  // Handle custom errors (optional)
-   if (
+  // Custom errors (optional)
+  if (
     typeof err === 'object' &&
     err !== null &&
     'status' in err &&
