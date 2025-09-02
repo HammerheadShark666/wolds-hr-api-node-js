@@ -1,7 +1,7 @@
 import request from "supertest";
-import { DepartmentRequest, DepartmentResponse } from "../../interface/department";
-import { expectError } from "../../utils/error.helper";
-import { withAuth } from "../utils/request.helper";
+import { expectError } from "../utils/error.helper";
+import { DepartmentRequest, DepartmentResponse } from "../interface/department";
+import { withAuth } from "./utils/request.helper";
 
 // --- Test Data ---
 const TEST_DEPARTMENT = {
