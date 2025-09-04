@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import asyncHandler from 'express-async-handler'; 
 import { ImportedEmployeesHistoryRequest } from '../interface/importEmployeeHistory';
-import { deleteImportedEmployeeHistoryAsync, importedEmployeesErrorPagedAsync, importedEmployeesExistingPagedAsync, importedEmployeesHistoryAsync, importedEmployeesPagedAsync } from '../services/importEmployeeHistory.service';
+import { deleteImportedEmployeeHistoryAsync, getLastEmployeeImports, importedEmployeesErrorPagedAsync, importedEmployeesExistingPagedAsync, importedEmployeesHistoryAsync, importedEmployeesPagedAsync } from '../services/importEmployeeHistory.service';
 
 export function createImportEmployeesHistoryRouter() {
   
@@ -11,6 +11,21 @@ export function createImportEmployeesHistoryRouter() {
     '', 
     asyncHandler(async (req: Request, res: Response) => {  
       const response = await importedEmployeesHistoryAsync();   
+      
+      if (!response.success) { 
+        res.status(400).json({ error: response.error });
+        return;
+      } 
+      res.status(200).json(response.data); 
+     })
+  );  
+
+  router.get(
+    '/latest', 
+    asyncHandler(async (req: Request, res: Response) => {  
+      const response = await getLastEmployeeImports();   
+
+      console.log(response)
       
       if (!response.success) { 
         res.status(400).json({ error: response.error });

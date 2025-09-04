@@ -2,6 +2,7 @@ import request from "supertest";
 import path from "path";
 import { PAGE_SIZE } from "../../utils/constants";
 import { withAuth } from "../utils/request.helper"; 
+import { number } from "zod";
 
 let importEmployeesId = "";
 const baseUrl = '/v1/import/employees';  
@@ -78,9 +79,9 @@ beforeAll(async () => {
 
 afterAll(async () => { 
   if (importEmployeesId) { 
-      const response = await importEmployeeRequest("delete", `/history/${importEmployeesId}`, ``);
-      expect(response.status).toBe(200);
-    }
+    const response = await importEmployeeRequest("delete", `/history/${importEmployeesId}`, ``);
+    expect(response.status).toBe(200);
+  }
 });
 
 // --- Tests ---
@@ -143,5 +144,30 @@ describe("POST employee import history", () => {
       totalEmployees: 8,
     });
     validateEmployeesErrorArray(response.body.employees, 5);
+  });
+
+  it("should get last 5 employee import summaries", async () => {
+     
+    const response = await importEmployeeHistoryRequest("get", `/history/latest`, ``);
+   
+    expect(response.status).toBe(200);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBeGreaterThan(0);
+
+    const lastImport = response.body[0]; 
+
+    expect(lastImport).toEqual(
+      expect.objectContaining({
+        id: expect.any(String),
+        date: expect.any(String),
+        importedEmployeesCount: expect.any(Number),
+        importedEmployeesExistingCount: expect.any(Number),
+        importedEmployeesErrorsCount: expect.any(Number),
+      })
+    );
+
+    expect(lastImport.importedEmployeesCount).toBe(10); 
+    expect(lastImport.importedEmployeesExistingCount).toBe(2); 
+    expect(lastImport.importedEmployeesErrorsCount).toBe(0); 
   });
 });

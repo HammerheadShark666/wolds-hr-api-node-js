@@ -1,4 +1,4 @@
-import mongoose, { Types } from "mongoose";
+import mongoose, { PipelineStage, Types } from "mongoose";
 import { ServiceResult } from "../types/ServiceResult";
 import { PAGE_SIZE } from "../utils/constants";
 import { toEmployeeResponse, toEmployeesImportHistoryResponse } from "../utils/mapper";
@@ -11,7 +11,7 @@ import { validate } from "../validation/validate";
 import { ImportedEmployeeExistingModel } from "../models/importedEmployeeExisting.model";
 import { ImportedEmployeeErrorModel } from "../models/importedEmployeeError.model";
 import { ImportedEmployeeHistoryModel } from "../models/importedEmployeeHistory.model";
-import { ImportedEmployeesHistoryRequest, ImportedEmployeeHistory, ImportedEmployeesErrorHistoryPagedResponse, ImportedEmployeeError, ImportedEmployeesHistoryPagedResponse } from "../interface/importEmployeeHistory";
+import { ImportedEmployeesHistoryRequest, ImportedEmployeeHistory, ImportedEmployeesErrorHistoryPagedResponse, ImportedEmployeeError, ImportedEmployeesHistoryPagedResponse, LastEmployeeImportResponse } from "../interface/importEmployeeHistory";
  
 export async function importedEmployeesHistoryAsync(): Promise<ServiceResult<ImportedEmployeeHistory[]>> { 
    
@@ -133,6 +133,21 @@ export async function importedEmployeesErrorPagedAsync(query: ImportedEmployeesH
     }}; 
 } 
  
+
+export async function getLastEmployeeImports(): Promise<ServiceResult<LastEmployeeImportResponse[]>>{
+  
+  try {
+    const result: LastEmployeeImportResponse[] = await ImportedEmployeeHistoryModel.aggregate(buildLastEmployeeImportsPipeline(5)).exec(); 
+    return { success: true, data: result };
+  } catch (error: any) {
+    return {
+      success: false,  
+      code: 500,
+      error: error.message || "Failed to fetch last employee imports",
+    };
+  }
+}
+
 export async function deleteImportedEmployeeHistoryAsync(id: string): Promise<ServiceResult<null>> {
   
   const session = await mongoose.startSession();
@@ -277,4 +292,49 @@ function parsePagination(query: ImportedEmployeesHistoryRequest, defaults = { pa
   const page = typeof query.page === 'number' ? query.page : parseInt(query.page ?? '', PAGE_SIZE) || defaults.page;
   const pageSize = typeof query.pageSize === 'number' ? query.pageSize : parseInt(query.pageSize ?? '', 10) || defaults.pageSize;    
   return { page, pageSize };
+}
+ 
+function buildLastEmployeeImportsPipeline(limit = 5) {
+
+  const lastEmployeeImportsPipeline: PipelineStage[] = [
+    { $sort: { date: -1 as const } },
+    { $limit: 5 },
+    {
+      $lookup: {
+        from: "importedemployeeerrors",
+        localField: "_id",
+        foreignField: "importEmployeesId",
+        as: "errors"
+      }
+    },
+    {
+      $lookup: {
+        from: "importedemployeeexistings",
+        localField: "_id",
+        foreignField: "importEmployeesId",
+        as: "existing"
+      }
+    },
+    {
+      $lookup: {
+        from: "employees",
+        localField: "_id",
+        foreignField: "importEmployeesId",
+        as: "importedEmployees"
+      }
+    },
+    {
+      $project: {
+        id: "$_id",
+        date: 1,
+        errors: 1, 
+        importedEmployeesCount: { $size: { $ifNull: ["$importedEmployees", []] } },
+        importedEmployeesExistingCount: { $size: { $ifNull: ["$existing", []] } },
+        importedEmployeesErrorsCount: { $size: { $ifNull: ["$errors", []] } },
+        _id: 0
+      }
+    }
+  ];
+
+  return lastEmployeeImportsPipeline;
 }
