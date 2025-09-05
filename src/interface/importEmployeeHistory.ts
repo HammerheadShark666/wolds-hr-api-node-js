@@ -47,3 +47,11 @@ export interface DeleteImportedEmployeesHistoryResponse {
   count?: number;
   error?: string;
 }
+
+export interface LastEmployeeImportResponse {
+  id: Types.ObjectId;
+  date: Date;
+  importedEmployeesCount: number;
+  importedEmployeesExistingCount: number;
+  importedEmployeesErrorsCount: number;
+}

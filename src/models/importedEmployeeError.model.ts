@@ -13,4 +13,4 @@ const ImportedEmployeeErrorSchema = new Schema< IImportedEmployeeError>({
   importEmployeesId: { type: Schema.Types.ObjectId, ref: 'ImportEmployee', required: false, default: null },
 });
 
-export const  ImportedEmployeeErrorModel = model< IImportedEmployeeError>(' ImportedEmployeeError',  ImportedEmployeeErrorSchema);
+export const  ImportedEmployeeErrorModel = model<IImportedEmployeeError>('ImportedEmployeeError',  ImportedEmployeeErrorSchema);
