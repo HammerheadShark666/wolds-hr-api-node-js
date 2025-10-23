@@ -25,6 +25,7 @@ jobs:
       LOCAL_FRONT_APP_END_URL: ${{ secrets.LOCAL_FRONT_APP_END_URL }}
       AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
       AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+      NODE_ENV: production
     steps:
       - uses: actions/checkout@v4
 
@@ -72,4 +73,5 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5132440345FB44559650CC1DA2458E6F }}
+
 
