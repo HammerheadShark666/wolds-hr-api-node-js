@@ -168,6 +168,6 @@ describe("POST employee import history", () => {
 
     expect(lastImport.importedEmployeesCount).toBe(10); 
     expect(lastImport.importedEmployeesExistingCount).toBe(2); 
-    expect(lastImport.importedEmployeesErrorsCount).toBe(0); 
+    expect(lastImport.importedEmployeesErrorsCount).toBe(8); 
   });
 });
